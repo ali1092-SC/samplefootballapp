@@ -1,0 +1,378 @@
+.match-summary {
+  background: var(--fifa-off-white);
+}
+
+.ms-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.ms-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--fifa-light-gray);
+  background: var(--fifa-white);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.ms-tab:hover {
+  border-color: var(--fifa-navy);
+}
+
+.ms-tab--active {
+  background: var(--fifa-navy);
+  border-color: var(--fifa-navy);
+  box-shadow: var(--shadow-md);
+}
+
+.ms-tab-flags {
+  font-size: 0.95rem;
+  color: var(--fifa-dark-gray);
+}
+
+.ms-tab--active .ms-tab-flags {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ms-tab-score {
+  font-family: var(--font-headline);
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--fifa-navy);
+  letter-spacing: 2px;
+}
+
+.ms-tab--active .ms-tab-score {
+  color: var(--fifa-gold);
+}
+
+.ms-card {
+  background: var(--fifa-white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--fifa-light-gray);
+}
+
+.ms-header {
+  background: var(--gradient-navy);
+  padding: 40px 32px 32px;
+  text-align: center;
+  position: relative;
+}
+
+.ms-header-meta {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.ms-stage {
+  display: inline-block;
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--fifa-gold);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 4px 14px;
+  border-radius: 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.ms-date,
+.ms-venue {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ms-scoreline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.ms-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.ms-team--home { align-items: flex-end; }
+.ms-team--away { align-items: flex-start; }
+
+.ms-flag {
+  font-size: 2.5rem;
+}
+
+.ms-team-name {
+  font-family: var(--font-headline);
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--fifa-white);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.ms-score {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius-md);
+}
+
+.ms-score-home,
+.ms-score-away {
+  font-family: var(--font-headline);
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--fifa-white);
+  line-height: 1;
+}
+
+.ms-score-sep {
+  font-family: var(--font-headline);
+  font-size: 2rem;
+  color: var(--fifa-gold);
+  font-weight: 700;
+}
+
+.ms-mom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: rgba(212, 175, 55, 0.08);
+  border-radius: var(--radius-md);
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.ms-mom-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.ms-mom-name {
+  font-family: var(--font-headline);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--fifa-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ms-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-bottom: 1px solid var(--fifa-light-gray);
+}
+
+.ms-events {
+  padding: 32px;
+  border-right: 1px solid var(--fifa-light-gray);
+}
+
+.ms-stats {
+  padding: 32px;
+}
+
+.ms-section-title {
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--fifa-navy);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  margin-top: 24px;
+}
+
+.ms-section-title:first-child {
+  margin-top: 0;
+}
+
+.ms-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ms-event {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ms-event--away {
+  flex-direction: row-reverse;
+}
+
+.ms-event__minute {
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--fifa-gray);
+  width: 36px;
+  text-align: right;
+}
+
+.ms-event--away .ms-event__minute {
+  text-align: left;
+}
+
+.ms-event__dot {
+  font-size: 1rem;
+}
+
+.ms-event__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ms-event__player {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--fifa-navy);
+}
+
+.ms-event__team {
+  font-size: 0.72rem;
+  color: var(--fifa-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ms-stats-teams {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--fifa-navy);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ms-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ms-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ms-stat-val {
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 800;
+  min-width: 40px;
+  color: var(--fifa-navy);
+}
+
+.ms-stat-val--home { text-align: right; }
+.ms-stat-val--away { text-align: left; }
+
+.ms-stat-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ms-stat-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--fifa-light-gray);
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+}
+
+.ms-stat-bar__home {
+  background: var(--fifa-navy);
+  transition: width 0.6s ease;
+}
+
+.ms-stat-bar__away {
+  background: var(--fifa-red);
+  transition: width 0.6s ease;
+}
+
+.ms-stat-label {
+  font-size: 0.65rem;
+  color: var(--fifa-gray);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+
+.ms-narrative {
+  padding: 32px;
+  background: var(--fifa-off-white);
+}
+
+.ms-narrative-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--fifa-gray);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.ms-narrative p {
+  font-size: 0.95rem;
+  color: var(--fifa-dark-gray);
+  line-height: 1.8;
+  max-width: 900px;
+}
+
+@media (max-width: 768px) {
+  .ms-body {
+    grid-template-columns: 1fr;
+  }
+
+  .ms-events {
+    border-right: none;
+    border-bottom: 1px solid var(--fifa-light-gray);
+  }
+
+  .ms-scoreline {
+    gap: 12px;
+  }
+
+  .ms-team-name {
+    font-size: 1rem;
+  }
+}

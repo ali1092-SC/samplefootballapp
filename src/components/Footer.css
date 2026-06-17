@@ -1,0 +1,249 @@
+.footer {
+  background: var(--fifa-navy-dark);
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.footer__top {
+  padding: 60px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.footer__top-inner {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.footer__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.footer__logo-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--gradient-gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: var(--shadow-gold);
+}
+
+.footer__logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__logo-fifa {
+  font-family: var(--font-headline);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--fifa-gold);
+  letter-spacing: 4px;
+  line-height: 1;
+}
+
+.footer__logo-wc {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.footer__brand-desc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  max-width: 320px;
+}
+
+.footer__social {
+  display: flex;
+  gap: 10px;
+}
+
+.footer__social-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 700;
+}
+
+.footer__social-btn:hover {
+  border-color: var(--fifa-gold);
+  color: var(--fifa-gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.footer__links-col h4 {
+  font-family: var(--font-headline);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--fifa-gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.footer__links-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer__links-col ul li button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0;
+  text-align: left;
+  font-family: var(--font-body);
+}
+
+.footer__links-col ul li button:hover {
+  color: var(--fifa-white);
+  padding-left: 6px;
+}
+
+.footer__hosts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer__host {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.4rem;
+}
+
+.footer__host div {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__host strong {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--fifa-white);
+}
+
+.footer__host span {
+  font-size: 0.72rem;
+  color: var(--fifa-gray);
+}
+
+.footer__middle {
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.footer__stats {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer__stat-num {
+  font-family: var(--font-headline);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--fifa-gold);
+  line-height: 1;
+}
+
+.footer__stat-label {
+  font-size: 0.68rem;
+  color: var(--fifa-gray);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+
+.footer__bottom {
+  padding: 24px 0;
+}
+
+.footer__bottom-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.footer__copyright {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+}
+
+.footer__disclaimer {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.25);
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.footer__legal {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.footer__legal button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-body);
+  letter-spacing: 0.5px;
+}
+
+.footer__legal button:hover {
+  color: var(--fifa-gold);
+}
+
+@media (max-width: 1024px) {
+  .footer__top-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer__top-inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
