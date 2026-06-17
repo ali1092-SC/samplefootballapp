@@ -1,0 +1,284 @@
+.players-section {
+  background: white;
+  position: relative;
+}
+
+.players-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--fifa-red), var(--fifa-gold), var(--fifa-navy));
+}
+
+.players-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.players-filter-btn {
+  padding: 8px 20px;
+  border-radius: 24px;
+  border: 1.5px solid var(--fifa-gray-light);
+  background: white;
+  color: var(--fifa-navy);
+  font-family: var(--font-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.players-filter-btn:hover {
+  border-color: var(--fifa-gold);
+  color: var(--fifa-gold-dark);
+}
+
+.players-filter-active {
+  background: linear-gradient(135deg, var(--fifa-navy), var(--fifa-navy-mid)) !important;
+  color: var(--fifa-gold) !important;
+  border-color: var(--fifa-navy) !important;
+}
+
+/* Players Grid */
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.no-players {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--fifa-gray);
+}
+
+.no-players i {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* Player Card */
+.player-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--fifa-gray-light);
+  transition: var(--transition);
+  position: relative;
+  animation: fadeInUp 0.5s ease both;
+}
+
+.player-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.player-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(135deg, var(--fifa-navy-dark) 0%, var(--fifa-navy) 60%, var(--fifa-navy-mid) 100%);
+}
+
+.player-card-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='20' cy='20' r='10'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.player-jersey {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 2px;
+  z-index: 1;
+}
+
+.player-photo-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+}
+
+.player-photo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  border: 4px solid var(--fifa-gold);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  background: var(--fifa-gray-light);
+}
+
+.player-photo-fallback {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 4px solid var(--fifa-gold);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  background: linear-gradient(135deg, var(--fifa-navy-mid), var(--fifa-gray-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 2.5rem;
+}
+
+.player-flag-badge {
+  position: absolute;
+  bottom: -4px;
+  right: calc(50% - 70px);
+  background: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border: 2px solid var(--fifa-gray-light);
+}
+
+/* Player Info */
+.player-info {
+  position: relative;
+  z-index: 1;
+  padding: 20px 20px 24px;
+  text-align: center;
+}
+
+.player-position-tag {
+  display: inline-block;
+  font-family: var(--font-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fifa-red);
+  border: 1.5px solid var(--fifa-red);
+  border-radius: 4px;
+  padding: 2px 10px;
+  margin-bottom: 8px;
+}
+
+.player-name {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--fifa-navy);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.player-country {
+  font-family: var(--font-accent);
+  font-size: 0.85rem;
+  color: var(--fifa-gray-dark);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.player-club {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-accent);
+  font-size: 0.8rem;
+  color: var(--fifa-gray);
+  margin-bottom: 4px;
+}
+
+.player-club i {
+  color: var(--fifa-gold-dark);
+  font-size: 0.7rem;
+}
+
+.player-match-context {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-accent);
+  font-size: 0.75rem;
+  color: var(--fifa-navy);
+  font-weight: 700;
+  margin-bottom: 16px;
+  background: var(--fifa-gray-light);
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+
+.player-match-context i {
+  color: var(--fifa-navy);
+  font-size: 0.7rem;
+}
+
+/* Stats */
+.player-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 14px 10px;
+  background: linear-gradient(135deg, #f8faff, #f0f4fc);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  border: 1px solid var(--fifa-gray-light);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-val {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--fifa-navy);
+  line-height: 1;
+}
+
+.stat-key {
+  font-family: var(--font-accent);
+  font-size: 0.65rem;
+  color: var(--fifa-gray);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.player-description {
+  font-size: 0.8rem;
+  color: var(--fifa-gray-dark);
+  line-height: 1.6;
+  text-align: left;
+  font-style: italic;
+  border-left: 3px solid var(--fifa-gold);
+  padding-left: 10px;
+}
+
+@media (max-width: 768px) {
+  .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}

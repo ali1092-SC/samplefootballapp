@@ -1,0 +1,382 @@
+.top-players-section {
+  background: linear-gradient(180deg, var(--section-bg) 0%, white 100%);
+  position: relative;
+}
+
+.top-players-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--fifa-gold-dark), var(--fifa-gold-light), var(--fifa-gold-dark));
+}
+
+.leaderboard-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  border: 1px solid var(--fifa-gray-light);
+  margin-bottom: 60px;
+}
+
+.leaderboard-nav {
+  display: flex;
+  background: linear-gradient(135deg, var(--fifa-navy-dark), var(--fifa-navy));
+  border-bottom: 3px solid var(--fifa-gold);
+}
+
+.leaderboard-nav-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 12px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-family: var(--font-accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+
+.leaderboard-nav-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--fifa-gold);
+  transform: scaleX(0);
+  transition: var(--transition);
+}
+
+.leaderboard-nav-btn:hover {
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.05);
+}
+
+.leaderboard-nav-active {
+  color: var(--fifa-gold) !important;
+  background: rgba(201, 168, 76, 0.08) !important;
+}
+
+.leaderboard-nav-active::after {
+  transform: scaleX(1);
+}
+
+.leaderboard-nav-icon {
+  font-size: 1.2rem;
+}
+
+/* Table */
+.leaderboard-table {
+  padding: 8px 0;
+}
+
+.leaderboard-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-bottom: 2px solid var(--fifa-gray-light);
+  background: var(--section-bg);
+}
+
+.lb-col {
+  font-family: var(--font-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fifa-gray);
+}
+
+.lb-rank { width: 60px; text-align: center; }
+.lb-player { flex: 2; display: flex; align-items: center; gap: 12px; }
+.lb-country { flex: 1.5; display: flex; align-items: center; gap: 8px; }
+.lb-stat { width: 80px; text-align: center; }
+.lb-bar { flex: 2; padding-left: 12px; }
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--fifa-gray-light);
+  transition: var(--transition);
+  animation: fadeInUp 0.5s ease both;
+}
+
+.leaderboard-row:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-row:hover {
+  background: linear-gradient(90deg, rgba(0,31,91,0.03), transparent);
+}
+
+.top-three {
+  background: linear-gradient(90deg, rgba(201,168,76,0.04), transparent);
+}
+
+.rank-badge {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.rank-gold .rank-badge {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: white;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(255,165,0,0.4);
+}
+
+.rank-silver .rank-badge {
+  background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+  color: white;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(160,160,160,0.4);
+}
+
+.rank-bronze .rank-badge {
+  background: linear-gradient(135deg, #CD7F32, #A0522D);
+  color: white;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(160,82,45,0.3);
+}
+
+.rank-default .rank-badge {
+  background: var(--section-bg);
+  color: var(--fifa-gray);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  border: 1.5px solid var(--fifa-gray-light);
+}
+
+.lb-player-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--fifa-gold);
+  flex-shrink: 0;
+}
+
+.lb-player-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.lb-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--fifa-navy), var(--fifa-navy-mid));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.1rem;
+}
+
+.lb-player-name {
+  font-family: var(--font-accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--fifa-navy);
+}
+
+.lb-flag {
+  font-size: 1.3rem;
+}
+
+.lb-country-name {
+  font-family: var(--font-accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fifa-gray-dark);
+}
+
+.lb-stat-value {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--fifa-navy);
+  letter-spacing: 1px;
+}
+
+.progress-bar-track {
+  height: 8px;
+  background: var(--fifa-gray-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--fifa-navy), var(--fifa-gold));
+  border-radius: 4px;
+  animation: growBar 0.8s ease both;
+}
+
+@keyframes growBar {
+  from { width: 0 !important; }
+}
+
+/* Podium */
+.podium-section {
+  text-align: center;
+}
+
+.podium-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--fifa-navy);
+  letter-spacing: 2px;
+  margin-bottom: 32px;
+  text-transform: uppercase;
+}
+
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.podium-place {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.podium-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.podium-photo-wrapper {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.podium-photo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  border: 3px solid var(--fifa-gold);
+}
+
+.podium-photo-fallback {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid var(--fifa-gold);
+  background: var(--fifa-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.8rem;
+}
+
+.podium-flag {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: 1.1rem;
+  background: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border: 1.5px solid var(--fifa-gray-light);
+}
+
+.podium-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--fifa-navy);
+  letter-spacing: 1px;
+}
+
+.podium-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--fifa-gold-dark);
+  letter-spacing: 2px;
+}
+
+.podium-block {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.podium-place-1 .podium-block {
+  background: linear-gradient(180deg, #FFD700, #FFA500);
+  box-shadow: 0 -4px 20px rgba(255,165,0,0.3);
+}
+
+.podium-place-2 .podium-block {
+  background: linear-gradient(180deg, #C0C0C0, #A8A8A8);
+}
+
+.podium-place-3 .podium-block {
+  background: linear-gradient(180deg, #CD7F32, #A0522D);
+}
+
+.podium-pos {
+  font-size: 2rem;
+}
+
+@media (max-width: 768px) {
+  .leaderboard-row {
+    padding: 12px 14px;
+    gap: 4px;
+  }
+
+  .lb-country-name,
+  .lb-bar {
+    display: none;
+  }
+
+  .lb-player { flex: 3; }
+  .lb-country { flex: 0; }
+
+  .leaderboard-nav-btn span:not(.leaderboard-nav-icon) {
+    display: none;
+  }
+
+  .podium-photo,
+  .podium-photo-fallback {
+    width: 55px;
+    height: 55px;
+  }
+}
