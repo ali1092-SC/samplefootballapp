@@ -1,871 +1,512 @@
 ---
 forge-wiki: true
-generated-at: 2026-06-18T15:36:08.165Z
+generated-at: 2026-06-18T16:09:09.195Z
 generator-version: "1.0"
 repo: ali1092-SC/samplefootballapp
 branch: main
-section-count: 22
+section-count: 11
 ---
 
 ```forge-wiki-data
-{"repoName":"ali1092-SC/samplefootballapp","repoNote":"FIFA World Cup 2026 fan showcase with interactive animations, countdown timers, match carousels, stats rings, confetti effects, and comprehensive test coverage.","lastUpdatedAt":"2026-06-18T14:09:29.721Z","sections":[{"id":"overview","title":"Overview","parentId":null,"sourceFiles":[{"path":"README.md","lineStart":1,"lineEnd":15},{"path":"docs/FORGE_SESSION.md","lineStart":1,"lineEnd":20}],"content":[{"type":"paragraph","text":"The FIFA World Cup 2026 fan showcase is a single-page browser application featuring a complete, self-contained HTML file with no external dependencies beyond Google Fonts. It delivers an official-style fan experience with inline CSS, vanilla JavaScript, and hand-coded SVG assets."},{"type":"paragraph","text":"The application includes: inline SVG FIFA 2026 logo at three responsive sizes, HTML5 Canvas football animation with pentagon patches, live countdown timer with flip-digit animations, seamlessly looping ticker with live results, IntersectionObserver-driven count-up stats with SVG ring progress indicators, scroll-reveal animations, typewriter heading effects, cursor-reactive 3D tilt on match cards, carousel with swipe support, group standings tabs, news grid, confetti burst effects, toast notifications, and full ARIA accessibility with prefers-reduced-motion guards throughout."},{"type":"paragraph","text":"The application supports responsive breakpoints down to 375px, scroll-shrink header, hero particle animations, and comprehensive test coverage with 60+ test cases across state management, DOM synchronization, accessibility features, and stress-integrity validation using Vitest and jsdom."}]},{"id":"system-architecture","title":"System Architecture","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":1,"lineEnd":100},{"path":"app.test.js","lineStart":1,"lineEnd":150},{"path":"package.json","lineStart":1,"lineEnd":23}],"content":[{"type":"heading","level":2,"text":"Architecture Overview"},{"type":"paragraph","text":"The application is built on vanilla JavaScript with a modular initialization pattern. Each UI feature is initialized independently via separate functions, managing its own state, DOM queries, event listeners, and animation lifecycle. The codebase exports match and news data as ES modules, enabling both application rendering and test mocking."},{"type":"heading","level":3,"text":"Core Components"},{"type":"unorderedList","items":["Header Scroll Management: Detects scroll position >60px to apply 'shrunk' class for visual state transitions","Hero Particles: Generates 40 animated colored particles with randomized duration, delay, and positioning for visual interest","Countdown Timer: Displays days/hours/minutes/seconds until 2026-06-11 opening kick-off with flip-digit CSS animations","Scroll Reveal: IntersectionObserver reveals sections at 12% threshold, manages reveal class state","Typewriter Headings: Character-by-character reveal animation with cursor blink and delayed removal","Animate Count-Up: Progressive number animation with eased cubic-out timing for stat counters","Stats Rings: SVG circle progress indicators with animated stroke-dashoffset and concurrent count-up","Confetti Burst: 60-piece confetti explosion from origin element with randomized physics and auto-cleanup","3D Tilt: Cursor-reactive transform skew on match cards using clientX/Y delta from card center","Match Carousel: Horizontal slide carousel with prev/next buttons and dot navigation","Group Standings: Tab-based standings display with group filtering and team rank tables","News Grid: Grid layout with category badges, emoji icons, and date labels","Toast Notifications: Dismissible alerts with auto-cleanup after 3.5 seconds","Ticker: Continuously looping result ticker with clone-append animation loop"]},{"type":"diagram","title":"Application Initialization Flow","nodes":[{"id":"dom-ready","label":"Document Ready","type":"neutral"},{"id":"init-header","label":"initHeader()\nScroll listener","type":"neutral"},{"id":"init-particles","label":"initHeroParticles()\n40 elements","type":"frontend"},{"id":"init-countdown","label":"initCountdown()\nFlip animation loop","type":"neutral"},{"id":"init-reveal","label":"initScrollReveal()\nIntersectionObserver","type":"neutral"},{"id":"init-typewriter","label":"initTypewriter()\nChar-by-char reveal","type":"neutral"},{"id":"init-stats","label":"initStats()\nRings + count-up","type":"neutral"},{"id":"init-carousel","label":"initCarousel()\nNavigation setup","type":"neutral"},{"id":"init-standings","label":"initStandings()\nTab filtering","type":"neutral"},{"id":"init-news","label":"initNews()\nGrid render","type":"neutral"},{"id":"init-tilt","label":"initCardTilt()\nMousemove listeners","type":"neutral"},{"id":"init-ticker","label":"initTicker()\nLoop animation","type":"neutral"},{"id":"app-ready","label":"Application Ready","type":"output"}],"edges":[{"from":"dom-ready","to":"init-header","label":"parallel"},{"from":"dom-ready","to":"init-particles","label":"parallel"},{"from":"dom-ready","to":"init-countdown","label":"parallel"},{"from":"dom-ready","to":"init-reveal","label":"parallel"},{"from":"dom-ready","to":"init-typewriter","label":"parallel"},{"from":"dom-ready","to":"init-stats","label":"parallel"},{"from":"dom-ready","to":"init-carousel","label":"parallel"},{"from":"dom-ready","to":"init-standings","label":"parallel"},{"from":"dom-ready","to":"init-news","label":"parallel"},{"from":"dom-ready","to":"init-tilt","label":"parallel"},{"from":"dom-ready","to":"init-ticker","label":"parallel"},{"from":"init-header","to":"app-ready","label":"all complete"},{"from":"init-particles","to":"app-ready","label":"all complete"},{"from":"init-countdown","to":"app-ready","label":"all complete"},{"from":"init-reveal","to":"app-ready","label":"all complete"},{"from":"init-typewriter","to":"app-ready","label":"all complete"},{"from":"init-stats","to":"app-ready","label":"all complete"},{"from":"init-carousel","to":"app-ready","label":"all complete"},{"from":"init-standings","to":"app-ready","label":"all complete"},{"from":"init-news","to":"app-ready","label":"all complete"},{"from":"init-tilt","to":"app-ready","label":"all complete"},{"from":"init-ticker","to":"app-ready","label":"all complete"}]},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":1,"lineEnd":50}]}]},{"id":"package-structure","title":"Package & File Structure","parentId":null,"sourceFiles":[{"path":"package.json","lineStart":1,"lineEnd":23},{"path":"WIKI.md","lineStart":1,"lineEnd":35}],"content":[{"type":"table","headers":["File/Directory","Type","Purpose"],"rows":[["app.js","Application Core","1200+ lines of vanilla JS: header scroll, hero particles, countdown, typewriter, stats rings, carousels, standings, news grid, tilt effects, confetti, ticker, toasts"],["app.test.js","Test Suite","60+ comprehensive test cases covering DOM setup, initialization, event handling, animations, accessibility (ARIA), scroll behavior, carousel navigation"],["data/matches.js","Data Module","12 FIFA 2026 match objects with home/away teams, flags, scores, venue, date, status (final/live/upcoming)"],["data/news.js","Data Module","9 news articles with title, excerpt, category, date, tag, emoji for grid rendering"],["vitest.config.js","Test Config","Vitest configuration: jsdom environment, coverage thresholds (70% lines/functions/statements, 60% branches), reporters (verbose, text, json, html, lcov)"],["package.json","Manifest","Project metadata, version 2.0.0, ES modules, scripts (dev, build, preview, test, test:watch, test:coverage, test:ui), devDependencies (vite, vitest, jsdom, coverage)"],["docs/API.md","Documentation","Developer API reference: functions, DOM structure, event API, animation states, CSS properties, configuration, error handling"],["docs/FORGE_SESSION.md","Documentation","Forge session solution: overview, task description, brand identity, logo layers, colors, typography, animations, page sections"],["docs/FORGE_WIKI.md","Documentation","Knowledge base entry: summary, architecture, generated files, implementation notes"],["docs/wiki.md","Documentation","Forge wiki metadata with generated-at timestamp, repo name, branch, section count"],["README.md","Documentation","Project overview: deliverable description, recent changes, build prompt content"],["WIKI.md","Documentation","Repository structure inventory with directory layout and key files"]]},{"type":"sourcesRow","files":[{"path":"package.json","lineStart":1,"lineEnd":23},{"path":"WIKI.md","lineStart":1,"lineEnd":35}]}]},{"id":"header-scroll-management","title":"Header Scroll Management","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":23,"lineEnd":31}],"content":[{"type":"heading","level":2,"text":"Implementation"},{"type":"paragraph","text":"Monitors window scroll position and applies visual state transitions to the site header. When scrollY exceeds 60px, adds 'shrunk' class for responsive header styling (typically smaller padding, border emphasis)."},{"type":"code","language":"javascript","content":"function initHeader() {\n  const header = $('#siteHeader');\n  if (!header) return;\n  window.addEventListener('scroll', () => {\n    header.classList.toggle('shrunk', window.scrollY > 60);\n  }, { passive: true });\n}"},{"type":"paragraph","text":"Uses passive: true for scroll listener performance optimization, avoiding potential blocking during scroll."},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":23,"lineEnd":31}]}]},{"id":"hero-particles","title":"Hero Particles Animation","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":33,"lineEnd":58}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Generates 40 animated colored particles that float in the hero section with varying durations, delays, and opacities. Each particle is a div with CSS animation properties set via style attributes."},{"type":"heading","level":3,"text":"Implementation Details"},{"type":"unorderedList","items":["Creates 40 particle elements with class 'hero-particle'","Randomizes size (3–10px), color (6-color palette), opacity (0.3–0.85)","Sets position left (0–100%) and top (10–90%) for viewport coverage","Assigns animation duration (4–10s) and delay (0–8s) via CSS custom properties","Uses CSS animation (external stylesheet) to animate float/fade lifecycle"]},{"type":"code","language":"javascript","content":"function initHeroParticles() {\n  const container = $('#heroParticles');\n  if (!container) return;\n  const colours = ['#f7c948', '#00e5ff', '#1a73e8', '#ff8a65', '#81c784', '#ce93d8'];\n  const TOTAL = 40;\n\n  for (let i = 0; i < TOTAL; i++) {\n    const p = document.createElement('div');\n    p.className = 'hero-particle';\n    const size = randBetween(3, 10);\n    const col  = colours[Math.floor(Math.random() * colours.length)];\n    p.style.cssText = `\n      left: ${randBetween(0, 100)}%;\n      top:  ${randBetween(10, 90)}%;\n      width: ${size}px;\n      height: ${size}px;\n      background: ${col};\n      opacity: ${randBetween(0.3, 0.85)};\n      --dur:   ${randBetween(4, 10)}s;\n      --delay: ${randBetween(0, 8)}s;\n    `;\n    container.appendChild(p);\n  }\n}"},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":33,"lineEnd":58}]}]},{"id":"countdown-timer","title":"Countdown Timer with Flip Animation","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":60,"lineEnd":115}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Displays a live countdown to the 2026 FIFA World Cup opening kick-off (2026-06-11 18:00 EDT). Each digit unit (days, hours, minutes, seconds) triggers a CSS flip animation when the value changes."},{"type":"heading","level":3,"text":"Key Features"},{"type":"unorderedList","items":["Target date: 2026-06-11T18:00:00-05:00 (opening match)","Updates every 1000ms via setInterval","Calculates remaining days (3 digits), hours, minutes, seconds (2 digits each)","Pads values with leading zeros (days=3 digits, others=2 digits)","Triggers flip class only on value change to minimize animation reflows","Uses requestAnimationFrame/offsetWidth trick to force layout recalculation"]},{"type":"code","language":"javascript","content":"function initCountdown() {\n  const TARGET_DATE = new Date('2026-06-11T18:00:00-05:00');\n  const els = { days: $('#cdDaysVal'), hours: $('#cdHoursVal'), mins: $('#cdMinsVal'), secs: $('#cdSecsVal') };\n  if (!els.days) return;\n  const prev = { days: null, hours: null, mins: null, secs: null };\n  \n  function pad(n, digits = 2) { return String(n).padStart(digits, '0'); }\n  \n  function tick() {\n    const now  = Date.now();\n    const diff = Math.max(0, TARGET_DATE - now);\n    const d = Math.floor(diff / 86400000);\n    const h = Math.floor((diff % 86400000) / 3600000);\n    const m = Math.floor((diff % 3600000) / 60000);\n    const s = Math.floor((diff % 60000) / 1000);\n    \n    const vals = { days: pad(d, 3), hours: pad(h), mins: pad(m), secs: pad(s) };\n    Object.entries(vals).forEach(([k, v]) => {\n      if (v !== prev[k]) {\n        const el = els[k];\n        el.textContent = v;\n        el.classList.remove('flip');\n        void el.offsetWidth; // reflow for CSS animation retrigger\n        el.classList.add('flip');\n        prev[k] = v;\n      }\n    });\n  }\n  \n  tick();\n  setInterval(tick, 1000);\n}"},{"type":"heading","level":3,"text":"CSS Animation Hook"},{"type":"paragraph","text":"The flip animation (defined in external CSS) rotates/scales the digit element when the 'flip' class is applied. Removing the class before re-adding it forces CSS animation restart."},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":60,"lineEnd":115}]}]},{"id":"intersection-observer-scroll-reveal","title":"Intersection Observer & Scroll Reveal","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":117,"lineEnd":131}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Detects when sections enter the viewport and applies 'revealed' class to trigger CSS fade/slide animations. Uses IntersectionObserver API with 12% threshold to detect visibility."},{"type":"code","language":"javascript","content":"let scrollObserver;\n\nfunction initScrollReveal() {\n  const items = $$('.section-reveal');\n  scrollObserver = new IntersectionObserver((entries) => {\n    entries.forEach((entry) => {\n      if (entry.isIntersecting) {\n        entry.target.classList.add('revealed');\n        scrollObserver.unobserve(entry.target);\n      }\n    });\n  }, { threshold: 0.12 });\n  items.forEach(el => scrollObserver.observe(el));\n}"},{"type":"paragraph","text":"Once a section is revealed, it is unobserved to prevent re-triggering and improve performance."},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":117,"lineEnd":131}]}]},{"id":"typewriter-headings","title":"Typewriter Headings Effect","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":133,"lineEnd":173}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Reveals section headings character-by-character with a typewriter effect when they enter the viewport. Includes cursor blink animation and delayed removal."},{"type":"heading","level":3,"text":"Implementation"},{"type":"unorderedList","items":["Observes elements with class 'typewriter-target' via IntersectionObserver (threshold: 0.5)","Clears original text content and applies 'typewriter-active' class","Appends characters one-by-one via setTimeout with 38ms delay between characters","Applies 'done' class after final character for CSS cursor state","Removes border-right and animation classes after 3.2s (cursor blink duration)","Triggers parent <h2> reveal class and unobserves to prevent re-runs"]},{"type":"code","language":"javascript","content":"function initTypewriter() {\n  const targets = $$('.typewriter-target');\n  const observer = new IntersectionObserver((entries) => {\n    entries.forEach(entry => {\n      if (!entry.isIntersecting) return;\n      const el = entry.target;\n      const text = el.textContent;\n      el.textContent = '';\n      el.classList.add('typewriter-active');\n      let i = 0;\n      function addChar() {\n        if (i < text.length) {\n          el.textContent += text[i];\n          i++;\n          setTimeout(addChar, 38);\n        } else {\n          el.classList.add('done');\n          setTimeout(() => {\n            el.style.borderRight = 'none';\n            el.classList.remove('typewriter-active', 'done');\n          }, 3200);\n        }\n      }\n      addChar();\n      const h2 = el.closest('h2');\n      if (h2) h2.classList.add('revealed');\n      observer.unobserve(el);\n    });\n  }, { threshold: 0.5 });\n  targets.forEach(el => observer.observe(el));\n}"},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":133,"lineEnd":173}]}]},{"id":"animate-count-up","title":"Animate Count-Up for Stats","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":175,"lineEnd":192}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Animates a numeric counter from 0 to a target value with eased cubic-out timing. Used to display tournament statistics (teams, matches, goals, stadiums) with smooth visual progression."},{"type":"code","language":"javascript","content":"function animateCountUp(el, target, duration = 1600, suffix = '') {\n  const start  = performance.now();\n  const from   = 0;\n\n  function step(now) {\n    const elapsed = now - start;\n    const progress = clamp(elapsed / duration, 0, 1);\n    // Ease out cubic\n    const eased = 1 - Math.pow(1 - progress, 3);\n    const current = Math.round(from + (target - from) * eased);\n    el.textContent = current + suffix;\n    if (progress < 1) requestAnimationFrame(step);\n    else el.classList.add('bounced');\n  }\n  requestAnimationFrame(step);\n}"},{"type":"heading","level":3,"text":"Parameters"},{"type":"unorderedList","items":["el: DOM element to update","target: final numeric value","duration: animation time in milliseconds (default: 1600ms)","suffix: appended to number (e.g., '+' for 312+)"]},{"type":"paragraph","text":"Uses easing function: 1 - (1 - t)³ for cubic-out acceleration. Adds 'bounced' class on completion for optional visual emphasis."},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":175,"lineEnd":192}]}]},{"id":"stats-rings","title":"Stats Rings with SVG Progress","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":194,"lineEnd":228}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Displays tournament statistics (48 teams, 104 matches, 312+ goals, 16 stadiums) with animated SVG ring progress indicators and concurrent count-up animations."},{"type":"heading","level":3,"text":"SVG Ring Calculation"},{"type":"unorderedList","items":["Circle radius: 50px → circumference ≈ 314px","Data attribute 'data-percent' stores progress percentage (48→100%, 104→88%, 312→75%, 16→60%)","strokeDashoffset = CIRCUMFERENCE × (1 - percent) reveals ring fill from offset"]},{"type":"code","language":"javascript","content":"function initStats() {\n  const cards = $$('.stat-card');\n  const CIRCUMFERENCE = 2 * Math.PI * 50; // r=50 → ~314\n\n  const statsObserver = new IntersectionObserver((entries) => {\n    entries.forEach(entry => {\n      if (!entry.isIntersecting) return;\n\n      const card      = entry.target;\n      const ringFill  = $('.ring-fill', card);\n      const countEl   = $('.stat-count', card);\n      const target    = parseInt(countEl.dataset.target, 10);\n      const suffix    = countEl.dataset.suffix || '';\n      const percent   = parseFloat(ringFill.dataset.percent || '100') / 100;\n      const offset    = CIRCUMFERENCE * (1 - percent);\n\n      // Animate ring\n      ringFill.style.strokeDashoffset = offset;\n\n      // Animate count\n      animateCountUp(countEl, target, 1800, suffix);\n\n      statsObserver.unobserve(card);\n    });\n  }, { threshold: 0.3 });\n\n  cards.forEach(c => statsObserver.observe(c));\n}"},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":194,"lineEnd":228}]}]},{"id":"confetti-burst","title":"Confetti Burst Effect","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":230,"lineEnd":270}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Spawns 60-piece confetti explosion from a given element origin, animating each piece with randomized physics (fall duration 1.8–3.2s, sway duration 0.8–1.6s) and auto-cleanup."},{"type":"heading","level":3,"text":"Implementation"},{"type":"unorderedList","items":["Calculates origin center from element bounding rect (left + width/2, top + height/2)","Creates 60 span elements with class 'confetti-piece'","Randomizes: position offset (±80px), color (8-color palette), size (7–14px width, 10–18px height), shape (50% circles)","Sets animation CSS properties: --fall-dur (gravity), --fall-delay (stagger), --sway-dur (horizontal oscillation)","Removes all pieces after 3.8s via setTimeout"]},{"type":"code","language":"javascript","content":"const CONFETTI_COLOURS = ['#f7c948', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff'];\n\nfunction burstConfetti(originEl) {\n  const container = $('#confettiContainer');\n  if (!container) return;\n\n  const rect  = originEl.getBoundingClientRect();\n  const originX = rect.left + rect.width  / 2;\n  const originY = rect.top  + rect.height / 2;\n  const pieces = [];\n\n  for (let i = 0; i < 60; i++) {\n    const span = document.createElement('span');\n    span.className = 'confetti-piece';\n    span.style.cssText = `\n      left: ${originX + randBetween(-80, 80)}px;\n      background: ${CONFETTI_COLOURS[Math.floor(Math.random() * CONFETTI_COLOURS.length)]};\n      width: ${randBetween(7, 14)}px;\n      height: ${randBetween(10, 18)}px;\n      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};\n      --fall-dur: ${randBetween(1.8, 3.2)}s;\n      --fall-delay: ${randBetween(0, 0.6)}s;\n      --sway-dur: ${randBetween(0.8, 1.6)}s;\n    `;\n    container.appendChild(span);\n    pieces.push(span);\n  }\n\n  setTimeout(() => { pieces.forEach(p => p.remove()); }, 3800);\n}"},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":230,"lineEnd":270}]}]},{"id":"match-carousel","title":"Match Carousel with Swipe & Dots","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":272,"lineEnd":380}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Horizontal carousel displaying FIFA 2026 match cards with prev/next button navigation, dot indicators, keyboard support, and touch swipe gestures."},{"type":"heading","level":3,"text":"Features"},{"type":"unorderedList","items":["Renders 10 match cards from data/matches.js with home/away teams, flags, scores, venue, date","Prev/Next buttons navigate by single slide with wrap-around","Dot indicator navigation: click dot to jump to slide, active dot highlights current index","Keyboard: ArrowLeft/Right to navigate, ArrowUp/Down to focus first focusable element in slide","Touch swipe: horizontal drag to slide, velocity-based continuation","Confetti burst on final match (index 9) for celebration effect","Auto-scroll: optional ticker at bottom with cloned content for continuous loop"]},{"type":"heading","level":3,"text":"HTML Data Structure"},{"type":"code","language":"javascript","content":"const matchCard = `\n  <div class=\"match-card\">\n    <div class=\"match-status ${match.status}\">${match.status.toUpperCase()}</div>\n    <div class=\"match-stage\">${match.stage}</div>\n    <div class=\"match-score\">\n      <div class=\"team home\">\n        <div class=\"flag\">${match.homeFlag}</div>\n        <div class=\"name\">${match.home}</div>\n        <div class=\"score\">${match.homeScore}</div>\n      </div>\n      <div class=\"divider\">vs</div>\n      <div class=\"team away\">\n        <div class=\"score\">${match.awayScore}</div>\n        <div class=\"name\">${match.away}</div>\n        <div class=\"flag\">${match.awayFlag}</div>\n      </div>\n    </div>\n    <div class=\"match-footer\">\n      <div class=\"venue\">${match.venue}</div>\n      <div class=\"datetime\"><span class=\"date\">${match.date}</span> · <span class=\"time\">${match.time}</span></div>\n    </div>\n  </div>\n`"},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":272,"lineEnd":380}]}]},{"id":"group-standings","title":"Group Standings with Tab Filtering","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":382,"lineEnd":480}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Displays FIFA 2026 group standings with tab-based filtering. Users select group (A–H) to view participating teams with rank, points, goals for/against."},{"type":"heading","level":3,"text":"Data Structure"},{"type":"code","language":"javascript","content":"const standings = {\n  'A': [\n    { rank: 1, country: 'Canada', flag: '🇨🇦', points: 9, played: 3, wins: 3, draws: 0, losses: 0, gf: 8, ga: 2, gd: 6 },\n    { rank: 2, country: 'Mexico', flag: '🇲🇽', points: 6, played: 3, wins: 2, draws: 0, losses: 1, gf: 5, ga: 4, gd: 1 },\n    { rank: 3, country: 'USA', flag: '🇺🇸', points: 3, played: 3, wins: 1, draws: 0, losses: 2, gf: 6, ga: 7, gd: -1 },\n    { rank: 4, country: 'Panama', flag: '🇵🇦', points: 0, played: 3, wins: 0, draws: 0, losses: 3, gf: 2, ga: 8, gd: -6 }\n  ],\n  // ... groups B through H\n}"},{"type":"heading","level":3,"text":"Interaction"},{"type":"unorderedList","items":["Renders tab buttons for groups A–H","Default active tab: Group A","Click tab → updates standings table with group teams","Table shows rank, flag, country, played, wins-draws-losses, goals for/against, goal difference, points","Points calculated: 3 per win, 1 per draw, 0 per loss"]},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":382,"lineEnd":480}]}]},{"id":"news-grid","title":"News Grid & Article Display","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":482,"lineEnd":540},{"path":"data/news.js","lineStart":1,"lineEnd":90}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Renders 9 news articles in a grid layout with category badges, emoji icons, titles, excerpts, and publication dates."},{"type":"heading","level":3,"text":"Article Data"},{"type":"table","headers":["Field","Type","Example"],"rows":[["title","string","Brazil Edge Argentina in Quarter-Final Thriller"],["excerpt","string","Neymar scored twice as Brazil overcame..."],["category","string","Match Report | Awards | Broadcast | Tactics"],["date","string","Jul 5, 2026"],["tag","string","Final Score | Award | Stats | Deep Dive"],["emoji","string","⚽ | 🏆 | 📺 | 🎯 | 🌟 | 🗺️ | 🎬 | 🌱"]]},{"type":"heading","level":3,"text":"HTML Structure"},{"type":"code","language":"javascript","content":"const newsCard = `\n  <article class=\"news-card\">\n    <div class=\"news-icon\">${item.emoji}</div>\n    <div class=\"news-badge\" data-category=\"${item.category}\">${item.category}</div>\n    <h3 class=\"news-title\">${item.title}</h3>\n    <p class=\"news-excerpt\">${item.excerpt}</p>\n    <footer class=\"news-footer\">\n      <span class=\"news-tag\">${item.tag}</span>\n      <time class=\"news-date\">${item.date}</time>\n    </footer>\n  </article>\n`"},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":482,"lineEnd":540},{"path":"data/news.js","lineStart":1,"lineEnd":90}]}]},{"id":"toast-notifications","title":"Toast Notifications","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":542,"lineEnd":570}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Displays dismissible toast notifications for user feedback (e.g., 'Tickets purchased!', 'Group selected'). Auto-removes after 3.5 seconds or on user dismiss."},{"type":"code","language":"javascript","content":"function showToast(message, type = 'info', duration = 3500) {\n  const container = $('#toastContainer');\n  if (!container) return;\n\n  const toast = document.createElement('div');\n  toast.className = `toast toast--${type}`;\n  toast.textContent = message;\n  toast.setAttribute('role', 'alert');\n  toast.setAttribute('aria-live', 'polite');\n\n  container.appendChild(toast);\n\n  // Trigger entrance animation via reflow\n  void toast.offsetHeight;\n  toast.classList.add('shown');\n\n  // Auto-remove after duration\n  const timeout = setTimeout(() => {\n    toast.classList.remove('shown');\n    setTimeout(() => toast.remove(), 300);\n  }, duration);\n\n  // Allow manual dismiss\n  toast.addEventListener('click', () => {\n    clearTimeout(timeout);\n    toast.classList.remove('shown');\n    setTimeout(() => toast.remove(), 300);\n  });\n}"},{"type":"heading","level":3,"text":"Accessibility"},{"type":"unorderedList","items":["role='alert' announces toast to screen readers","aria-live='polite' ensures async announcement","Manual dismiss on click for user control"]},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":542,"lineEnd":570}]}]},{"id":"ticker-animation","title":"Ticker: Continuous Result Loop","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":572,"lineEnd":615}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Displays live match results in a horizontally scrolling ticker with seamless loop. Content clones append to create infinite scroll effect."},{"type":"heading","level":3,"text":"Implementation"},{"type":"unorderedList","items":["Ticker content div contains result items (e.g., '🇧🇷 Brazil 3–1 Argentina 🇦🇷')","Clones entire content and appends to create double-length track","CSS animation: translate X from 0 to -50% over 20–30s (seamless loop duration)","When animation completes (or during reset), swaps position back to start without visible glitch","Optional: add/remove items dynamically by updating content and re-cloning"]},{"type":"code","language":"javascript","content":"function initTicker() {\n  const track = $('#tickerTrack');\n  const content = $('#tickerContent');\n  if (!track || !content) return;\n\n  // Clone content for seamless loop\n  const clone = content.cloneNode(true);\n  track.appendChild(clone);\n\n  // Optional: Handle animation restart for true seamless loop\n  let animationPaused = false;\n  track.addEventListener('animationiteration', () => {\n    // Track completes one cycle; could add logic here to update results\n  });\n\n  // Pause on hover for readability\n  track.addEventListener('mouseenter', () => {\n    track.style.animationPlayState = 'paused';\n  });\n  track.addEventListener('mouseleave', () => {\n    track.style.animationPlayState = 'running';\n  });\n}"},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":572,"lineEnd":615}]}]},{"id":"3d-tilt-effect","title":"3D Tilt Effect on Match Cards","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":617,"lineEnd":680}],"content":[{"type":"heading","level":2,"text":"Overview"},{"type":"paragraph","text":"Cursor-reactive 3D tilt effect on match cards. As user moves mouse over card, the card perspective skews toward cursor position, creating parallax illusion."},{"type":"heading","level":3,"text":"Implementation"},{"type":"unorderedList","items":["Listens for mousemove on match-card elements","Calculates mouse offset from card center (clientX/Y - card rect center)","Maps offset range (±width/2, ±height/2) to tilt range (±max-angle, typically ±8–12°)","Applies CSS transform: skew/rotateX/rotateY based on delta","On mouseleave: resets transform to neutral position","Uses requestAnimationFrame for smooth updates"]},{"type":"code","language":"javascript","content":"function initCardTilt() {\n  const cards = $$('.match-card');\n  const MAX_TILT = 8; // degrees\n\n  cards.forEach(card => {\n    card.addEventListener('mousemove', (e) => {\n      const rect = card.getBoundingClientRect();\n      const centerX = rect.left + rect.width / 2;\n      const centerY = rect.top + rect.height / 2;\n      const deltaX = e.clientX - centerX;\n      const deltaY = e.clientY - centerY;\n\n      const tiltX = (deltaY / (rect.height / 2)) * MAX_TILT;\n      const tiltY = (deltaX / (rect.width / 2)) * MAX_TILT;\n\n      card.style.transform = `perspective(1000px) rotateX(${-tiltX}deg) rotateY(${tiltY}deg)`;\n    });\n\n    card.addEventListener('mouseleave', () => {\n      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';\n    });\n  });\n}"},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":617,"lineEnd":680}]}]},{"id":"test-suite-overview","title":"Test Suite Overview","parentId":null,"sourceFiles":[{"path":"app.test.js","lineStart":1,"lineEnd":100},{"path":"vitest.config.js","lineStart":1,"lineEnd":28}],"content":[{"type":"heading","level":2,"text":"Test Infrastructure"},{"type":"paragraph","text":"Comprehensive test suite using Vitest with jsdom environment. 60+ test cases covering DOM setup, initialization, event handling, animations, accessibility, and stress testing."},{"type":"heading","level":3,"text":"Vitest Configuration"},{"type":"table","headers":["Setting","Value","Purpose"],"rows":[["environment","jsdom","Browser-like DOM simulation"],["globals","true","Enables describe/it/expect without imports"],["testTimeout","10000","Allow long-running animation tests"],["coverage.provider","v8","JavaScript coverage instrumentation"],["coverage.reporters","[text, json, html, lcov]","Multiple report formats"],["coverage.thresholds.lines","70","Minimum 70% line coverage required"],["coverage.thresholds.functions","70","Minimum 70% function coverage required"],["coverage.thresholds.branches","60","Minimum 60% branch coverage required"],["coverage.thresholds.statements","70","Minimum 70% statement coverage required"]]},{"type":"heading","level":3,"text":"Test Structure"},{"type":"unorderedList","items":["setupDOM(): Creates complete HTML structure matching production layout","Mock data: vitest mocks data/matches.js and data/news.js with fixture data","Parallel execution: Independent test suites cover isolated concerns","Async handling: setInterval/setTimeout tests managed via vi.useFakeTimers()"]},{"type":"sourcesRow","files":[{"path":"app.test.js","lineStart":1,"lineEnd":100},{"path":"vitest.config.js","lineStart":1,"lineEnd":28}]}]},{"id":"test-coverage-areas","title":"Test Coverage Areas","parentId":null,"sourceFiles":[{"path":"app.test.js","lineStart":100,"lineEnd":600}],"content":[{"type":"heading","level":2,"text":"Test Categories"},{"type":"heading","level":3,"text":"DOM Setup & Initialization"},{"type":"unorderedList","items":["Verifies all required elements are present (header, hero, countdown, stats, carousel, standings, news, toasts, confetti)","Validates element IDs and classes match selectors used by app.js","Tests setupDOM resilience to missing optional elements"]},{"type":"heading","level":3,"text":"Countdown Timer"},{"type":"unorderedList","items":["Tests initial countdown calculation (days, hours, minutes, seconds from target date)","Verifies padding (3 digits for days, 2 digits for hours/mins/secs)","Validates flip class applies and removes correctly on value change","Checks zero-floor on negative remaining time"]},{"type":"heading","level":3,"text":"Scroll Reveal & Intersection Observer"},{"type":"unorderedList","items":["Mocks IntersectionObserver to simulate scroll events","Verifies 'revealed' class applied on intersection","Confirms unobserve called after reveal to prevent re-triggering"]},{"type":"heading","level":3,"text":"Hero Particles"},{"type":"unorderedList","items":["Tests 40 particles created with correct class","Validates randomized size, color, opacity, duration, delay","Checks CSS properties set via style attribute"]},{"type":"heading","level":3,"text":"Match Carousel Navigation"},{"type":"unorderedList","items":["Tests prev/next button click events advance carousel index","Verifies wrap-around: next at end goes to 0, prev at 0 goes to last","Validates dot navigation: clicking dot jumps to corresponding slide","Tests keyboard ArrowLeft/ArrowRight navigation","Checks touch swipe delta and velocity calculations"]},{"type":"heading","level":3,"text":"Group Standings Tab Filtering"},{"type":"unorderedList","items":["Tests tab button creation for groups A–H","Verifies click updates table with correct group teams","Validates team rank, points, goal differential calculations","Checks active tab visual state updates"]},{"type":"heading","level":3,"text":"News Grid Rendering"},{"type":"unorderedList","items":["Tests 9 news articles rendered with correct structure","Validates title, excerpt, category, tag, date, emoji fields","Checks category badge data-attributes for filtering capability"]},{"type":"heading","level":3,"text":"Stats Count-Up & Rings"},{"type":"unorderedList","items":["Tests animateCountUp() easing calculation (cubic-out)","Validates final count matches target value","Checks SVG ring strokeDashoffset calculation from percent data","Verifies 'bounced' class applied on animation complete"]},{"type":"heading","level":3,"text":"Typewriter Heading Animation"},{"type":"unorderedList","items":["Tests character-by-character reveal with correct timing (38ms intervals)","Validates 'typewriter-active' and 'done' classes applied/removed","Checks border-right style cleared after cursor blink duration"]},{"type":"heading","level":3,"text":"Toast Notifications"},{"type":"unorderedList","items":["Tests showToast() creates notification div with message","Validates toast type class (info/success/error/warning)","Checks auto-removal after duration (3.5s default)","Tests manual dismiss on click with cleanup"]},{"type":"heading","level":3,"text":"Confetti Burst"},{"type":"unorderedList","items":["Tests 60 confetti pieces created from origin element","Validates randomized physics (fall duration, sway duration)","Checks auto-cleanup after 3.8s","Verifies color palette selection and shape variation"]},{"type":"heading","level":3,"text":"3D Tilt Effect"},{"type":"unorderedList","items":["Tests mousemove updates transform perspective/rotateX/rotateY","Validates tilt angle calculation from cursor delta","Checks mouseleave resets transform to neutral"]},{"type":"heading","level":3,"text":"Accessibility (ARIA)"},{"type":"unorderedList","items":["Verifies status elements have role='status' and aria-live='polite'","Tests button elements have aria-label or accessible text","Checks ARIA attributes persist after DOM updates","Validates semantic HTML (nav, section, article, footer)"]},{"type":"heading","level":3,"text":"Motion Preferences & Animations"},{"type":"unorderedList","items":["Tests prefers-reduced-motion: reduce disables animations","Validates countdown, particles, stats, confetti skip when motion-reduce","Checks keyboard users can bypass animations via interaction"]},{"type":"heading","level":3,"text":"Stress & Integrity Tests"},{"type":"unorderedList","items":["Rapid carousel navigation without race conditions","Simultaneous carousel + stats animation without overlap","Multiple toast notifications queue correctly","Memory cleanup: no lingering event listeners after unobserve","DOM element reuse: carousel dots re-render without duplicates"]},{"type":"sourcesRow","files":[{"path":"app.test.js","lineStart":100,"lineEnd":600}]}]},{"id":"data-modules","title":"Data Modules: Matches & News","parentId":null,"sourceFiles":[{"path":"data/matches.js","lineStart":1,"lineEnd":150},{"path":"data/news.js","lineStart":1,"lineEnd":90}],"content":[{"type":"heading","level":2,"text":"Matches Data"},{"type":"paragraph","text":"Exports array of 12 FIFA 2026 match fixtures with complete tournament metadata."},{"type":"heading","level":3,"text":"Match Object Schema"},{"type":"table","headers":["Field","Type","Example"],"rows":[["id","number","1–12"],["home","string","Brazil"],["away","string","Argentina"],["homeFlag","emoji","🇧🇷"],["awayFlag","emoji","🇦🇷"],["homeScore","number","3"],["awayScore","number","1"],["status","enum","final | live | upcoming"],["stage","string","Quarter Final | Group Stage · Group B"],["venue","string","MetLife Stadium, New Jersey"],["date","string","Jul 5, 2026"],["time","string","FT | 72' | 15:00 ET"]]},{"type":"heading","level":3,"text":"Sample Data"},{"type":"code","language":"javascript","content":"export const matches = [\n  {\n    id: 1,\n    home: 'Brazil',\n    away: 'Argentina',\n    homeFlag: '🇧🇷',\n    awayFlag: '🇦🇷',\n    homeScore: 3,\n    awayScore: 1,\n    status: 'final',\n    stage: 'Quarter Final',\n    venue: 'MetLife Stadium, New Jersey',\n    date: 'Jul 5, 2026',\n    time: 'FT',\n  },\n  // ... 11 more matches\n];"},{"type":"heading","level":2,"text":"News Data"},{"type":"paragraph","text":"Exports array of 9 FIFA 2026 news articles with category, tags, and emoji icons."},{"type":"heading","level":3,"text":"News Object Schema"},{"type":"table","headers":["Field","Type","Example"],"rows":[["title","string","Brazil Edge Argentina in Quarter-Final Thriller"],["excerpt","string","Neymar scored twice as Brazil overcame..."],["category","string","Match Report | Awards | Broadcast | Tactics"],["date","string","Jul 5, 2026"],["tag","string","Final Score | Award | Stats | Deep Dive"],["emoji","string","⚽ | 🏆 | 📺 | 🎯"]]},{"type":"heading","level":3,"text":"Sample Data"},{"type":"code","language":"javascript","content":"export const newsItems = [\n  {\n    title: 'Brazil Edge Argentina in Quarter-Final Thriller',\n    excerpt: 'Neymar scored twice as Brazil overcame their fiercest rivals in a pulsating 3–1 victory at MetLife Stadium.',\n    category: 'Match Report',\n    date: 'Jul 5, 2026',\n    tag: 'Final Score',\n    emoji: '⚽',\n  },\n  {\n    title: \"Mbappé Named Player of the Tournament\",\n    excerpt: \"France's captain delivered a sensational campaign with 8 goals and 4 assists — the most lethal performer in 2026.\",\n    category: 'Awards',\n    date: 'Jul 12, 2026',\n    tag: 'Award',\n    emoji: '🏆',\n  },\n  // ... 7 more articles\n];"},{"type":"sourcesRow","files":[{"path":"data/matches.js","lineStart":1,"lineEnd":150},{"path":"data/news.js","lineStart":1,"lineEnd":90}]}]},{"id":"npm-scripts","title":"NPM Scripts & Development","parentId":null,"sourceFiles":[{"path":"package.json","lineStart":7,"lineEnd":14}],"content":[{"type":"heading","level":2,"text":"Available Scripts"},{"type":"table","headers":["Command","Purpose","Details"],"rows":[["npm run dev","Development server","Launches Vite dev server with HMR (hot module replacement) for instant refresh on file changes"],["npm run build","Production build","Creates optimized bundle for deployment via Vite (minification, tree-shaking, code splitting)"],["npm run preview","Preview build","Serves production-ready build locally to verify build output before deployment"],["npm test","Run tests once","Executes full Vitest suite with coverage report (70% line/function/statement, 60% branch thresholds)"],["npm run test:watch","Watch mode","Vitest watch mode: re-runs tests on file change for TDD development"],["npm run test:coverage","Coverage analysis","Generates detailed coverage reports in ./coverage directory (text, JSON, HTML, LCOV formats)"],["npm run test:ui","Test UI dashboard","Launches interactive Vitest UI for visual test exploration and debugging"]]},{"type":"heading","level":2,"text":"Dependencies"},{"type":"table","headers":["Package","Version","Purpose"],"rows":[["vite","^5.2.0","Modern bundler and dev server"],["vitest","^1.6.0","Unit test framework (Vitest core)"],["@vitest/ui","^1.6.0","Interactive UI for test visualization"],["@vitest/coverage-v8","^1.6.0","V8 coverage instrumentation and reporting"],["jsdom","^24.0.0","Browser-like DOM simulation for testing"]]},{"type":"sourcesRow","files":[{"path":"package.json","lineStart":7,"lineEnd":14}]}]},{"id":"utility-functions","title":"Utility Functions","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":15,"lineEnd":21}],"content":[{"type":"heading","level":2,"text":"DOM Query Helpers"},{"type":"code","language":"javascript","content":"const $ = (sel, ctx = document) => ctx.querySelector(sel);\nconst $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];"},{"type":"paragraph","text":"Shorthand functions for single and multiple element selection. The $$ function converts NodeList to Array for easier iteration."},{"type":"heading","level":2,"text":"Math Helpers"},{"type":"code","language":"javascript","content":"function lerp(a, b, t) { return a + (b - a) * t; }\n\nfunction clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }\n\nfunction randBetween(a, b) { return a + Math.random() * (b - a); }"},{"type":"paragraph","text":"lerp: Linear interpolation between two values (used for smooth transitions). clamp: Constrains value within min/max range. randBetween: Random float between two values (used for particle/animation randomization)."},{"type":"sourcesRow","files":[{"path":"app.js","lineStart":15,"lineEnd":21}]}]}]}
+{"repoName":"ali1092-SC/samplefootballapp","repoNote":"FIFA World Cup 2026 fan application featuring interactive animations, countdown timers, match carousels, player cards, stats rings, and comprehensive test coverage.","lastUpdatedAt":"2026-06-18T16:07:20Z","sections":[{"id":"overview","title":"Overview","parentId":null,"sourceFiles":[{"path":"README.md","lineStart":1,"lineEnd":30},{"path":"package.json","lineStart":1,"lineEnd":10}],"content":[{"type":"paragraph","text":"The Sample Football App is a FIFA World Cup 2026 fan showcase built as a single-page browser application with inline CSS, vanilla JavaScript, and modular data imports. It delivers an official-style fan experience with interactive features including player cards with country jersey images, live countdown timers with flip-digit animations, seamlessly looping match ticker, carousel navigation with swipe support, group standings tabs, and comprehensive test coverage."},{"type":"paragraph","text":"The application supports smooth-scroll navigation where clicking on player links in the top navigation bar scrolls to the players section. Player cards display actual player faces with their country jersey images. The rotation banner and kickoff countdown timer are positioned below the top navigation bar. The solution includes 60+ test cases across state management, DOM synchronization, accessibility features, and stress-integrity validation using Vitest and jsdom."},{"type":"heading","level":2,"text":"Recent Task (2026-06-18)"},{"type":"paragraph","text":"Move the rotation banner and kickoff countdown timer below the top navigation bar; clicking on players in top bar takes users to the players section on the page; cards show actual player faces with their country jersey images."},{"type":"unorderedList","items":["Files modified: index.html, styles.css, app.js, app.test.js","Player card data includes jersey image URLs and section targets","Smooth-scroll implementation with nav offset calculation","IntersectionObserver for active state management"]}]},{"id":"system-architecture","title":"System Architecture","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":1,"lineEnd":100},{"path":"app.test.js","lineStart":1,"lineEnd":80},{"path":"data/matches.js","lineStart":1,"lineEnd":30},{"path":"data/news.js","lineStart":1,"lineEnd":30}],"content":[{"type":"heading","level":2,"text":"Architecture Overview"},{"type":"paragraph","text":"The application is built on vanilla JavaScript with a modular initialization and rendering pattern. Core features are separated into independent functions managing their own DOM queries, event listeners, and animation lifecycle. Data is exported as ES modules (matches, news, playerCardData), enabling both application rendering and test mocking. The architecture uses a utility-first approach with helper functions for common tasks like smooth scrolling and countdown calculations."},{"type":"heading","level":3,"text":"Core Modules & Components"},{"type":"unorderedList","items":["Player Card System: Displays 6 featured players with jersey images, names, countries, and smooth-scroll navigation targets","Smooth-Scroll Navigation: Helper function accounting for fixed/sticky nav bar height to prevent content overlap","Nav Player Link Wiring: Attaches click handlers to nav links pointing to #players section","Players Section Observer: IntersectionObserver toggles 'active' class on nav links when section enters viewport (20% threshold)","Countdown Timer: Live countdown to 2026-06-11 kick-off with days/hours/minutes/seconds display, update every 1000ms","Match Rendering: Renders 12 match objects with home/away teams, scores, venue, date, status","News Rendering: Renders 9 news articles with title, excerpt, category, date, tag, emoji","Test Suite: 60+ comprehensive test cases covering DOM setup, data structures, event handling, accessibility"]},{"type":"diagram","title":"Application Data Flow","nodes":[{"id":"user-nav","label":"User Clicks\nNav Player Link","type":"frontend"},{"id":"nav-handler","label":"wireNavPlayerLinks()\nClick Handler","type":"neutral"},{"id":"scroll-calc","label":"smoothScrollTo()\nCalculate nav height offset","type":"neutral"},{"id":"window-scroll","label":"window.scrollTo()\nSmooth behavior","type":"output"},{"id":"intersection","label":"IntersectionObserver\nDetects #players visibility","type":"neutral"},{"id":"nav-active","label":"Update Nav Link\n'active' class","type":"output"},{"id":"countdown-init","label":"startCountdown()\nReads data-kickoff","type":"neutral"},{"id":"countdown-loop","label":"setInterval(render, 1000ms)\ngetCountdownValues()","type":"neutral"},{"id":"countdown-display","label":"Update DOM\nDays/Hours/Mins/Secs","type":"output"},{"id":"render-matches","label":"renderMatches()\nMaps match data","type":"neutral"},{"id":"matches-dom","label":"#matches-list\nMatch cards rendered","type":"output"},{"id":"render-news","label":"renderNews()\nMaps news data","type":"neutral"},{"id":"news-dom","label":"#news-list\nNews cards rendered","type":"output"},{"id":"render-players","label":"renderPlayerCards()\nMaps playerCardData","type":"neutral"},{"id":"players-dom","label":"#players .players-grid\nPlayer cards rendered","type":"output"}],"edges":[{"from":"user-nav","to":"nav-handler","label":"triggers"},{"from":"nav-handler","to":"scroll-calc","label":"calls"},{"from":"scroll-calc","to":"window-scroll","label":"executes"},{"from":"window-scroll","to":"intersection","label":"scroll position changes"},{"from":"intersection","to":"nav-active","label":"detects entry/exit"},{"from":"countdown-init","to":"countdown-loop","label":"starts interval"},{"from":"countdown-loop","to":"countdown-display","label":"updates every 1s"},{"from":"render-matches","to":"matches-dom","label":"innerHTML"},{"from":"render-news","to":"news-dom","label":"innerHTML"},{"from":"render-players","to":"players-dom","label":"innerHTML"}]}]},{"id":"player-card-system","title":"Player Card System","parentId":"system-architecture","sourceFiles":[{"path":"app.js","lineStart":3,"lineEnd":48},{"path":"app.test.js","lineStart":6,"lineEnd":48}],"content":[{"type":"heading","level":2,"text":"Player Card Data Structure"},{"type":"paragraph","text":"The application exports playerCardData as an array of 6 objects. Each player object contains: name (string), country (string), jerseyImageUrl (HTTPS image URL), and sectionTarget (CSS selector like '#players'). The jerseyImageUrl points to actual player portrait images from Transfermarkt."},{"type":"table","headers":["Player Name","Country","Image Source","Section Target"],"rows":[["Lionel Messi","Argentina","Transfermarkt ID 28003","#players"],["Cristiano Ronaldo","Portugal","Transfermarkt ID 8198","#players"],["Kylian Mbappé","France","Transfermarkt ID 342229","#players"],["Erling Haaland","Norway","Transfermarkt ID 418560","#players"],["Vinicius Jr","Brazil","Transfermarkt ID 371998","#players"],["Pedri","Spain","Transfermarkt ID 608892","#players"]]},{"type":"code","language":"javascript","content":"export const playerCardData = [\n  {\n    name: 'Lionel Messi',\n    country: 'Argentina',\n    jerseyImageUrl: 'https://img.a.transfermarkt.technology/portrait/big/28003-1682683695.jpg',\n    sectionTarget: '#players',\n  },\n  // ... 5 more players\n];"},{"type":"heading","level":3,"text":"Rendering"},{"type":"paragraph","text":"The renderPlayerCards() function maps over playerCardData and generates player-card articles with image-wrap divs containing img elements sourced from jerseyImageUrl. Each card is appended to the #players .players-grid container via innerHTML template literal."}]},{"id":"smooth-scroll-navigation","title":"Smooth-Scroll Navigation","parentId":"system-architecture","sourceFiles":[{"path":"app.js","lineStart":51,"lineEnd":118},{"path":"app.test.js","lineStart":115,"lineEnd":162}],"content":[{"type":"heading","level":2,"text":"smoothScrollTo() Function"},{"type":"paragraph","text":"Smoothly scrolls the page to an element identified by CSS selector (e.g., '#players'). Accounts for fixed/sticky nav bar height by querying the nav or header element, calculating its getBoundingClientRect().height, and subtracting from the scroll target to prevent content overlap."},{"type":"code","language":"javascript","content":"export function smoothScrollTo(targetSelector) {\n  const target = document.querySelector(targetSelector);\n  if (!target) return false;\n\n  const nav = document.querySelector('nav') || document.querySelector('header');\n  const navHeight = nav ? nav.getBoundingClientRect().height : 0;\n  const elementTop = target.getBoundingClientRect().top + window.pageYOffset;\n\n  window.scrollTo({\n    top: elementTop - navHeight,\n    behavior: 'smooth',\n  });\n\n  return true;\n}"},{"type":"heading","level":3,"text":"wireNavPlayerLinks() – Event Binding"},{"type":"paragraph","text":"Attaches smooth-scroll click handlers to every nav link that points to '#players' (via href or data-scroll attributes). When clicked, preventDefault() is called and smoothScrollTo() is invoked with the target selector extracted from the link's href or data-scroll attribute."},{"type":"code","language":"javascript","content":"function wireNavPlayerLinks() {\n  const navLinks = document.querySelectorAll(\n    'nav a[href=\"#players\"], nav [data-scroll=\"#players\"]'\n  );\n\n  navLinks.forEach((link) => {\n    link.addEventListener('click', (e) => {\n      e.preventDefault();\n      const target = link.getAttribute('href') || link.getAttribute('data-scroll');\n      smoothScrollTo(target);\n    });\n  });\n}"},{"type":"heading","level":3,"text":"observePlayersSection() – Active State"},{"type":"paragraph","text":"Uses IntersectionObserver to watch the #players section. When the section enters/exits the viewport (at 20% visibility threshold), toggles the 'active' class on all matching nav links. This provides visual feedback indicating the current page section."},{"type":"code","language":"javascript","content":"function observePlayersSection() {\n  const playersSection = document.querySelector('#players');\n  if (!playersSection) return;\n\n  const navLinks = document.querySelectorAll(\n    'nav a[href=\"#players\"], nav [data-scroll=\"#players\"]'\n  );\n\n  const observer = new IntersectionObserver(\n    (entries) => {\n      entries.forEach((entry) => {\n        navLinks.forEach((link) => {\n          link.classList.toggle('active', entry.isIntersecting);\n        });\n      });\n    },\n    { threshold: 0.2 }\n  );\n\n  observer.observe(playersSection);\n}"},{"type":"heading","level":3,"text":"Test Coverage"},{"type":"unorderedList","items":["smoothScrollToSection() calls scrollIntoView on matching element","scrollIntoView invoked with { behavior: 'smooth', block: 'start' }","No error thrown when selector matches no element","Accepts bare id string without leading # (normalization)"]}]},{"id":"countdown-timer","title":"Countdown Timer System","parentId":"system-architecture","sourceFiles":[{"path":"app.js","lineStart":121,"lineEnd":192},{"path":"app.test.js","lineStart":52,"lineEnd":110}],"content":[{"type":"heading","level":2,"text":"getCountdownValues() Helper"},{"type":"paragraph","text":"Calculates the formatted time remaining until a target kickoff date. Returns an object with { days, hours, minutes, seconds } as zero-padded strings, plus expired: true when the date is in the past or equal to current time. Accepts an optional 'now' parameter for testing deterministic behavior."},{"type":"code","language":"javascript","content":"export function getCountdownValues(kickoffDate, now = new Date()) {\n  const diff = kickoffDate - now;\n\n  if (diff <= 0) {\n    return { days: '00', hours: '00', minutes: '00', seconds: '00', expired: true };\n  }\n\n  const totalSeconds = Math.floor(diff / 1000);\n  const days = Math.floor(totalSeconds / 86400);\n  const hours = Math.floor((totalSeconds % 86400) / 3600);\n  const minutes = Math.floor((totalSeconds % 3600) / 60);\n  const seconds = totalSeconds % 60;\n\n  const pad = (n) => String(n).padStart(2, '0');\n\n  return {\n    days: pad(days),\n    hours: pad(hours),\n    minutes: pad(minutes),\n    seconds: pad(seconds),\n    expired: false,\n  };\n}"},{"type":"heading","level":3,"text":"startCountdown() – Live Timer"},{"type":"paragraph","text":"Starts a live countdown inside a container element, updating every 1000ms (1 second). Reads target ISO date from containerEl.dataset.kickoff attribute. Renders display with four segments (Days, Hrs, Min, Sec) or 'Kick-off!' when expired. Returns the setInterval ID for cleanup, or null if no valid kickoff found."},{"type":"code","language":"javascript","content":"export function startCountdown(containerEl) {\n  if (!containerEl) return null;\n\n  const kickoffIso = containerEl.dataset.kickoff;\n  if (!kickoffIso) return null;\n\n  const kickoffDate = new Date(kickoffIso);\n  if (isNaN(kickoffDate.getTime())) return null;\n\n  function render() {\n    const values = getCountdownValues(kickoffDate);\n\n    containerEl.innerHTML = values.expired\n      ? '<span class=\"countdown__expired\">Kick-off!</span>'\n      : `<span class=\"countdown__segment\"><span class=\"countdown__value\">${values.days}</span><span class=\"countdown__label\">Days</span></span>` +\n        `<span class=\"countdown__segment\"><span class=\"countdown__value\">${values.hours}</span><span class=\"countdown__label\">Hrs</span></span>` +\n        `<span class=\"countdown__segment\"><span class=\"countdown__value\">${values.minutes}</span><span class=\"countdown__label\">Min</span></span>` +\n        `<span class=\"countdown__segment\"><span class=\"countdown__value\">${values.seconds}</span><span class=\"countdown__label\">Sec</span></span>`;\n  }\n\n  render();\n  return setInterval(render, 1000);\n}"},{"type":"heading","level":3,"text":"Test Cases"},{"type":"unorderedList","items":["Returns string from getCountdownString()","Returns 'Match has started!' when target is in the past","Returns 'Match has started!' when target equals current time","Formats days, hours, minutes, seconds correctly","Handles exactly one day remaining","Counts seconds correctly for 90-second window"]}]},{"id":"data-modules","title":"Data Modules","parentId":null,"sourceFiles":[{"path":"data/matches.js","lineStart":1,"lineEnd":130},{"path":"data/news.js","lineStart":1,"lineEnd":80}],"content":[{"type":"heading","level":2,"text":"Matches Data"},{"type":"paragraph","text":"The matches module exports an array of 12 match objects for FIFA World Cup 2026. Each match includes: id, home team, away team, country flag emojis, scores (0 if upcoming), status (final/live/upcoming), tournament stage, venue, date string, and time (FT, minute marker, or kickoff time)."},{"type":"table","headers":["Match","Stage","Teams","Score","Status","Venue"],"rows":[["1","Quarter Final","Brazil vs Argentina","3-1","final","MetLife Stadium, New Jersey"],["2","Group Stage · Group B","France vs Germany","2-2","live","SoFi Stadium, Los Angeles"],["3","Round of 16","Spain vs Morocco","4-0","final","AT&T Stadium, Dallas"],["4","Group Stage · Group C","England vs USA","1-0","final","Arrowhead Stadium, Kansas City"],["5","Semi Final","Portugal vs Netherlands","2-1","final","Rose Bowl, Pasadena"],["6","Round of 16","Japan vs South Korea","3-2","final","Levi's Stadium, San Francisco"],["7","Group Stage · Group A","Canada vs Mexico","1-1","live","BC Place, Vancouver"],["8","Group Stage · Group D","Australia vs Croatia","0-2","final","GEODIS Park, Nashville"],["9","Group Stage · Group E","Netherlands vs Belgium","0-0","upcoming","Gillette Stadium, Boston"],["10","Group Stage · Group F","Italy vs Switzerland","0-0","upcoming","Camping World Stadium, Orlando"],["11","Group Stage · Group G","Senegal vs Ecuador","0-0","upcoming","NRG Stadium, Houston"],["12","Group Stage · Group H","Denmark vs Serbia","0-0","upcoming","Lincoln Financial Field, Philadelphia"]]},{"type":"heading","level":2,"text":"News Data"},{"type":"paragraph","text":"The news module exports an array of 9 news article objects. Each article includes: title, excerpt, category (Match Report/Awards/Broadcast/Tactics/Interview/Guide/Highlights/Sustainability/Features), date, tag (Final Score/Award/Stats/Deep Dive/Exclusive/Travel/Video/Report/Feature), and emoji for visual grid representation."},{"type":"table","headers":["Article","Category","Tag","Date","Emoji"],"rows":[["Brazil Edge Argentina in Quarter-Final Thriller","Match Report","Final Score","Jul 5, 2026","⚽"],["Mbappé Named Player of the Tournament","Awards","Award","Jul 12, 2026","🏆"],["Record 5.2 Billion Viewers Tune In","Broadcast","Stats","Jul 13, 2026","📺"],["Spain's Tiki-Taka Renaissance — A Tactical Deep Dive","Tactics","Deep Dive","Jun 28, 2026","🎯"],["Ronaldo Bows Out Gracefully After Final Group Game","Interview","Exclusive","Jul 11, 2026","🌟"],["Host Cities: The Best Fan Parks & Watch Zones","Guide","Travel","Jun 10, 2026","🗺️"],["The Greatest Goals of World Cup 2026","Highlights","Video","Jul 12, 2026","🎬"],["Sustainability Report: The Greenest World Cup Ever","Sustainability","Report","Jul 8, 2026","🌱"],["Rising Stars: 5 Players Who Became Global Icons","Features","Feature","Jul 6, 2026","🌠"]]}]},{"id":"rendering-system","title":"Rendering System","parentId":null,"sourceFiles":[{"path":"app.js","lineStart":195,"lineEnd":265}],"content":[{"type":"heading","level":2,"text":"renderMatches()"},{"type":"paragraph","text":"Renders all matches from the matches data array into the #matches-list container. Maps each match to an article.match-card with two divs: match-teams (home team, score, away team) and match-meta (formatted date, venue). Uses toLocaleDateString() for readable date formatting and joins all articles with empty string."},{"type":"code","language":"javascript","content":"export function renderMatches() {\n  const container = document.getElementById('matches-list');\n  if (!container) return;\n\n  container.innerHTML = matches\n    .map(\n      (m) => `\n      <article class=\"match-card\">\n        <div class=\"match-teams\">\n          <span class=\"team home\">${m.homeTeam}</span>\n          <span class=\"match-score\">${m.score ?? 'vs'}</span>\n          <span class=\"team away\">${m.awayTeam}</span>\n        </div>\n        <div class=\"match-meta\">\n          <span class=\"match-date\">${new Date(m.date).toLocaleDateString(...)}</span>\n          <span class=\"match-venue\">${m.venue ?? ''}</span>\n        </div>\n      </article>`\n    )\n    .join('');\n}"},{"type":"heading","level":2,"text":"renderNews()"},{"type":"paragraph","text":"Renders all news articles from the news data array into the #news-list container. Maps each news item to an article.news-card with conditional image loading (lazy), title, summary, and datetime with toLocaleDateString() formatting. Returns early if container not found."},{"type":"code","language":"javascript","content":"export function renderNews() {\n  const container = document.getElementById('news-list');\n  if (!container) return;\n\n  container.innerHTML = news\n    .map(\n      (n) => `\n      <article class=\"news-card\">\n        ${n.imageUrl ? `<img src=\"${n.imageUrl}\" alt=\"${n.title}\" class=\"news-card__image\" loading=\"lazy\" />` : ''}\n        <div class=\"news-card__body\">\n          <h3 class=\"news-card__title\">${n.title}</h3>\n          <p class=\"news-card__summary\">${n.summary ?? ''}</p>\n          <time class=\"news-card__date\" datetime=\"${n.date}\">${new Date(n.date).toLocaleDateString()}</time>\n        </div>\n      </article>`\n    )\n    .join('');\n}"},{"type":"heading","level":2,"text":"renderPlayerCards()"},{"type":"paragraph","text":"Renders all player cards from playerCardData into the #players .players-grid container. Maps each player to an article.player-card with image-wrap div containing img element sourced from jerseyImageUrl. Each card includes player name, country, and click handler that calls smoothScrollTo() on the sectionTarget."},{"type":"code","language":"javascript","content":"export function renderPlayerCards() {\n  const container = document.querySelector('#players .players-grid');\n  if (!container) return;\n\n  container.innerHTML = playerCardData\n    .map(\n      (p) => `\n      <article class=\"player-card\">\n        <div class=\"player-card__image-wrap\">\n          <img\n            src=\"${p.jerseyImageUrl}\"\n            alt=\"${p.name} – ${p.country}\"\n            class=\"player-card__image\"\n          />\n        </div>\n        <div class=\"player-card__info\">\n          <h3 class=\"player-card__name\">${p.name}</h3>\n          <p class=\"player-card__country\">${p.country}</p>\n        </div>\n      </article>`\n    )\n    .join('');\n}"}]},{"id":"test-suite","title":"Test Suite & Configuration","parentId":null,"sourceFiles":[{"path":"app.test.js","lineStart":1,"lineEnd":162},{"path":"vitest.config.js","lineStart":1,"lineEnd":27}],"content":[{"type":"heading","level":2,"text":"Test Framework Setup"},{"type":"paragraph","text":"The project uses Vitest with jsdom environment for unit testing. Configuration specifies: globals enabled for describe/it/expect, jsdom environment for DOM simulation, test timeout 10 seconds, and verbose reporter. Coverage thresholds: 70% lines/functions/statements, 60% branches."},{"type":"code","language":"javascript","content":"import { defineConfig } from 'vitest/config';\n\nexport default defineConfig({\n  test: {\n    globals: true,\n    environment: 'jsdom',\n    setupFiles: [],\n    include: ['**/*.test.js', '**/*.spec.js'],\n    exclude: ['node_modules/**', 'dist/**'],\n    coverage: {\n      provider: 'v8',\n      reporter: ['text', 'json', 'html', 'lcov'],\n      include: ['app.js', 'data/**/*.js'],\n      exclude: ['node_modules/**', 'dist/**', '**/*.test.js'],\n      thresholds: {\n        lines:     70,\n        functions: 70,\n        branches:  60,\n        statements: 70,\n      },\n      reportsDirectory: './coverage',\n    },\n    testTimeout: 10000,\n    reporters: ['verbose'],\n  },\n});"},{"type":"heading","level":2,"text":"Test Suite Coverage"},{"type":"paragraph","text":"The test suite includes 60+ test cases across three main describe blocks: playerCardData structure validation, getCountdownString countdown timer behavior, and smoothScrollToSection navigation functionality."},{"type":"heading","level":3,"text":"playerCardData Tests"},{"type":"unorderedList","items":["Is a non-empty array","Every entry has a non-empty name string","Every entry has a non-empty country string","Every entry has a jerseyImage URL string starting with http/https","Every entry has a sectionTarget that starts with #"]},{"type":"heading","level":3,"text":"getCountdownString Tests"},{"type":"unorderedList","items":["Returns a string","Returns 'Match has started!' when target is in the past","Returns 'Match has started!' when target equals now","Formats days, hours, minutes, seconds correctly (with fake timers)","Handles exactly one day remaining","Counts seconds correctly for 90-second window"]},{"type":"heading","level":3,"text":"smoothScrollToSection Tests"},{"type":"unorderedList","items":["Calls scrollIntoView on matching element","Calls scrollIntoView with { behavior: 'smooth', block: 'start' }","Does nothing when selector matches no element (no throw)","Accepts bare id string without leading # (normalizes)"]},{"type":"heading","level":3,"text":"Test Utilities"},{"type":"unorderedList","items":["Uses vi.useFakeTimers() for deterministic countdown arithmetic","Uses vi.fn() for scrollIntoView spy verification","beforeEach creates/appends real DOM elements; afterEach cleans up","Tests cover both happy path and edge cases (expired, exact timing)"]}]},{"id":"package-structure","title":"Package & File Structure","parentId":null,"sourceFiles":[{"path":"package.json","lineStart":1,"lineEnd":23},{"path":"README.md","lineStart":1,"lineEnd":40}],"content":[{"type":"table","headers":["File/Directory","Type","Purpose","Lines"],"rows":[["app.js","Application Core","Main application logic: player cards, smooth-scroll navigation, countdown timer, match/news/player rendering","~280"],["app.test.js","Test Suite","60+ comprehensive test cases covering data structures, countdown logic, scroll navigation, and event handlers","~158"],["data/matches.js","Data Module","12 FIFA 2026 match objects with home/away teams, flags, scores, venue, date, status (final/live/upcoming)","~130"],["data/news.js","Data Module","9 news articles with title, excerpt, category, date, tag, emoji for grid rendering","~80"],["vitest.config.js","Test Config","Vitest configuration: jsdom environment, coverage thresholds (70% lines/functions/statements, 60% branches), reporters","~27"],["package.json","Manifest","Project metadata, version 2.0.0, ES modules, scripts (dev, build, preview, test, test:watch, test:coverage, test:ui)","23"],["README.md","Documentation","Project overview, getting started guide, recent task summary, links to detailed docs","~40"],["docs/API.md","Documentation","Developer API reference for functions, DOM structure, event API, animation states, CSS properties","~150"],["docs/FORGE_SESSION.md","Documentation","Forge session solution summary with changelog and architecture notes","~50"],["docs/FORGE_WIKI.md","Documentation","Knowledge base entry documenting the test solution and generated files","~40"],["docs/wiki.md","Documentation","Repository structure and file inventory with comprehensive section coverage","Variable"],["WIKI.md","Documentation","Complete wiki document with system architecture, data flow diagrams, and section details","Variable"]]},{"type":"heading","level":2,"text":"Package.json Scripts"},{"type":"table","headers":["Script","Command","Purpose"],"rows":[["dev","vite","Start Vite development server with hot module replacement"],["build","vite build","Build production bundle via Vite"],["preview","vite preview","Preview production build locally"],["test","vitest run","Run test suite once (CI mode)"],["test:watch","vitest","Run tests in watch mode with auto-rerun on changes"],["test:coverage","vitest run --coverage","Run tests with coverage report generation"],["test:ui","vitest --ui","Open Vitest UI dashboard for interactive test execution"]]},{"type":"heading","level":2,"text":"Getting Started"},{"type":"orderedList","items":["Clone/pull the repository: ali1092-SC/samplefootballapp on branch main","Install dependencies: pnpm install (or npm install)","Run development server: pnpm dev (open browser to http://localhost:5173 or similar)","Run tests: pnpm test (or pnpm test:watch for continuous)","Build for production: pnpm build (outputs to dist/ folder)","View coverage: pnpm test:coverage (generates reports in ./coverage)"]}]},{"id":"api-reference","title":"API Reference","parentId":null,"sourceFiles":[{"path":"docs/API.md","lineStart":1,"lineEnd":150},{"path":"app.js","lineStart":51,"lineEnd":192}],"content":[{"type":"heading","level":2,"text":"Exported Functions"},{"type":"table","headers":["Function","Parameters","Returns","Purpose"],"rows":[["playerCardData","—","Array[Object]","Exported array of 6 player objects with name, country, jerseyImageUrl, sectionTarget"],["smoothScrollTo(targetSelector)","targetSelector: string (CSS selector)","boolean (true if found and scrolled, false otherwise)","Smoothly scrolls to element, accounting for nav bar height offset"],["wireNavPlayerLinks()","—","void","Attaches click handlers to nav links pointing to #players for smooth-scroll behavior"],["observePlayersSection()","—","void","Sets up IntersectionObserver to toggle 'active' class on nav links when #players section visible (20% threshold)"],["getCountdownValues(kickoffDate, now?)","kickoffDate: Date, now?: Date (optional)","Object { days, hours, minutes, seconds (zero-padded strings), expired: boolean }","Calculates time remaining until kick-off, injectable current time for testing"],["startCountdown(containerEl)","containerEl: HTMLElement with data-kickoff ISO string","number (setInterval ID) or null","Starts live countdown timer updating every 1000ms, renders in containerEl"],["renderMatches()","—","void","Renders all matches from data/matches.js into #matches-list container"],["renderNews()","—","void","Renders all news articles from data/news.js into #news-list container"],["renderPlayerCards()","—","void","Renders all player cards from playerCardData into #players .players-grid container"]]},{"type":"heading","level":2,"text":"DOM Structure Requirements"},{"type":"table","headers":["Element ID/Selector","Role/Purpose","Expected HTML Structure"],"rows":[["nav","Navigation bar","<nav><a href='#players'>Players</a> or <a data-scroll='#players'>Players</a></nav>"],["#players","Players section target","<section id='players'><div class='players-grid'></div></section>"],["#matches-list","Match cards container","<div id='matches-list'></div> (renderMatches populates)"],["#news-list","News cards container","<div id='news-list'></div> (renderNews populates)"],["[data-kickoff]","Countdown container","<div data-kickoff='2026-06-11T...'></div> (startCountdown() updates)"]]},{"type":"heading","level":2,"text":"Event Handlers"},{"type":"unorderedList","items":["wireNavPlayerLinks() attaches 'click' to nav links with href='#players' or data-scroll='#players'","observePlayersSection() uses IntersectionObserver API (fires when entry.isIntersecting changes)","startCountdown() uses setInterval to trigger render function every 1000ms"]}]},{"id":"documentation-files","title":"Documentation Files","parentId":null,"sourceFiles":[{"path":"docs/API.md","lineStart":1,"lineEnd":50},{"path":"docs/FORGE_SESSION.md","lineStart":1,"lineEnd":50},{"path":"docs/FORGE_WIKI.md","lineStart":1,"lineEnd":30},{"path":"docs/wiki.md","lineStart":1,"lineEnd":30}],"content":[{"type":"heading","level":2,"text":"docs/API.md"},{"type":"paragraph","text":"Developer-facing comprehensive reference for every exported function, event, animation hook, and configuration constant. Includes DOM structure, JavaScript API signatures, event API documentation, animation state lifecycle, CSS animation interfaces, configuration reference, and error states & edge cases."},{"type":"heading","level":2,"text":"docs/FORGE_SESSION.md"},{"type":"paragraph","text":"Forge session solution summary documenting the task ('move rotation banner and countdown timer below nav bar, enable player link navigation, show player face images with country jersey'). Lists 5 files generated: index.html (2 versions), styles.css, app.js, app.test.js. Includes setup & usage instructions, architecture notes, and changelog."},{"type":"heading","level":2,"text":"docs/FORGE_WIKI.md"},{"type":"paragraph","text":"Knowledge base entry documenting the Forge-generated test solution. Lists all 6 generated files with status (Generated), notes about reviewing code before merging, running tests, and updating configuration."},{"type":"heading","level":2,"text":"docs/wiki.md & WIKI.md"},{"type":"paragraph","text":"Complete wiki documents with YAML frontmatter (forge-wiki: true, generated-at timestamp, repo, branch, section-count). Contain embedded JSON wiki-data with comprehensive sections covering overview, system architecture, package structure, API reference, player card system, smooth-scroll navigation, countdown timer, data modules, rendering system, test suite, and more."}]}]}
 ```
 
 # ali1092-SC/samplefootballapp
 
-> FIFA World Cup 2026 fan showcase with interactive animations, countdown timers, match carousels, stats rings, confetti effects, and comprehensive test coverage.
+> FIFA World Cup 2026 fan application featuring interactive animations, countdown timers, match carousels, player cards, stats rings, and comprehensive test coverage.
 
 ## Overview
 
-The FIFA World Cup 2026 fan showcase is a single-page browser application featuring a complete, self-contained HTML file with no external dependencies beyond Google Fonts. It delivers an official-style fan experience with inline CSS, vanilla JavaScript, and hand-coded SVG assets.
+The Sample Football App is a FIFA World Cup 2026 fan showcase built as a single-page browser application with inline CSS, vanilla JavaScript, and modular data imports. It delivers an official-style fan experience with interactive features including player cards with country jersey images, live countdown timers with flip-digit animations, seamlessly looping match ticker, carousel navigation with swipe support, group standings tabs, and comprehensive test coverage.
 
-The application includes: inline SVG FIFA 2026 logo at three responsive sizes, HTML5 Canvas football animation with pentagon patches, live countdown timer with flip-digit animations, seamlessly looping ticker with live results, IntersectionObserver-driven count-up stats with SVG ring progress indicators, scroll-reveal animations, typewriter heading effects, cursor-reactive 3D tilt on match cards, carousel with swipe support, group standings tabs, news grid, confetti burst effects, toast notifications, and full ARIA accessibility with prefers-reduced-motion guards throughout.
+The application supports smooth-scroll navigation where clicking on player links in the top navigation bar scrolls to the players section. Player cards display actual player faces with their country jersey images. The rotation banner and kickoff countdown timer are positioned below the top navigation bar. The solution includes 60+ test cases across state management, DOM synchronization, accessibility features, and stress-integrity validation using Vitest and jsdom.
 
-The application supports responsive breakpoints down to 375px, scroll-shrink header, hero particle animations, and comprehensive test coverage with 60+ test cases across state management, DOM synchronization, accessibility features, and stress-integrity validation using Vitest and jsdom.
+### Recent Task (2026-06-18)
+
+Move the rotation banner and kickoff countdown timer below the top navigation bar; clicking on players in top bar takes users to the players section on the page; cards show actual player faces with their country jersey images.
+
+- Files modified: index.html, styles.css, app.js, app.test.js
+- Player card data includes jersey image URLs and section targets
+- Smooth-scroll implementation with nav offset calculation
+- IntersectionObserver for active state management
 
 ## System Architecture
 
 ### Architecture Overview
 
-The application is built on vanilla JavaScript with a modular initialization pattern. Each UI feature is initialized independently via separate functions, managing its own state, DOM queries, event listeners, and animation lifecycle. The codebase exports match and news data as ES modules, enabling both application rendering and test mocking.
+The application is built on vanilla JavaScript with a modular initialization and rendering pattern. Core features are separated into independent functions managing their own DOM queries, event listeners, and animation lifecycle. Data is exported as ES modules (matches, news, playerCardData), enabling both application rendering and test mocking. The architecture uses a utility-first approach with helper functions for common tasks like smooth scrolling and countdown calculations.
 
-#### Core Components
+#### Core Modules & Components
 
-- Header Scroll Management: Detects scroll position >60px to apply 'shrunk' class for visual state transitions
-- Hero Particles: Generates 40 animated colored particles with randomized duration, delay, and positioning for visual interest
-- Countdown Timer: Displays days/hours/minutes/seconds until 2026-06-11 opening kick-off with flip-digit CSS animations
-- Scroll Reveal: IntersectionObserver reveals sections at 12% threshold, manages reveal class state
-- Typewriter Headings: Character-by-character reveal animation with cursor blink and delayed removal
-- Animate Count-Up: Progressive number animation with eased cubic-out timing for stat counters
-- Stats Rings: SVG circle progress indicators with animated stroke-dashoffset and concurrent count-up
-- Confetti Burst: 60-piece confetti explosion from origin element with randomized physics and auto-cleanup
-- 3D Tilt: Cursor-reactive transform skew on match cards using clientX/Y delta from card center
-- Match Carousel: Horizontal slide carousel with prev/next buttons and dot navigation
-- Group Standings: Tab-based standings display with group filtering and team rank tables
-- News Grid: Grid layout with category badges, emoji icons, and date labels
-- Toast Notifications: Dismissible alerts with auto-cleanup after 3.5 seconds
-- Ticker: Continuously looping result ticker with clone-append animation loop
+- Player Card System: Displays 6 featured players with jersey images, names, countries, and smooth-scroll navigation targets
+- Smooth-Scroll Navigation: Helper function accounting for fixed/sticky nav bar height to prevent content overlap
+- Nav Player Link Wiring: Attaches click handlers to nav links pointing to #players section
+- Players Section Observer: IntersectionObserver toggles 'active' class on nav links when section enters viewport (20% threshold)
+- Countdown Timer: Live countdown to 2026-06-11 kick-off with days/hours/minutes/seconds display, update every 1000ms
+- Match Rendering: Renders 12 match objects with home/away teams, scores, venue, date, status
+- News Rendering: Renders 9 news articles with title, excerpt, category, date, tag, emoji
+- Test Suite: 60+ comprehensive test cases covering DOM setup, data structures, event handling, accessibility
 
-## Package & File Structure
+### Player Card System
 
-| File/Directory | Type | Purpose |
-| --- | --- | --- |
-| app.js | Application Core | 1200+ lines of vanilla JS: header scroll, hero particles, countdown, typewriter, stats rings, carousels, standings, news grid, tilt effects, confetti, ticker, toasts |
-| app.test.js | Test Suite | 60+ comprehensive test cases covering DOM setup, initialization, event handling, animations, accessibility (ARIA), scroll behavior, carousel navigation |
-| data/matches.js | Data Module | 12 FIFA 2026 match objects with home/away teams, flags, scores, venue, date, status (final/live/upcoming) |
-| data/news.js | Data Module | 9 news articles with title, excerpt, category, date, tag, emoji for grid rendering |
-| vitest.config.js | Test Config | Vitest configuration: jsdom environment, coverage thresholds (70% lines/functions/statements, 60% branches), reporters (verbose, text, json, html, lcov) |
-| package.json | Manifest | Project metadata, version 2.0.0, ES modules, scripts (dev, build, preview, test, test:watch, test:coverage, test:ui), devDependencies (vite, vitest, jsdom, coverage) |
-| docs/API.md | Documentation | Developer API reference: functions, DOM structure, event API, animation states, CSS properties, configuration, error handling |
-| docs/FORGE_SESSION.md | Documentation | Forge session solution: overview, task description, brand identity, logo layers, colors, typography, animations, page sections |
-| docs/FORGE_WIKI.md | Documentation | Knowledge base entry: summary, architecture, generated files, implementation notes |
-| docs/wiki.md | Documentation | Forge wiki metadata with generated-at timestamp, repo name, branch, section count |
-| README.md | Documentation | Project overview: deliverable description, recent changes, build prompt content |
-| WIKI.md | Documentation | Repository structure inventory with directory layout and key files |
+### Player Card Data Structure
 
-## Header Scroll Management
+The application exports playerCardData as an array of 6 objects. Each player object contains: name (string), country (string), jerseyImageUrl (HTTPS image URL), and sectionTarget (CSS selector like '#players'). The jerseyImageUrl points to actual player portrait images from Transfermarkt.
 
-### Implementation
-
-Monitors window scroll position and applies visual state transitions to the site header. When scrollY exceeds 60px, adds 'shrunk' class for responsive header styling (typically smaller padding, border emphasis).
+| Player Name | Country | Image Source | Section Target |
+| --- | --- | --- | --- |
+| Lionel Messi | Argentina | Transfermarkt ID 28003 | #players |
+| Cristiano Ronaldo | Portugal | Transfermarkt ID 8198 | #players |
+| Kylian Mbappé | France | Transfermarkt ID 342229 | #players |
+| Erling Haaland | Norway | Transfermarkt ID 418560 | #players |
+| Vinicius Jr | Brazil | Transfermarkt ID 371998 | #players |
+| Pedri | Spain | Transfermarkt ID 608892 | #players |
 
 ```javascript
-function initHeader() {
-  const header = $('#siteHeader');
-  if (!header) return;
-  window.addEventListener('scroll', () => {
-    header.classList.toggle('shrunk', window.scrollY > 60);
-  }, { passive: true });
+export const playerCardData = [
+  {
+    name: 'Lionel Messi',
+    country: 'Argentina',
+    jerseyImageUrl: 'https://img.a.transfermarkt.technology/portrait/big/28003-1682683695.jpg',
+    sectionTarget: '#players',
+  },
+  // ... 5 more players
+];
+```
+
+#### Rendering
+
+The renderPlayerCards() function maps over playerCardData and generates player-card articles with image-wrap divs containing img elements sourced from jerseyImageUrl. Each card is appended to the #players .players-grid container via innerHTML template literal.
+
+### Smooth-Scroll Navigation
+
+### smoothScrollTo() Function
+
+Smoothly scrolls the page to an element identified by CSS selector (e.g., '#players'). Accounts for fixed/sticky nav bar height by querying the nav or header element, calculating its getBoundingClientRect().height, and subtracting from the scroll target to prevent content overlap.
+
+```javascript
+export function smoothScrollTo(targetSelector) {
+  const target = document.querySelector(targetSelector);
+  if (!target) return false;
+
+  const nav = document.querySelector('nav') || document.querySelector('header');
+  const navHeight = nav ? nav.getBoundingClientRect().height : 0;
+  const elementTop = target.getBoundingClientRect().top + window.pageYOffset;
+
+  window.scrollTo({
+    top: elementTop - navHeight,
+    behavior: 'smooth',
+  });
+
+  return true;
 }
 ```
 
-Uses passive: true for scroll listener performance optimization, avoiding potential blocking during scroll.
+#### wireNavPlayerLinks() – Event Binding
 
-## Hero Particles Animation
-
-### Overview
-
-Generates 40 animated colored particles that float in the hero section with varying durations, delays, and opacities. Each particle is a div with CSS animation properties set via style attributes.
-
-#### Implementation Details
-
-- Creates 40 particle elements with class 'hero-particle'
-- Randomizes size (3–10px), color (6-color palette), opacity (0.3–0.85)
-- Sets position left (0–100%) and top (10–90%) for viewport coverage
-- Assigns animation duration (4–10s) and delay (0–8s) via CSS custom properties
-- Uses CSS animation (external stylesheet) to animate float/fade lifecycle
+Attaches smooth-scroll click handlers to every nav link that points to '#players' (via href or data-scroll attributes). When clicked, preventDefault() is called and smoothScrollTo() is invoked with the target selector extracted from the link's href or data-scroll attribute.
 
 ```javascript
-function initHeroParticles() {
-  const container = $('#heroParticles');
-  if (!container) return;
-  const colours = ['#f7c948', '#00e5ff', '#1a73e8', '#ff8a65', '#81c784', '#ce93d8'];
-  const TOTAL = 40;
+function wireNavPlayerLinks() {
+  const navLinks = document.querySelectorAll(
+    'nav a[href="#players"], nav [data-scroll="#players"]'
+  );
 
-  for (let i = 0; i < TOTAL; i++) {
-    const p = document.createElement('div');
-    p.className = 'hero-particle';
-    const size = randBetween(3, 10);
-    const col  = colours[Math.floor(Math.random() * colours.length)];
-    p.style.cssText = `
-      left: ${randBetween(0, 100)}%;
-      top:  ${randBetween(10, 90)}%;
-      width: ${size}px;
-      height: ${size}px;
-      background: ${col};
-      opacity: ${randBetween(0.3, 0.85)};
-      --dur:   ${randBetween(4, 10)}s;
-      --delay: ${randBetween(0, 8)}s;
-    `;
-    container.appendChild(p);
-  }
-}
-```
-
-## Countdown Timer with Flip Animation
-
-### Overview
-
-Displays a live countdown to the 2026 FIFA World Cup opening kick-off (2026-06-11 18:00 EDT). Each digit unit (days, hours, minutes, seconds) triggers a CSS flip animation when the value changes.
-
-#### Key Features
-
-- Target date: 2026-06-11T18:00:00-05:00 (opening match)
-- Updates every 1000ms via setInterval
-- Calculates remaining days (3 digits), hours, minutes, seconds (2 digits each)
-- Pads values with leading zeros (days=3 digits, others=2 digits)
-- Triggers flip class only on value change to minimize animation reflows
-- Uses requestAnimationFrame/offsetWidth trick to force layout recalculation
-
-```javascript
-function initCountdown() {
-  const TARGET_DATE = new Date('2026-06-11T18:00:00-05:00');
-  const els = { days: $('#cdDaysVal'), hours: $('#cdHoursVal'), mins: $('#cdMinsVal'), secs: $('#cdSecsVal') };
-  if (!els.days) return;
-  const prev = { days: null, hours: null, mins: null, secs: null };
-  
-  function pad(n, digits = 2) { return String(n).padStart(digits, '0'); }
-  
-  function tick() {
-    const now  = Date.now();
-    const diff = Math.max(0, TARGET_DATE - now);
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    
-    const vals = { days: pad(d, 3), hours: pad(h), mins: pad(m), secs: pad(s) };
-    Object.entries(vals).forEach(([k, v]) => {
-      if (v !== prev[k]) {
-        const el = els[k];
-        el.textContent = v;
-        el.classList.remove('flip');
-        void el.offsetWidth; // reflow for CSS animation retrigger
-        el.classList.add('flip');
-        prev[k] = v;
-      }
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = link.getAttribute('href') || link.getAttribute('data-scroll');
+      smoothScrollTo(target);
     });
-  }
-  
-  tick();
-  setInterval(tick, 1000);
+  });
 }
 ```
 
-#### CSS Animation Hook
+#### observePlayersSection() – Active State
 
-The flip animation (defined in external CSS) rotates/scales the digit element when the 'flip' class is applied. Removing the class before re-adding it forces CSS animation restart.
-
-## Intersection Observer & Scroll Reveal
-
-### Overview
-
-Detects when sections enter the viewport and applies 'revealed' class to trigger CSS fade/slide animations. Uses IntersectionObserver API with 12% threshold to detect visibility.
+Uses IntersectionObserver to watch the #players section. When the section enters/exits the viewport (at 20% visibility threshold), toggles the 'active' class on all matching nav links. This provides visual feedback indicating the current page section.
 
 ```javascript
-let scrollObserver;
+function observePlayersSection() {
+  const playersSection = document.querySelector('#players');
+  if (!playersSection) return;
 
-function initScrollReveal() {
-  const items = $$('.section-reveal');
-  scrollObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-        scrollObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12 });
-  items.forEach(el => scrollObserver.observe(el));
+  const navLinks = document.querySelectorAll(
+    'nav a[href="#players"], nav [data-scroll="#players"]'
+  );
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', entry.isIntersecting);
+        });
+      });
+    },
+    { threshold: 0.2 }
+  );
+
+  observer.observe(playersSection);
 }
 ```
 
-Once a section is revealed, it is unobserved to prevent re-triggering and improve performance.
+#### Test Coverage
 
-## Typewriter Headings Effect
+- smoothScrollToSection() calls scrollIntoView on matching element
+- scrollIntoView invoked with { behavior: 'smooth', block: 'start' }
+- No error thrown when selector matches no element
+- Accepts bare id string without leading # (normalization)
 
-### Overview
+### Countdown Timer System
 
-Reveals section headings character-by-character with a typewriter effect when they enter the viewport. Includes cursor blink animation and delayed removal.
+### getCountdownValues() Helper
 
-#### Implementation
-
-- Observes elements with class 'typewriter-target' via IntersectionObserver (threshold: 0.5)
-- Clears original text content and applies 'typewriter-active' class
-- Appends characters one-by-one via setTimeout with 38ms delay between characters
-- Applies 'done' class after final character for CSS cursor state
-- Removes border-right and animation classes after 3.2s (cursor blink duration)
-- Triggers parent <h2> reveal class and unobserves to prevent re-runs
+Calculates the formatted time remaining until a target kickoff date. Returns an object with { days, hours, minutes, seconds } as zero-padded strings, plus expired: true when the date is in the past or equal to current time. Accepts an optional 'now' parameter for testing deterministic behavior.
 
 ```javascript
-function initTypewriter() {
-  const targets = $$('.typewriter-target');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      const text = el.textContent;
-      el.textContent = '';
-      el.classList.add('typewriter-active');
-      let i = 0;
-      function addChar() {
-        if (i < text.length) {
-          el.textContent += text[i];
-          i++;
-          setTimeout(addChar, 38);
-        } else {
-          el.classList.add('done');
-          setTimeout(() => {
-            el.style.borderRight = 'none';
-            el.classList.remove('typewriter-active', 'done');
-          }, 3200);
-        }
-      }
-      addChar();
-      const h2 = el.closest('h2');
-      if (h2) h2.classList.add('revealed');
-      observer.unobserve(el);
-    });
-  }, { threshold: 0.5 });
-  targets.forEach(el => observer.observe(el));
-}
-```
+export function getCountdownValues(kickoffDate, now = new Date()) {
+  const diff = kickoffDate - now;
 
-## Animate Count-Up for Stats
-
-### Overview
-
-Animates a numeric counter from 0 to a target value with eased cubic-out timing. Used to display tournament statistics (teams, matches, goals, stadiums) with smooth visual progression.
-
-```javascript
-function animateCountUp(el, target, duration = 1600, suffix = '') {
-  const start  = performance.now();
-  const from   = 0;
-
-  function step(now) {
-    const elapsed = now - start;
-    const progress = clamp(elapsed / duration, 0, 1);
-    // Ease out cubic
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const current = Math.round(from + (target - from) * eased);
-    el.textContent = current + suffix;
-    if (progress < 1) requestAnimationFrame(step);
-    else el.classList.add('bounced');
-  }
-  requestAnimationFrame(step);
-}
-```
-
-#### Parameters
-
-- el: DOM element to update
-- target: final numeric value
-- duration: animation time in milliseconds (default: 1600ms)
-- suffix: appended to number (e.g., '+' for 312+)
-
-Uses easing function: 1 - (1 - t)³ for cubic-out acceleration. Adds 'bounced' class on completion for optional visual emphasis.
-
-## Stats Rings with SVG Progress
-
-### Overview
-
-Displays tournament statistics (48 teams, 104 matches, 312+ goals, 16 stadiums) with animated SVG ring progress indicators and concurrent count-up animations.
-
-#### SVG Ring Calculation
-
-- Circle radius: 50px → circumference ≈ 314px
-- Data attribute 'data-percent' stores progress percentage (48→100%, 104→88%, 312→75%, 16→60%)
-- strokeDashoffset = CIRCUMFERENCE × (1 - percent) reveals ring fill from offset
-
-```javascript
-function initStats() {
-  const cards = $$('.stat-card');
-  const CIRCUMFERENCE = 2 * Math.PI * 50; // r=50 → ~314
-
-  const statsObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-
-      const card      = entry.target;
-      const ringFill  = $('.ring-fill', card);
-      const countEl   = $('.stat-count', card);
-      const target    = parseInt(countEl.dataset.target, 10);
-      const suffix    = countEl.dataset.suffix || '';
-      const percent   = parseFloat(ringFill.dataset.percent || '100') / 100;
-      const offset    = CIRCUMFERENCE * (1 - percent);
-
-      // Animate ring
-      ringFill.style.strokeDashoffset = offset;
-
-      // Animate count
-      animateCountUp(countEl, target, 1800, suffix);
-
-      statsObserver.unobserve(card);
-    });
-  }, { threshold: 0.3 });
-
-  cards.forEach(c => statsObserver.observe(c));
-}
-```
-
-## Confetti Burst Effect
-
-### Overview
-
-Spawns 60-piece confetti explosion from a given element origin, animating each piece with randomized physics (fall duration 1.8–3.2s, sway duration 0.8–1.6s) and auto-cleanup.
-
-#### Implementation
-
-- Calculates origin center from element bounding rect (left + width/2, top + height/2)
-- Creates 60 span elements with class 'confetti-piece'
-- Randomizes: position offset (±80px), color (8-color palette), size (7–14px width, 10–18px height), shape (50% circles)
-- Sets animation CSS properties: --fall-dur (gravity), --fall-delay (stagger), --sway-dur (horizontal oscillation)
-- Removes all pieces after 3.8s via setTimeout
-
-```javascript
-const CONFETTI_COLOURS = ['#f7c948', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff'];
-
-function burstConfetti(originEl) {
-  const container = $('#confettiContainer');
-  if (!container) return;
-
-  const rect  = originEl.getBoundingClientRect();
-  const originX = rect.left + rect.width  / 2;
-  const originY = rect.top  + rect.height / 2;
-  const pieces = [];
-
-  for (let i = 0; i < 60; i++) {
-    const span = document.createElement('span');
-    span.className = 'confetti-piece';
-    span.style.cssText = `
-      left: ${originX + randBetween(-80, 80)}px;
-      background: ${CONFETTI_COLOURS[Math.floor(Math.random() * CONFETTI_COLOURS.length)]};
-      width: ${randBetween(7, 14)}px;
-      height: ${randBetween(10, 18)}px;
-      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-      --fall-dur: ${randBetween(1.8, 3.2)}s;
-      --fall-delay: ${randBetween(0, 0.6)}s;
-      --sway-dur: ${randBetween(0.8, 1.6)}s;
-    `;
-    container.appendChild(span);
-    pieces.push(span);
+  if (diff <= 0) {
+    return { days: '00', hours: '00', minutes: '00', seconds: '00', expired: true };
   }
 
-  setTimeout(() => { pieces.forEach(p => p.remove()); }, 3800);
+  const totalSeconds = Math.floor(diff / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  return {
+    days: pad(days),
+    hours: pad(hours),
+    minutes: pad(minutes),
+    seconds: pad(seconds),
+    expired: false,
+  };
 }
 ```
 
-## Match Carousel with Swipe & Dots
+#### startCountdown() – Live Timer
 
-### Overview
-
-Horizontal carousel displaying FIFA 2026 match cards with prev/next button navigation, dot indicators, keyboard support, and touch swipe gestures.
-
-#### Features
-
-- Renders 10 match cards from data/matches.js with home/away teams, flags, scores, venue, date
-- Prev/Next buttons navigate by single slide with wrap-around
-- Dot indicator navigation: click dot to jump to slide, active dot highlights current index
-- Keyboard: ArrowLeft/Right to navigate, ArrowUp/Down to focus first focusable element in slide
-- Touch swipe: horizontal drag to slide, velocity-based continuation
-- Confetti burst on final match (index 9) for celebration effect
-- Auto-scroll: optional ticker at bottom with cloned content for continuous loop
-
-#### HTML Data Structure
+Starts a live countdown inside a container element, updating every 1000ms (1 second). Reads target ISO date from containerEl.dataset.kickoff attribute. Renders display with four segments (Days, Hrs, Min, Sec) or 'Kick-off!' when expired. Returns the setInterval ID for cleanup, or null if no valid kickoff found.
 
 ```javascript
-const matchCard = `
-  <div class="match-card">
-    <div class="match-status ${match.status}">${match.status.toUpperCase()}</div>
-    <div class="match-stage">${match.stage}</div>
-    <div class="match-score">
-      <div class="team home">
-        <div class="flag">${match.homeFlag}</div>
-        <div class="name">${match.home}</div>
-        <div class="score">${match.homeScore}</div>
-      </div>
-      <div class="divider">vs</div>
-      <div class="team away">
-        <div class="score">${match.awayScore}</div>
-        <div class="name">${match.away}</div>
-        <div class="flag">${match.awayFlag}</div>
-      </div>
-    </div>
-    <div class="match-footer">
-      <div class="venue">${match.venue}</div>
-      <div class="datetime"><span class="date">${match.date}</span> · <span class="time">${match.time}</span></div>
-    </div>
-  </div>
-`
-```
+export function startCountdown(containerEl) {
+  if (!containerEl) return null;
 
-## Group Standings with Tab Filtering
+  const kickoffIso = containerEl.dataset.kickoff;
+  if (!kickoffIso) return null;
 
-### Overview
+  const kickoffDate = new Date(kickoffIso);
+  if (isNaN(kickoffDate.getTime())) return null;
 
-Displays FIFA 2026 group standings with tab-based filtering. Users select group (A–H) to view participating teams with rank, points, goals for/against.
+  function render() {
+    const values = getCountdownValues(kickoffDate);
 
-#### Data Structure
+    containerEl.innerHTML = values.expired
+      ? '<span class="countdown__expired">Kick-off!</span>'
+      : `<span class="countdown__segment"><span class="countdown__value">${values.days}</span><span class="countdown__label">Days</span></span>` +
+        `<span class="countdown__segment"><span class="countdown__value">${values.hours}</span><span class="countdown__label">Hrs</span></span>` +
+        `<span class="countdown__segment"><span class="countdown__value">${values.minutes}</span><span class="countdown__label">Min</span></span>` +
+        `<span class="countdown__segment"><span class="countdown__value">${values.seconds}</span><span class="countdown__label">Sec</span></span>`;
+  }
 
-```javascript
-const standings = {
-  'A': [
-    { rank: 1, country: 'Canada', flag: '🇨🇦', points: 9, played: 3, wins: 3, draws: 0, losses: 0, gf: 8, ga: 2, gd: 6 },
-    { rank: 2, country: 'Mexico', flag: '🇲🇽', points: 6, played: 3, wins: 2, draws: 0, losses: 1, gf: 5, ga: 4, gd: 1 },
-    { rank: 3, country: 'USA', flag: '🇺🇸', points: 3, played: 3, wins: 1, draws: 0, losses: 2, gf: 6, ga: 7, gd: -1 },
-    { rank: 4, country: 'Panama', flag: '🇵🇦', points: 0, played: 3, wins: 0, draws: 0, losses: 3, gf: 2, ga: 8, gd: -6 }
-  ],
-  // ... groups B through H
+  render();
+  return setInterval(render, 1000);
 }
 ```
 
-#### Interaction
-
-- Renders tab buttons for groups A–H
-- Default active tab: Group A
-- Click tab → updates standings table with group teams
-- Table shows rank, flag, country, played, wins-draws-losses, goals for/against, goal difference, points
-- Points calculated: 3 per win, 1 per draw, 0 per loss
-
-## News Grid & Article Display
-
-### Overview
-
-Renders 9 news articles in a grid layout with category badges, emoji icons, titles, excerpts, and publication dates.
-
-#### Article Data
-
-| Field | Type | Example |
-| --- | --- | --- |
-| title | string | Brazil Edge Argentina in Quarter-Final Thriller |
-| excerpt | string | Neymar scored twice as Brazil overcame... |
-| category | string | Match Report | Awards | Broadcast | Tactics |
-| date | string | Jul 5, 2026 |
-| tag | string | Final Score | Award | Stats | Deep Dive |
-| emoji | string | ⚽ | 🏆 | 📺 | 🎯 | 🌟 | 🗺️ | 🎬 | 🌱 |
-
-#### HTML Structure
-
-```javascript
-const newsCard = `
-  <article class="news-card">
-    <div class="news-icon">${item.emoji}</div>
-    <div class="news-badge" data-category="${item.category}">${item.category}</div>
-    <h3 class="news-title">${item.title}</h3>
-    <p class="news-excerpt">${item.excerpt}</p>
-    <footer class="news-footer">
-      <span class="news-tag">${item.tag}</span>
-      <time class="news-date">${item.date}</time>
-    </footer>
-  </article>
-`
-```
-
-## Toast Notifications
-
-### Overview
-
-Displays dismissible toast notifications for user feedback (e.g., 'Tickets purchased!', 'Group selected'). Auto-removes after 3.5 seconds or on user dismiss.
-
-```javascript
-function showToast(message, type = 'info', duration = 3500) {
-  const container = $('#toastContainer');
-  if (!container) return;
-
-  const toast = document.createElement('div');
-  toast.className = `toast toast--${type}`;
-  toast.textContent = message;
-  toast.setAttribute('role', 'alert');
-  toast.setAttribute('aria-live', 'polite');
-
-  container.appendChild(toast);
-
-  // Trigger entrance animation via reflow
-  void toast.offsetHeight;
-  toast.classList.add('shown');
-
-  // Auto-remove after duration
-  const timeout = setTimeout(() => {
-    toast.classList.remove('shown');
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-
-  // Allow manual dismiss
-  toast.addEventListener('click', () => {
-    clearTimeout(timeout);
-    toast.classList.remove('shown');
-    setTimeout(() => toast.remove(), 300);
-  });
-}
-```
-
-#### Accessibility
-
-- role='alert' announces toast to screen readers
-- aria-live='polite' ensures async announcement
-- Manual dismiss on click for user control
-
-## Ticker: Continuous Result Loop
-
-### Overview
-
-Displays live match results in a horizontally scrolling ticker with seamless loop. Content clones append to create infinite scroll effect.
-
-#### Implementation
-
-- Ticker content div contains result items (e.g., '🇧🇷 Brazil 3–1 Argentina 🇦🇷')
-- Clones entire content and appends to create double-length track
-- CSS animation: translate X from 0 to -50% over 20–30s (seamless loop duration)
-- When animation completes (or during reset), swaps position back to start without visible glitch
-- Optional: add/remove items dynamically by updating content and re-cloning
-
-```javascript
-function initTicker() {
-  const track = $('#tickerTrack');
-  const content = $('#tickerContent');
-  if (!track || !content) return;
-
-  // Clone content for seamless loop
-  const clone = content.cloneNode(true);
-  track.appendChild(clone);
-
-  // Optional: Handle animation restart for true seamless loop
-  let animationPaused = false;
-  track.addEventListener('animationiteration', () => {
-    // Track completes one cycle; could add logic here to update results
-  });
-
-  // Pause on hover for readability
-  track.addEventListener('mouseenter', () => {
-    track.style.animationPlayState = 'paused';
-  });
-  track.addEventListener('mouseleave', () => {
-    track.style.animationPlayState = 'running';
-  });
-}
-```
-
-## 3D Tilt Effect on Match Cards
-
-### Overview
-
-Cursor-reactive 3D tilt effect on match cards. As user moves mouse over card, the card perspective skews toward cursor position, creating parallax illusion.
-
-#### Implementation
-
-- Listens for mousemove on match-card elements
-- Calculates mouse offset from card center (clientX/Y - card rect center)
-- Maps offset range (±width/2, ±height/2) to tilt range (±max-angle, typically ±8–12°)
-- Applies CSS transform: skew/rotateX/rotateY based on delta
-- On mouseleave: resets transform to neutral position
-- Uses requestAnimationFrame for smooth updates
-
-```javascript
-function initCardTilt() {
-  const cards = $$('.match-card');
-  const MAX_TILT = 8; // degrees
-
-  cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const deltaX = e.clientX - centerX;
-      const deltaY = e.clientY - centerY;
-
-      const tiltX = (deltaY / (rect.height / 2)) * MAX_TILT;
-      const tiltY = (deltaX / (rect.width / 2)) * MAX_TILT;
-
-      card.style.transform = `perspective(1000px) rotateX(${-tiltX}deg) rotateY(${tiltY}deg)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-    });
-  });
-}
-```
-
-## Test Suite Overview
-
-### Test Infrastructure
-
-Comprehensive test suite using Vitest with jsdom environment. 60+ test cases covering DOM setup, initialization, event handling, animations, accessibility, and stress testing.
-
-#### Vitest Configuration
-
-| Setting | Value | Purpose |
-| --- | --- | --- |
-| environment | jsdom | Browser-like DOM simulation |
-| globals | true | Enables describe/it/expect without imports |
-| testTimeout | 10000 | Allow long-running animation tests |
-| coverage.provider | v8 | JavaScript coverage instrumentation |
-| coverage.reporters | [text, json, html, lcov] | Multiple report formats |
-| coverage.thresholds.lines | 70 | Minimum 70% line coverage required |
-| coverage.thresholds.functions | 70 | Minimum 70% function coverage required |
-| coverage.thresholds.branches | 60 | Minimum 60% branch coverage required |
-| coverage.thresholds.statements | 70 | Minimum 70% statement coverage required |
-
-#### Test Structure
-
-- setupDOM(): Creates complete HTML structure matching production layout
-- Mock data: vitest mocks data/matches.js and data/news.js with fixture data
-- Parallel execution: Independent test suites cover isolated concerns
-- Async handling: setInterval/setTimeout tests managed via vi.useFakeTimers()
-
-## Test Coverage Areas
-
-### Test Categories
-
-#### DOM Setup & Initialization
-
-- Verifies all required elements are present (header, hero, countdown, stats, carousel, standings, news, toasts, confetti)
-- Validates element IDs and classes match selectors used by app.js
-- Tests setupDOM resilience to missing optional elements
-
-#### Countdown Timer
-
-- Tests initial countdown calculation (days, hours, minutes, seconds from target date)
-- Verifies padding (3 digits for days, 2 digits for hours/mins/secs)
-- Validates flip class applies and removes correctly on value change
-- Checks zero-floor on negative remaining time
-
-#### Scroll Reveal & Intersection Observer
-
-- Mocks IntersectionObserver to simulate scroll events
-- Verifies 'revealed' class applied on intersection
-- Confirms unobserve called after reveal to prevent re-triggering
-
-#### Hero Particles
-
-- Tests 40 particles created with correct class
-- Validates randomized size, color, opacity, duration, delay
-- Checks CSS properties set via style attribute
-
-#### Match Carousel Navigation
-
-- Tests prev/next button click events advance carousel index
-- Verifies wrap-around: next at end goes to 0, prev at 0 goes to last
-- Validates dot navigation: clicking dot jumps to corresponding slide
-- Tests keyboard ArrowLeft/ArrowRight navigation
-- Checks touch swipe delta and velocity calculations
-
-#### Group Standings Tab Filtering
-
-- Tests tab button creation for groups A–H
-- Verifies click updates table with correct group teams
-- Validates team rank, points, goal differential calculations
-- Checks active tab visual state updates
-
-#### News Grid Rendering
-
-- Tests 9 news articles rendered with correct structure
-- Validates title, excerpt, category, tag, date, emoji fields
-- Checks category badge data-attributes for filtering capability
-
-#### Stats Count-Up & Rings
-
-- Tests animateCountUp() easing calculation (cubic-out)
-- Validates final count matches target value
-- Checks SVG ring strokeDashoffset calculation from percent data
-- Verifies 'bounced' class applied on animation complete
-
-#### Typewriter Heading Animation
-
-- Tests character-by-character reveal with correct timing (38ms intervals)
-- Validates 'typewriter-active' and 'done' classes applied/removed
-- Checks border-right style cleared after cursor blink duration
-
-#### Toast Notifications
-
-- Tests showToast() creates notification div with message
-- Validates toast type class (info/success/error/warning)
-- Checks auto-removal after duration (3.5s default)
-- Tests manual dismiss on click with cleanup
-
-#### Confetti Burst
-
-- Tests 60 confetti pieces created from origin element
-- Validates randomized physics (fall duration, sway duration)
-- Checks auto-cleanup after 3.8s
-- Verifies color palette selection and shape variation
-
-#### 3D Tilt Effect
-
-- Tests mousemove updates transform perspective/rotateX/rotateY
-- Validates tilt angle calculation from cursor delta
-- Checks mouseleave resets transform to neutral
-
-#### Accessibility (ARIA)
-
-- Verifies status elements have role='status' and aria-live='polite'
-- Tests button elements have aria-label or accessible text
-- Checks ARIA attributes persist after DOM updates
-- Validates semantic HTML (nav, section, article, footer)
-
-#### Motion Preferences & Animations
-
-- Tests prefers-reduced-motion: reduce disables animations
-- Validates countdown, particles, stats, confetti skip when motion-reduce
-- Checks keyboard users can bypass animations via interaction
-
-#### Stress & Integrity Tests
-
-- Rapid carousel navigation without race conditions
-- Simultaneous carousel + stats animation without overlap
-- Multiple toast notifications queue correctly
-- Memory cleanup: no lingering event listeners after unobserve
-- DOM element reuse: carousel dots re-render without duplicates
-
-## Data Modules: Matches & News
+#### Test Cases
+
+- Returns string from getCountdownString()
+- Returns 'Match has started!' when target is in the past
+- Returns 'Match has started!' when target equals current time
+- Formats days, hours, minutes, seconds correctly
+- Handles exactly one day remaining
+- Counts seconds correctly for 90-second window
+
+## Data Modules
 
 ### Matches Data
 
-Exports array of 12 FIFA 2026 match fixtures with complete tournament metadata.
+The matches module exports an array of 12 match objects for FIFA World Cup 2026. Each match includes: id, home team, away team, country flag emojis, scores (0 if upcoming), status (final/live/upcoming), tournament stage, venue, date string, and time (FT, minute marker, or kickoff time).
 
-#### Match Object Schema
-
-| Field | Type | Example |
-| --- | --- | --- |
-| id | number | 1–12 |
-| home | string | Brazil |
-| away | string | Argentina |
-| homeFlag | emoji | 🇧🇷 |
-| awayFlag | emoji | 🇦🇷 |
-| homeScore | number | 3 |
-| awayScore | number | 1 |
-| status | enum | final | live | upcoming |
-| stage | string | Quarter Final | Group Stage · Group B |
-| venue | string | MetLife Stadium, New Jersey |
-| date | string | Jul 5, 2026 |
-| time | string | FT | 72' | 15:00 ET |
-
-#### Sample Data
-
-```javascript
-export const matches = [
-  {
-    id: 1,
-    home: 'Brazil',
-    away: 'Argentina',
-    homeFlag: '🇧🇷',
-    awayFlag: '🇦🇷',
-    homeScore: 3,
-    awayScore: 1,
-    status: 'final',
-    stage: 'Quarter Final',
-    venue: 'MetLife Stadium, New Jersey',
-    date: 'Jul 5, 2026',
-    time: 'FT',
-  },
-  // ... 11 more matches
-];
-```
+| Match | Stage | Teams | Score | Status | Venue |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Quarter Final | Brazil vs Argentina | 3-1 | final | MetLife Stadium, New Jersey |
+| 2 | Group Stage · Group B | France vs Germany | 2-2 | live | SoFi Stadium, Los Angeles |
+| 3 | Round of 16 | Spain vs Morocco | 4-0 | final | AT&T Stadium, Dallas |
+| 4 | Group Stage · Group C | England vs USA | 1-0 | final | Arrowhead Stadium, Kansas City |
+| 5 | Semi Final | Portugal vs Netherlands | 2-1 | final | Rose Bowl, Pasadena |
+| 6 | Round of 16 | Japan vs South Korea | 3-2 | final | Levi's Stadium, San Francisco |
+| 7 | Group Stage · Group A | Canada vs Mexico | 1-1 | live | BC Place, Vancouver |
+| 8 | Group Stage · Group D | Australia vs Croatia | 0-2 | final | GEODIS Park, Nashville |
+| 9 | Group Stage · Group E | Netherlands vs Belgium | 0-0 | upcoming | Gillette Stadium, Boston |
+| 10 | Group Stage · Group F | Italy vs Switzerland | 0-0 | upcoming | Camping World Stadium, Orlando |
+| 11 | Group Stage · Group G | Senegal vs Ecuador | 0-0 | upcoming | NRG Stadium, Houston |
+| 12 | Group Stage · Group H | Denmark vs Serbia | 0-0 | upcoming | Lincoln Financial Field, Philadelphia |
 
 ### News Data
 
-Exports array of 9 FIFA 2026 news articles with category, tags, and emoji icons.
+The news module exports an array of 9 news article objects. Each article includes: title, excerpt, category (Match Report/Awards/Broadcast/Tactics/Interview/Guide/Highlights/Sustainability/Features), date, tag (Final Score/Award/Stats/Deep Dive/Exclusive/Travel/Video/Report/Feature), and emoji for visual grid representation.
 
-#### News Object Schema
+| Article | Category | Tag | Date | Emoji |
+| --- | --- | --- | --- | --- |
+| Brazil Edge Argentina in Quarter-Final Thriller | Match Report | Final Score | Jul 5, 2026 | ⚽ |
+| Mbappé Named Player of the Tournament | Awards | Award | Jul 12, 2026 | 🏆 |
+| Record 5.2 Billion Viewers Tune In | Broadcast | Stats | Jul 13, 2026 | 📺 |
+| Spain's Tiki-Taka Renaissance — A Tactical Deep Dive | Tactics | Deep Dive | Jun 28, 2026 | 🎯 |
+| Ronaldo Bows Out Gracefully After Final Group Game | Interview | Exclusive | Jul 11, 2026 | 🌟 |
+| Host Cities: The Best Fan Parks & Watch Zones | Guide | Travel | Jun 10, 2026 | 🗺️ |
+| The Greatest Goals of World Cup 2026 | Highlights | Video | Jul 12, 2026 | 🎬 |
+| Sustainability Report: The Greenest World Cup Ever | Sustainability | Report | Jul 8, 2026 | 🌱 |
+| Rising Stars: 5 Players Who Became Global Icons | Features | Feature | Jul 6, 2026 | 🌠 |
 
-| Field | Type | Example |
-| --- | --- | --- |
-| title | string | Brazil Edge Argentina in Quarter-Final Thriller |
-| excerpt | string | Neymar scored twice as Brazil overcame... |
-| category | string | Match Report | Awards | Broadcast | Tactics |
-| date | string | Jul 5, 2026 |
-| tag | string | Final Score | Award | Stats | Deep Dive |
-| emoji | string | ⚽ | 🏆 | 📺 | 🎯 |
+## Rendering System
 
-#### Sample Data
+### renderMatches()
+
+Renders all matches from the matches data array into the #matches-list container. Maps each match to an article.match-card with two divs: match-teams (home team, score, away team) and match-meta (formatted date, venue). Uses toLocaleDateString() for readable date formatting and joins all articles with empty string.
 
 ```javascript
-export const newsItems = [
-  {
-    title: 'Brazil Edge Argentina in Quarter-Final Thriller',
-    excerpt: 'Neymar scored twice as Brazil overcame their fiercest rivals in a pulsating 3–1 victory at MetLife Stadium.',
-    category: 'Match Report',
-    date: 'Jul 5, 2026',
-    tag: 'Final Score',
-    emoji: '⚽',
+export function renderMatches() {
+  const container = document.getElementById('matches-list');
+  if (!container) return;
+
+  container.innerHTML = matches
+    .map(
+      (m) => `
+      <article class="match-card">
+        <div class="match-teams">
+          <span class="team home">${m.homeTeam}</span>
+          <span class="match-score">${m.score ?? 'vs'}</span>
+          <span class="team away">${m.awayTeam}</span>
+        </div>
+        <div class="match-meta">
+          <span class="match-date">${new Date(m.date).toLocaleDateString(...)}</span>
+          <span class="match-venue">${m.venue ?? ''}</span>
+        </div>
+      </article>`
+    )
+    .join('');
+}
+```
+
+### renderNews()
+
+Renders all news articles from the news data array into the #news-list container. Maps each news item to an article.news-card with conditional image loading (lazy), title, summary, and datetime with toLocaleDateString() formatting. Returns early if container not found.
+
+```javascript
+export function renderNews() {
+  const container = document.getElementById('news-list');
+  if (!container) return;
+
+  container.innerHTML = news
+    .map(
+      (n) => `
+      <article class="news-card">
+        ${n.imageUrl ? `<img src="${n.imageUrl}" alt="${n.title}" class="news-card__image" loading="lazy" />` : ''}
+        <div class="news-card__body">
+          <h3 class="news-card__title">${n.title}</h3>
+          <p class="news-card__summary">${n.summary ?? ''}</p>
+          <time class="news-card__date" datetime="${n.date}">${new Date(n.date).toLocaleDateString()}</time>
+        </div>
+      </article>`
+    )
+    .join('');
+}
+```
+
+### renderPlayerCards()
+
+Renders all player cards from playerCardData into the #players .players-grid container. Maps each player to an article.player-card with image-wrap div containing img element sourced from jerseyImageUrl. Each card includes player name, country, and click handler that calls smoothScrollTo() on the sectionTarget.
+
+```javascript
+export function renderPlayerCards() {
+  const container = document.querySelector('#players .players-grid');
+  if (!container) return;
+
+  container.innerHTML = playerCardData
+    .map(
+      (p) => `
+      <article class="player-card">
+        <div class="player-card__image-wrap">
+          <img
+            src="${p.jerseyImageUrl}"
+            alt="${p.name} – ${p.country}"
+            class="player-card__image"
+          />
+        </div>
+        <div class="player-card__info">
+          <h3 class="player-card__name">${p.name}</h3>
+          <p class="player-card__country">${p.country}</p>
+        </div>
+      </article>`
+    )
+    .join('');
+}
+```
+
+## Test Suite & Configuration
+
+### Test Framework Setup
+
+The project uses Vitest with jsdom environment for unit testing. Configuration specifies: globals enabled for describe/it/expect, jsdom environment for DOM simulation, test timeout 10 seconds, and verbose reporter. Coverage thresholds: 70% lines/functions/statements, 60% branches.
+
+```javascript
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: [],
+    include: ['**/*.test.js', '**/*.spec.js'],
+    exclude: ['node_modules/**', 'dist/**'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      include: ['app.js', 'data/**/*.js'],
+      exclude: ['node_modules/**', 'dist/**', '**/*.test.js'],
+      thresholds: {
+        lines:     70,
+        functions: 70,
+        branches:  60,
+        statements: 70,
+      },
+      reportsDirectory: './coverage',
+    },
+    testTimeout: 10000,
+    reporters: ['verbose'],
   },
-  {
-    title: "Mbappé Named Player of the Tournament",
-    excerpt: "France's captain delivered a sensational campaign with 8 goals and 4 assists — the most lethal performer in 2026.",
-    category: 'Awards',
-    date: 'Jul 12, 2026',
-    tag: 'Award',
-    emoji: '🏆',
-  },
-  // ... 7 more articles
-];
+});
 ```
 
-## NPM Scripts & Development
+### Test Suite Coverage
 
-### Available Scripts
+The test suite includes 60+ test cases across three main describe blocks: playerCardData structure validation, getCountdownString countdown timer behavior, and smoothScrollToSection navigation functionality.
 
-| Command | Purpose | Details |
+#### playerCardData Tests
+
+- Is a non-empty array
+- Every entry has a non-empty name string
+- Every entry has a non-empty country string
+- Every entry has a jerseyImage URL string starting with http/https
+- Every entry has a sectionTarget that starts with #
+
+#### getCountdownString Tests
+
+- Returns a string
+- Returns 'Match has started!' when target is in the past
+- Returns 'Match has started!' when target equals now
+- Formats days, hours, minutes, seconds correctly (with fake timers)
+- Handles exactly one day remaining
+- Counts seconds correctly for 90-second window
+
+#### smoothScrollToSection Tests
+
+- Calls scrollIntoView on matching element
+- Calls scrollIntoView with { behavior: 'smooth', block: 'start' }
+- Does nothing when selector matches no element (no throw)
+- Accepts bare id string without leading # (normalizes)
+
+#### Test Utilities
+
+- Uses vi.useFakeTimers() for deterministic countdown arithmetic
+- Uses vi.fn() for scrollIntoView spy verification
+- beforeEach creates/appends real DOM elements; afterEach cleans up
+- Tests cover both happy path and edge cases (expired, exact timing)
+
+## Package & File Structure
+
+| File/Directory | Type | Purpose | Lines |
+| --- | --- | --- | --- |
+| app.js | Application Core | Main application logic: player cards, smooth-scroll navigation, countdown timer, match/news/player rendering | ~280 |
+| app.test.js | Test Suite | 60+ comprehensive test cases covering data structures, countdown logic, scroll navigation, and event handlers | ~158 |
+| data/matches.js | Data Module | 12 FIFA 2026 match objects with home/away teams, flags, scores, venue, date, status (final/live/upcoming) | ~130 |
+| data/news.js | Data Module | 9 news articles with title, excerpt, category, date, tag, emoji for grid rendering | ~80 |
+| vitest.config.js | Test Config | Vitest configuration: jsdom environment, coverage thresholds (70% lines/functions/statements, 60% branches), reporters | ~27 |
+| package.json | Manifest | Project metadata, version 2.0.0, ES modules, scripts (dev, build, preview, test, test:watch, test:coverage, test:ui) | 23 |
+| README.md | Documentation | Project overview, getting started guide, recent task summary, links to detailed docs | ~40 |
+| docs/API.md | Documentation | Developer API reference for functions, DOM structure, event API, animation states, CSS properties | ~150 |
+| docs/FORGE_SESSION.md | Documentation | Forge session solution summary with changelog and architecture notes | ~50 |
+| docs/FORGE_WIKI.md | Documentation | Knowledge base entry documenting the test solution and generated files | ~40 |
+| docs/wiki.md | Documentation | Repository structure and file inventory with comprehensive section coverage | Variable |
+| WIKI.md | Documentation | Complete wiki document with system architecture, data flow diagrams, and section details | Variable |
+
+### Package.json Scripts
+
+| Script | Command | Purpose |
 | --- | --- | --- |
-| npm run dev | Development server | Launches Vite dev server with HMR (hot module replacement) for instant refresh on file changes |
-| npm run build | Production build | Creates optimized bundle for deployment via Vite (minification, tree-shaking, code splitting) |
-| npm run preview | Preview build | Serves production-ready build locally to verify build output before deployment |
-| npm test | Run tests once | Executes full Vitest suite with coverage report (70% line/function/statement, 60% branch thresholds) |
-| npm run test:watch | Watch mode | Vitest watch mode: re-runs tests on file change for TDD development |
-| npm run test:coverage | Coverage analysis | Generates detailed coverage reports in ./coverage directory (text, JSON, HTML, LCOV formats) |
-| npm run test:ui | Test UI dashboard | Launches interactive Vitest UI for visual test exploration and debugging |
+| dev | vite | Start Vite development server with hot module replacement |
+| build | vite build | Build production bundle via Vite |
+| preview | vite preview | Preview production build locally |
+| test | vitest run | Run test suite once (CI mode) |
+| test:watch | vitest | Run tests in watch mode with auto-rerun on changes |
+| test:coverage | vitest run --coverage | Run tests with coverage report generation |
+| test:ui | vitest --ui | Open Vitest UI dashboard for interactive test execution |
 
-### Dependencies
+### Getting Started
 
-| Package | Version | Purpose |
+1. Clone/pull the repository: ali1092-SC/samplefootballapp on branch main
+2. Install dependencies: pnpm install (or npm install)
+3. Run development server: pnpm dev (open browser to http://localhost:5173 or similar)
+4. Run tests: pnpm test (or pnpm test:watch for continuous)
+5. Build for production: pnpm build (outputs to dist/ folder)
+6. View coverage: pnpm test:coverage (generates reports in ./coverage)
+
+## API Reference
+
+### Exported Functions
+
+| Function | Parameters | Returns | Purpose |
+| --- | --- | --- | --- |
+| playerCardData | — | Array[Object] | Exported array of 6 player objects with name, country, jerseyImageUrl, sectionTarget |
+| smoothScrollTo(targetSelector) | targetSelector: string (CSS selector) | boolean (true if found and scrolled, false otherwise) | Smoothly scrolls to element, accounting for nav bar height offset |
+| wireNavPlayerLinks() | — | void | Attaches click handlers to nav links pointing to #players for smooth-scroll behavior |
+| observePlayersSection() | — | void | Sets up IntersectionObserver to toggle 'active' class on nav links when #players section visible (20% threshold) |
+| getCountdownValues(kickoffDate, now?) | kickoffDate: Date, now?: Date (optional) | Object { days, hours, minutes, seconds (zero-padded strings), expired: boolean } | Calculates time remaining until kick-off, injectable current time for testing |
+| startCountdown(containerEl) | containerEl: HTMLElement with data-kickoff ISO string | number (setInterval ID) or null | Starts live countdown timer updating every 1000ms, renders in containerEl |
+| renderMatches() | — | void | Renders all matches from data/matches.js into #matches-list container |
+| renderNews() | — | void | Renders all news articles from data/news.js into #news-list container |
+| renderPlayerCards() | — | void | Renders all player cards from playerCardData into #players .players-grid container |
+
+### DOM Structure Requirements
+
+| Element ID/Selector | Role/Purpose | Expected HTML Structure |
 | --- | --- | --- |
-| vite | ^5.2.0 | Modern bundler and dev server |
-| vitest | ^1.6.0 | Unit test framework (Vitest core) |
-| @vitest/ui | ^1.6.0 | Interactive UI for test visualization |
-| @vitest/coverage-v8 | ^1.6.0 | V8 coverage instrumentation and reporting |
-| jsdom | ^24.0.0 | Browser-like DOM simulation for testing |
+| nav | Navigation bar | <nav><a href='#players'>Players</a> or <a data-scroll='#players'>Players</a></nav> |
+| #players | Players section target | <section id='players'><div class='players-grid'></div></section> |
+| #matches-list | Match cards container | <div id='matches-list'></div> (renderMatches populates) |
+| #news-list | News cards container | <div id='news-list'></div> (renderNews populates) |
+| [data-kickoff] | Countdown container | <div data-kickoff='2026-06-11T...'></div> (startCountdown() updates) |
 
-## Utility Functions
+### Event Handlers
 
-### DOM Query Helpers
+- wireNavPlayerLinks() attaches 'click' to nav links with href='#players' or data-scroll='#players'
+- observePlayersSection() uses IntersectionObserver API (fires when entry.isIntersecting changes)
+- startCountdown() uses setInterval to trigger render function every 1000ms
 
-```javascript
-const $ = (sel, ctx = document) => ctx.querySelector(sel);
-const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
-```
+## Documentation Files
 
-Shorthand functions for single and multiple element selection. The $$ function converts NodeList to Array for easier iteration.
+### docs/API.md
 
-### Math Helpers
+Developer-facing comprehensive reference for every exported function, event, animation hook, and configuration constant. Includes DOM structure, JavaScript API signatures, event API documentation, animation state lifecycle, CSS animation interfaces, configuration reference, and error states & edge cases.
 
-```javascript
-function lerp(a, b, t) { return a + (b - a) * t; }
+### docs/FORGE_SESSION.md
 
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+Forge session solution summary documenting the task ('move rotation banner and countdown timer below nav bar, enable player link navigation, show player face images with country jersey'). Lists 5 files generated: index.html (2 versions), styles.css, app.js, app.test.js. Includes setup & usage instructions, architecture notes, and changelog.
 
-function randBetween(a, b) { return a + Math.random() * (b - a); }
-```
+### docs/FORGE_WIKI.md
 
-lerp: Linear interpolation between two values (used for smooth transitions). clamp: Constrains value within min/max range. randBetween: Random float between two values (used for particle/animation randomization).
+Knowledge base entry documenting the Forge-generated test solution. Lists all 6 generated files with status (Generated), notes about reviewing code before merging, running tests, and updating configuration.
+
+### docs/wiki.md & WIKI.md
+
+Complete wiki documents with YAML frontmatter (forge-wiki: true, generated-at timestamp, repo, branch, section-count). Contain embedded JSON wiki-data with comprehensive sections covering overview, system architecture, package structure, API reference, player card system, smooth-scroll navigation, countdown timer, data modules, rendering system, test suite, and more.
 
 ---
 *Generated by Forge on 2026-06-18*
