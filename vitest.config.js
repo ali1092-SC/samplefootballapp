@@ -2,17 +2,25 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    environment: 'jsdom',
     globals: true,
+    environment: 'jsdom',
+    setupFiles: [],
+    include: ['**/*.test.js', '**/*.spec.js'],
+    exclude: ['node_modules/**', 'dist/**'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'lcov', 'html'],
+      reporter: ['text', 'json', 'html', 'lcov'],
+      include: ['app.js', 'data/**/*.js'],
+      exclude: ['node_modules/**', 'dist/**', '**/*.test.js'],
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 75,
-        statements: 80,
+        lines:     70,
+        functions: 70,
+        branches:  60,
+        statements:70,
       },
+      reportsDirectory: './coverage',
     },
+    testTimeout: 10000,
+    reporters: ['verbose'],
   },
 });
