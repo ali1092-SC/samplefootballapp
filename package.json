@@ -1,0 +1,19 @@
+{
+  "name": "samplefootballapp",
+  "version": "1.0.0",
+  "description": "Football animation app with parabolic arc, squash-and-stretch, and shadow sync",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^1.6.0",
+    "jsdom": "^24.1.0",
+    "vite": "^5.3.1",
+    "vitest": "^1.6.0"
+  }
+}
