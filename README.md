@@ -1,16 +1,14 @@
 # Project
 
-Three files were updated to add a continuously bouncing, swaying, and spinning football fixed to the bottom-right corner of the screen. The ball uses an inline SVG with realistic pentagon patches and a highlight gloss, driven by three simultaneous CSS keyframe animations (`footballBounce`, `footballSway`, `footballSpin`), and clicking it triggers a satisfying burst kick animation (`footballKick`) with a cooldown guard in JavaScript. A hover tooltip, drop-shadow glow, and responsive sizing at `768px` and `480px` breakpoints ensure it looks great on all devices without obscuring UI content.
+The football is now fixed to the **bottom-left corner** of the screen where it gently bounces and sways as its idle state. Clicking it fires the `footballKickAcross` CSS keyframe animation that arcs the ball from left to right across the viewport with realistic bounce squash/stretch, rolling spin, and an ease curve — then after a brief pause at the right edge, JavaScript invisibly snaps it back to the left and restores the idle animations so it can be kicked again.
 
 ## Recent Changes
 
-### 2026-06-18 01:32:58 UTC
+### 2026-06-18 01:47:59 UTC
 
-**Task:** add a moving worldcup football animation on right corner of the screen
+**Task:** kick the animated football from left bottom screen to right bottom screen
 
 **Files modified:**
-- `index.html`
-- `styles.css`
 - `app.js`
 
 ## Getting Started
@@ -36,4 +34,4 @@ pnpm build
 
 ---
 
-*Last updated by Forge on 2026-06-18 01:32:58 UTC*
+*Last updated by Forge on 2026-06-18 01:47:59 UTC*
