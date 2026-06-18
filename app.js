@@ -1,956 +1,640 @@
-/**
- * FIFA World Cup 2026™ — App Controller
- * Handles: rendering, live-score simulation, countdown, scroll-reveal,
- *          carousels, tabs, toast notifications, animated counters, and more.
- */
+/* ──────────────────────────────────────────────────────────────────
+   FIFA World Cup 2026™ — app.js
+   Complete interactive SPA with:
+   - Countdown timer with flip-digit animation
+   - Hero floating particles
+   - Cursor-reactive 3D tilt on match cards
+   - IntersectionObserver scroll-reveal
+   - Typewriter headings
+   - AnimateCountUp + SVG ring progress for stats
+   - Confetti burst on final match cards
+   - Carousel with swipe support
+   - Standings tabs
+   - News grid
+   - Toast notifications
+   - Scroll-shrink header
+   ────────────────────────────────────────────────────────────────── */
 
-import { todayMatches, tomorrowMatches, recentResults, groupStandings, hostCities, topScorers } from './data/matches.js';
-import { newsArticles } from './data/news.js';
+import { matches }  from './data/matches.js';
+import { newsItems } from './data/news.js';
 
-/* ═══════════════════════════════════════════════════
-   CONSTANTS
-═══════════════════════════════════════════════════ */
-const TOURNAMENT_START = new Date('2026-06-11T16:00:00Z');
-const NEWS_PER_PAGE    = 6;
-const LIVE_POLL_MS     = 8000;
+/* ─── UTILITIES ──────────────────────────────────────────────────── */
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
-/* ═══════════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════════ */
-const state = {
-  liveMatches:      JSON.parse(JSON.stringify(todayMatches)),
-  newsPage:         1,
-  newsCategory:     'all',
-  standingsPage:    0,
-  citiesPage:       0,
-  liveInterval:     null,
-  countdownInterval: null,
-};
+function lerp(a, b, t) { return a + (b - a) * t; }
 
-/* ═══════════════════════════════════════════════════
-   UTILITY HELPERS
-═══════════════════════════════════════════════════ */
-export function pad(n, len = 2) {
-  return String(n).padStart(len, '0');
-}
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
-export function timeAgo(dateStr) {
-  const diff = Math.floor((Date.now() - new Date(dateStr)) / 60000);
-  if (diff < 1)  return 'just now';
-  if (diff < 60) return `${diff}m ago`;
-  const h = Math.floor(diff / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
+function randBetween(a, b) { return a + Math.random() * (b - a); }
 
-export function getCountdownValues(targetDate) {
-  const now   = Date.now();
-  const delta = Math.max(0, Math.floor((targetDate - now) / 1000));
-  const days  = Math.floor(delta / 86400);
-  const hours = Math.floor((delta % 86400) / 3600);
-  const mins  = Math.floor((delta % 3600) / 60);
-  const secs  = delta % 60;
-  return { days, hours, mins, secs, delta };
-}
-
-export function animatedCounter(el, target, duration = 1200) {
-  if (!el) return;
-  const start    = performance.now();
-  const startVal = parseInt(el.textContent, 10) || 0;
-  const update   = (ts) => {
-    const progress = Math.min((ts - start) / duration, 1);
-    const ease     = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.round(startVal + (target - startVal) * ease);
-    el.classList.add('number-count');
-    if (progress < 1) requestAnimationFrame(update);
-    else el.textContent = target;
-  };
-  requestAnimationFrame(update);
-}
-
-/* ═══════════════════════════════════════════════════
-   SCROLL-REVEAL  (IntersectionObserver)
-═══════════════════════════════════════════════════ */
-export function initScrollReveal() {
-  if (typeof IntersectionObserver === 'undefined') {
-    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale')
-      .forEach(el => el.classList.add('visible'));
-    return;
-  }
-
-  const opts = { threshold: 0.12, rootMargin: '0px 0px -40px 0px' };
-  const io   = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        // animate section-title underline
-        const title = entry.target.querySelector?.('.section-title');
-        if (title) title.classList.add('visible');
-        io.unobserve(entry.target);
-      }
-    });
-  }, opts);
-
-  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale')
-    .forEach(el => io.observe(el));
-
-  // Also observe goal bars
-  const barIO = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const fill = entry.target.querySelector('.goal-bar-fill');
-        if (fill) {
-          const pct = fill.dataset.pct || '0';
-          setTimeout(() => { fill.style.width = pct + '%'; }, 150);
-        }
-        barIO.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.3 });
-
-  document.querySelectorAll('.scorer-row').forEach(el => barIO.observe(el));
-}
-
-/* ═══════════════════════════════════════════════════
-   HEADER — scroll & mobile nav
-═══════════════════════════════════════════════════ */
-export function initHeader() {
-  const header    = document.getElementById('site-header');
-  const hamburger = document.getElementById('hamburger');
-  const mobileNav = document.getElementById('mobile-nav');
-  const scrollTop = document.getElementById('scroll-top');
-
+/* ─── SCROLL-SHRINK HEADER ───────────────────────────────────────── */
+function initHeader() {
+  const header = $('#siteHeader');
   if (!header) return;
-
-  let ticking = false;
   window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        const y = window.scrollY;
-        header.classList.toggle('scrolled', y > 60);
-        if (scrollTop) scrollTop.classList.toggle('visible', y > 400);
-        ticking = false;
-      });
-      ticking = true;
-    }
+    header.classList.toggle('shrunk', window.scrollY > 60);
   }, { passive: true });
-
-  if (hamburger && mobileNav) {
-    hamburger.addEventListener('click', () => {
-      const open = mobileNav.classList.toggle('open');
-      hamburger.classList.toggle('open', open);
-      hamburger.setAttribute('aria-expanded', String(open));
-      document.body.style.overflow = open ? 'hidden' : '';
-    });
-  }
-
-  if (scrollTop) {
-    scrollTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-  }
-
-  // Highlight active nav link on scroll
-  const sections = document.querySelectorAll('section[id]');
-  const links    = document.querySelectorAll('.nav-link');
-  const sectionIO = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${id}`));
-      }
-    });
-  }, { threshold: 0.35 });
-  sections.forEach(s => sectionIO.observe(s));
 }
 
-export function closeMobileNav() {
-  const mobileNav = document.getElementById('mobile-nav');
-  const hamburger = document.getElementById('hamburger');
-  if (mobileNav) mobileNav.classList.remove('open');
-  if (hamburger) { hamburger.classList.remove('open'); hamburger.setAttribute('aria-expanded', 'false'); }
-  document.body.style.overflow = '';
-}
-// Expose for inline onclick
-window.closeMobileNav = closeMobileNav;
-
-/* ═══════════════════════════════════════════════════
-   HERO PARTICLES
-═══════════════════════════════════════════════════ */
-export function initParticles() {
-  const container = document.getElementById('hero-particles');
+/* ─── HERO PARTICLES ─────────────────────────────────────────────── */
+function initHeroParticles() {
+  const container = $('#heroParticles');
   if (!container) return;
+  const colours = ['#f7c948', '#00e5ff', '#1a73e8', '#ff8a65', '#81c784', '#ce93d8'];
+  const TOTAL = 40;
 
-  const colors = ['#F0A500','#C8102E','#ffffff','#FFD060'];
-  const count  = 22;
-
-  for (let i = 0; i < count; i++) {
-    const p   = document.createElement('div');
-    p.className = 'particle';
-    const size = 3 + Math.random() * 7;
-    const left = Math.random() * 100;
-    const top  = 20 + Math.random() * 70;
-    const dur  = 4 + Math.random() * 6;
-    const del  = Math.random() * 8;
-    const col  = colors[Math.floor(Math.random() * colors.length)];
-
-    p.style.cssText = [
-      `width:${size}px`, `height:${size}px`,
-      `left:${left}%`,   `top:${top}%`,
-      `background:${col}`,
-      `animation-duration:${dur}s`,
-      `animation-delay:${del}s`,
-      `animation-iteration-count:infinite`,
-    ].join(';');
-
+  for (let i = 0; i < TOTAL; i++) {
+    const p = document.createElement('div');
+    p.className = 'hero-particle';
+    const size = randBetween(3, 10);
+    const col  = colours[Math.floor(Math.random() * colours.length)];
+    p.style.cssText = `
+      left: ${randBetween(0, 100)}%;
+      top:  ${randBetween(10, 90)}%;
+      width: ${size}px;
+      height: ${size}px;
+      background: ${col};
+      opacity: ${randBetween(0.3, 0.85)};
+      --dur:   ${randBetween(4, 10)}s;
+      --delay: ${randBetween(0, 8)}s;
+    `;
     container.appendChild(p);
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   COUNTDOWN TIMER
-═══════════════════════════════════════════════════ */
-export function initCountdown(target = TOURNAMENT_START) {
+/* ─── COUNTDOWN ──────────────────────────────────────────────────── */
+function initCountdown() {
+  const TARGET_DATE = new Date('2026-06-11T18:00:00-05:00'); // Opening kick-off
+
   const els = {
-    days:  document.getElementById('cd-days'),
-    hours: document.getElementById('cd-hours'),
-    mins:  document.getElementById('cd-mins'),
-    secs:  document.getElementById('cd-secs'),
+    days:  $('#cdDaysVal'),
+    hours: $('#cdHoursVal'),
+    mins:  $('#cdMinsVal'),
+    secs:  $('#cdSecsVal'),
   };
-  const prevValues = { days: -1, hours: -1, mins: -1, secs: -1 };
 
-  function update() {
-    const { days, hours, mins, secs } = getCountdownValues(target);
-    const map = { days, hours, mins, secs };
-    Object.entries(map).forEach(([k, v]) => {
-      const el = els[k];
-      if (!el) return;
-      const span = el.querySelector('span');
-      if (!span) return;
-      const newVal = pad(v, k === 'days' ? 3 : 2);
-      if (prevValues[k] !== v) {
-        el.classList.remove('flipping');
+  if (!els.days) return;
+
+  const prev = { days: null, hours: null, mins: null, secs: null };
+
+  function pad(n, digits = 2) { return String(n).padStart(digits, '0'); }
+
+  function tick() {
+    const now  = Date.now();
+    const diff = Math.max(0, TARGET_DATE - now);
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    const vals = {
+      days:  pad(d, 3),
+      hours: pad(h),
+      mins:  pad(m),
+      secs:  pad(s),
+    };
+
+    Object.entries(vals).forEach(([k, v]) => {
+      if (v !== prev[k]) {
+        const el = els[k];
+        el.textContent = v;
+        el.classList.remove('flip');
         void el.offsetWidth; // reflow
-        el.classList.add('flipping');
-        span.textContent = newVal;
-        prevValues[k] = v;
+        el.classList.add('flip');
+        prev[k] = v;
       }
     });
   }
 
-  update();
-  state.countdownInterval = setInterval(update, 1000);
+  tick();
+  setInterval(tick, 1000);
 }
 
-/* ═══════════════════════════════════════════════════
-   LIVE SCORE TICKER
-═══════════════════════════════════════════════════ */
-export function buildTickerItem(match) {
-  const item = document.createElement('div');
-  item.className = 'ticker-item';
-  item.setAttribute('role', 'listitem');
-  item.dataset.matchId = match.id;
+/* ─── INTERSECTION OBSERVER ──────────────────────────────────────── */
+let scrollObserver;
 
-  const statusClass = match.status === 'LIVE' ? 'live' : match.status === 'FT' ? 'ft' : 'soon';
-  const statusLabel = match.status === 'LIVE' ? 'Live' : match.status === 'FT' ? 'FT' : match.time;
-  const scoreStr    = match.status === 'UPCOMING'
-    ? `${match.time}`
-    : `${match.homeScore} - ${match.awayScore}`;
-
-  item.innerHTML = `
-    <span class="teams">${match.homeFlag} ${match.homeTeam} <span class="score" id="ticker-score-${match.id}">${scoreStr}</span> ${match.awayTeam} ${match.awayFlag}</span>
-    ${match.status === 'LIVE' ? `<span class="minute">${match.minute}'</span>` : ''}
-    <span class="status-badge ${statusClass}">${statusLabel}</span>
-  `;
-  return item;
-}
-
-export function renderTicker(matches) {
-  const track = document.getElementById('ticker-track');
-  if (!track) return;
-  track.innerHTML = '';
-
-  // Double the items for seamless infinite scroll
-  const allMatches = [...matches, ...matches];
-  allMatches.forEach(m => track.appendChild(buildTickerItem(m)));
-}
-
-export function updateTickerScore(matchId, homeScore, awayScore) {
-  const scoreEls = document.querySelectorAll(`#ticker-score-${matchId}`);
-  scoreEls.forEach(el => {
-    el.textContent = `${homeScore} - ${awayScore}`;
-    el.classList.remove('updated');
-    void el.offsetWidth;
-    el.classList.add('updated');
-    setTimeout(() => el.classList.remove('updated'), 800);
-  });
-}
-
-/* ═══════════════════════════════════════════════════
-   MATCH CARDS
-═══════════════════════════════════════════════════ */
-export function buildMatchCard(match) {
-  const card = document.createElement('article');
-  card.className = `match-card reveal${match.status === 'LIVE' ? ' live-card' : ''}`;
-  card.setAttribute('role', 'listitem');
-  card.dataset.matchId = match.id;
-  card.tabIndex = 0;
-  card.setAttribute('aria-label', `${match.homeTeam} vs ${match.awayTeam}`);
-
-  const statusClass = match.status === 'LIVE' ? 'live' : match.status === 'FT' ? 'ft' : 'upcoming';
-  const statusLabel = match.status === 'LIVE'
-    ? `🔴 ${match.minute}'`
-    : match.status === 'FT' ? 'Full Time' : match.time;
-
-  const scoreOrVs = match.status === 'UPCOMING'
-    ? `<span class="vs-label">VS</span>`
-    : `<div class="score-display" id="score-${match.id}">${match.homeScore} - ${match.awayScore}</div>
-       ${match.status === 'LIVE' ? `<div class="match-minute">${match.minute}'</div>` : ''}`;
-
-  card.innerHTML = `
-    <div class="match-card-header">
-      <span class="match-group-label">${match.group || match.round || 'Group Stage'}</span>
-      <span class="match-status ${statusClass}">${statusLabel}</span>
-    </div>
-    <div class="match-card-body">
-      <div class="match-teams">
-        <div class="team-block">
-          <div class="team-flag" aria-hidden="true">${match.homeFlag}</div>
-          <div class="team-name">${match.homeTeam}</div>
-        </div>
-        <div class="score-block">${scoreOrVs}</div>
-        <div class="team-block">
-          <div class="team-flag" aria-hidden="true">${match.awayFlag}</div>
-          <div class="team-name">${match.awayTeam}</div>
-        </div>
-      </div>
-    </div>
-    <div class="match-card-footer">
-      <span class="match-venue">📍 ${match.venue}</span>
-      <span class="match-time">${match.date}</span>
-    </div>
-  `;
-
-  card.addEventListener('click', () => {
-    showToast(
-      `${match.homeTeam} vs ${match.awayTeam}`,
-      match.status === 'UPCOMING'
-        ? `Kick-off at ${match.time} — ${match.venue}`
-        : `Score: ${match.homeScore} - ${match.awayScore}`,
-      match.status === 'LIVE' ? '🔴' : '⚽',
-      match.status === 'LIVE' ? 'toast-goal' : 'toast-info'
-    );
-  });
-
-  card.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') card.click();
-  });
-
-  return card;
-}
-
-export function renderMatchGrid(containerId, matches) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
-
-  if (!matches || matches.length === 0) {
-    container.innerHTML = `<p style="color:var(--gray-400);padding:24px 0;">No matches available.</p>`;
-    return;
-  }
-
-  matches.forEach((m, i) => {
-    const card = buildMatchCard(m);
-    card.style.transitionDelay = `${i * 0.07}s`;
-    container.appendChild(card);
-  });
-
-  // Re-observe newly added reveal elements
-  setTimeout(initScrollReveal, 50);
-}
-
-export function updateMatchCard(matchId, homeScore, awayScore, minute) {
-  const scoreEl = document.getElementById(`score-${matchId}`);
-  if (scoreEl) {
-    const prev = scoreEl.textContent;
-    const next = `${homeScore} - ${awayScore}`;
-    if (prev !== next) {
-      scoreEl.textContent = next;
-      scoreEl.classList.remove('updated');
-      void scoreEl.offsetWidth;
-      scoreEl.classList.add('updated');
-      const card = scoreEl.closest('.match-card');
-      if (card) {
-        card.classList.remove('score-updated');
-        void card.offsetWidth;
-        card.classList.add('score-updated');
-      }
-    }
-  }
-  const minEl = document.querySelector(`[data-match-id="${matchId}"] .match-minute`);
-  if (minEl && minute !== undefined) minEl.textContent = `${minute}'`;
-}
-
-/* ═══════════════════════════════════════════════════
-   MATCH TABS
-═══════════════════════════════════════════════════ */
-export function initMatchTabs() {
-  const tabs   = document.querySelectorAll('[role="tab"]');
-  const panels = document.querySelectorAll('[role="tabpanel"]');
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
-      panels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
-      const panelId = tab.getAttribute('aria-controls');
-      const panel   = document.getElementById(panelId);
-      if (panel) {
-        panel.classList.add('active');
-        // trigger scroll reveal on newly visible cards
-        setTimeout(initScrollReveal, 80);
+function initScrollReveal() {
+  const items = $$('.section-reveal');
+  scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        scrollObserver.unobserve(entry.target);
       }
     });
+  }, { threshold: 0.12 });
+  items.forEach(el => scrollObserver.observe(el));
+}
 
-    // Keyboard navigation
-    tab.addEventListener('keydown', (e) => {
-      const idx = [...tabs].indexOf(tab);
-      if (e.key === 'ArrowRight') { tabs[(idx + 1) % tabs.length].focus(); tabs[(idx + 1) % tabs.length].click(); }
-      if (e.key === 'ArrowLeft')  { tabs[(idx - 1 + tabs.length) % tabs.length].focus(); tabs[(idx - 1 + tabs.length) % tabs.length].click(); }
+/* ─── TYPEWRITER HEADINGS ────────────────────────────────────────── */
+function initTypewriter() {
+  const targets = $$('.typewriter-target');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const text = el.textContent;
+      el.textContent = '';
+      el.classList.add('typewriter-active');
+      // reveal char-by-char using CSS width animation driven by char count step
+      // We use a simple setTimeout character approach for reliability
+      let i = 0;
+      el.textContent = '';
+      function addChar() {
+        if (i < text.length) {
+          el.textContent += text[i];
+          i++;
+          setTimeout(addChar, 38);
+        } else {
+          el.classList.add('done');
+          // Remove border after cursor blink ends
+          setTimeout(() => {
+            el.style.borderRight = 'none';
+            el.classList.remove('typewriter-active', 'done');
+          }, 3200);
+        }
+      }
+      addChar();
+
+      // Also trigger h2 underline
+      const h2 = el.closest('h2');
+      if (h2) h2.classList.add('revealed');
+
+      observer.unobserve(el);
     });
-  });
+  }, { threshold: 0.5 });
+
+  targets.forEach(el => observer.observe(el));
 }
 
-/* ═══════════════════════════════════════════════════
-   LIVE SCORE SIMULATION
-═══════════════════════════════════════════════════ */
-export function simulateLiveScores() {
-  const liveMatches = state.liveMatches.filter(m => m.status === 'LIVE');
-  if (liveMatches.length === 0) return;
+/* ─── ANIMATE COUNT-UP ───────────────────────────────────────────── */
+function animateCountUp(el, target, duration = 1600, suffix = '') {
+  const start  = performance.now();
+  const from   = 0;
 
-  liveMatches.forEach(match => {
-    // Advance minute
-    match.minute = Math.min(90, (match.minute || 45) + Math.floor(Math.random() * 3) + 1);
-
-    // ~20% chance of a goal per poll
-    if (Math.random() < 0.2) {
-      const isHome = Math.random() > 0.5;
-      if (isHome) match.homeScore++;
-      else        match.awayScore++;
-
-      const scorer = isHome ? match.homeTeam : match.awayTeam;
-      showToast(
-        `⚽ GOAL! ${scorer}`,
-        `${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam} (${match.minute}')`,
-        '⚽',
-        'toast-goal'
-      );
-    }
-
-    updateMatchCard(match.id, match.homeScore, match.awayScore, match.minute);
-    updateTickerScore(match.id, match.homeScore, match.awayScore);
-  });
-}
-
-export function startLivePolling() {
-  if (state.liveInterval) clearInterval(state.liveInterval);
-  state.liveInterval = setInterval(simulateLiveScores, LIVE_POLL_MS);
-}
-
-export function stopLivePolling() {
-  if (state.liveInterval) clearInterval(state.liveInterval);
-  state.liveInterval = null;
-}
-
-/* ═══════════════════════════════════════════════════
-   GROUP STANDINGS
-═══════════════════════════════════════════════════ */
-export function buildGroupCard(group) {
-  const card = document.createElement('div');
-  card.className = 'group-card reveal-scale';
-  card.setAttribute('role', 'listitem');
-  card.setAttribute('aria-label', `Group ${group.name} standings`);
-
-  const rows = group.teams.map((t, i) => `
-    <tr class="${i < 2 ? 'qualified' : ''}" role="row">
-      <td class="team-cell">
-        <span class="pos-num">${i + 1}</span>
-        <span>${t.flag}</span>
-        <span>${t.name}</span>
-      </td>
-      <td>${t.played}</td>
-      <td>${t.won}</td>
-      <td>${t.drawn}</td>
-      <td>${t.lost}</td>
-      <td>${t.gd > 0 ? '+' : ''}${t.gd}</td>
-      <td class="pts-cell">${t.pts}</td>
-    </tr>
-  `).join('');
-
-  card.innerHTML = `
-    <div class="group-card-header">
-      <span class="group-label">Group ${group.name}</span>
-      <span class="group-teams-count">${group.teams.length} Teams</span>
-    </div>
-    <table class="standings-table" aria-label="Group ${group.name} standings">
-      <thead>
-        <tr>
-          <th scope="col">Team</th>
-          <th scope="col" title="Played">P</th>
-          <th scope="col" title="Won">W</th>
-          <th scope="col" title="Drawn">D</th>
-          <th scope="col" title="Lost">L</th>
-          <th scope="col" title="Goal Difference">GD</th>
-          <th scope="col" title="Points">Pts</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  `;
-  return card;
-}
-
-export function renderStandings() {
-  const track = document.getElementById('standings-track');
-  if (!track) return;
-  track.innerHTML = '';
-  groupStandings.forEach((g, i) => {
-    const card = buildGroupCard(g);
-    card.style.transitionDelay = `${i * 0.08}s`;
-    track.appendChild(card);
-  });
-  initCarousel('standings', groupStandings.length, 3);
-  setTimeout(initScrollReveal, 80);
-}
-
-/* ═══════════════════════════════════════════════════
-   GENERIC CAROUSEL
-═══════════════════════════════════════════════════ */
-export function initCarousel(name, totalItems, visibleCount) {
-  const track   = document.getElementById(`${name}-track`);
-  const prevBtn = document.getElementById(`${name}-prev`);
-  const nextBtn = document.getElementById(`${name}-next`);
-  const dotsEl  = document.getElementById(`${name}-dots`);
-  if (!track) return;
-
-  const pageCount   = Math.ceil(totalItems / visibleCount);
-  let   currentPage = 0;
-
-  // Build dots
-  if (dotsEl) {
-    dotsEl.innerHTML = '';
-    for (let i = 0; i < pageCount; i++) {
-      const dot = document.createElement('button');
-      dot.className  = `carousel-dot${i === 0 ? ' active' : ''}`;
-      dot.type       = 'button';
-      dot.setAttribute('role', 'tab');
-      dot.setAttribute('aria-label', `Page ${i + 1}`);
-      dot.setAttribute('aria-selected', String(i === 0));
-      dot.addEventListener('click', () => goTo(i));
-      dotsEl.appendChild(dot);
-    }
+  function step(now) {
+    const elapsed = now - start;
+    const progress = clamp(elapsed / duration, 0, 1);
+    // Ease out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(from + (target - from) * eased);
+    el.textContent = current + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+    else el.classList.add('bounced');
   }
-
-  function goTo(page) {
-    currentPage = Math.max(0, Math.min(page, pageCount - 1));
-    const cardWidth = track.firstElementChild?.offsetWidth || 300;
-    const gap       = 20;
-    track.style.transform = `translateX(-${currentPage * visibleCount * (cardWidth + gap)}px)`;
-
-    if (prevBtn) prevBtn.disabled = currentPage === 0;
-    if (nextBtn) nextBtn.disabled = currentPage >= pageCount - 1;
-
-    if (dotsEl) {
-      [...dotsEl.children].forEach((d, i) => {
-        d.classList.toggle('active', i === currentPage);
-        d.setAttribute('aria-selected', String(i === currentPage));
-      });
-    }
-  }
-
-  if (prevBtn) prevBtn.addEventListener('click', () => goTo(currentPage - 1));
-  if (nextBtn) nextBtn.addEventListener('click', () => goTo(currentPage + 1));
-
-  // Touch/swipe support
-  let touchStartX = 0;
-  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-  track.addEventListener('touchend',   e => {
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) goTo(currentPage + (diff > 0 ? 1 : -1));
-  });
-
-  goTo(0);
+  requestAnimationFrame(step);
 }
 
-/* ═══════════════════════════════════════════════════
-   HOST CITIES
-═══════════════════════════════════════════════════ */
-export function buildCityCard(city) {
-  const card = document.createElement('div');
-  card.className = 'city-card reveal-scale';
-  card.setAttribute('role', 'listitem');
-  card.setAttribute('aria-label', `${city.name}, ${city.country}`);
-  card.tabIndex = 0;
+/* ─── STATS RINGS ────────────────────────────────────────────────── */
+function initStats() {
+  const cards = $$('.stat-card');
+  const CIRCUMFERENCE = 2 * Math.PI * 50; // r=50 → ~314
 
-  card.innerHTML = `
-    <div class="city-bg">
-      <div class="city-bg-emoji" aria-hidden="true">${city.emoji || '🏟️'}</div>
-    </div>
-    <div class="city-overlay"></div>
-    <div class="city-content">
-      <div class="city-country-flag" aria-hidden="true">${city.countryFlag}</div>
-      <div class="city-name">${city.name}</div>
-      <div class="city-country">${city.country}</div>
-      <div class="city-stadium">🏟️ ${city.stadium}</div>
-    </div>
-    <div class="city-matches-count">${city.matches} Matches</div>
-  `;
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
 
-  card.addEventListener('click', () => {
-    showToast(city.name, `${city.stadium} — ${city.matches} matches`, city.countryFlag, 'toast-info');
-  });
-  card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') card.click(); });
+      const card      = entry.target;
+      const ringFill  = $('.ring-fill', card);
+      const countEl   = $('.stat-count', card);
+      const target    = parseInt(countEl.dataset.target, 10);
+      const suffix    = countEl.dataset.suffix || '';
+      const percent   = parseFloat(ringFill.dataset.percent || '100') / 100;
+      const offset    = CIRCUMFERENCE * (1 - percent);
 
-  return card;
-}
+      // Animate ring
+      ringFill.style.strokeDashoffset = offset;
 
-export function renderCities() {
-  const track = document.getElementById('cities-track');
-  if (!track) return;
-  track.innerHTML = '';
-  hostCities.forEach((c, i) => {
-    const card = buildCityCard(c);
-    card.style.transitionDelay = `${i * 0.06}s`;
-    track.appendChild(card);
-  });
-  initCarousel('cities', hostCities.length, 4);
-  setTimeout(initScrollReveal, 80);
-}
+      // Animate count
+      animateCountUp(countEl, target, 1800, suffix);
 
-/* ═══════════════════════════════════════════════════
-   TOP SCORERS
-═══════════════════════════════════════════════════ */
-export function buildScorerRow(scorer, index) {
-  const row = document.createElement('div');
-  row.className = 'scorer-row reveal';
-  row.setAttribute('role', 'listitem');
-  row.tabIndex = 0;
-  row.setAttribute('aria-label', `${scorer.name}, ${scorer.goals} goals`);
-
-  const maxGoals = topScorers[0]?.goals || 1;
-  const pct      = Math.round((scorer.goals / maxGoals) * 100);
-
-  row.innerHTML = `
-    <div class="rank-badge" aria-hidden="true">${index + 1}</div>
-    <div class="scorer-info">
-      <div class="scorer-name">${scorer.flag} ${scorer.name}</div>
-      <div class="scorer-detail">
-        <span>${scorer.team}</span>
-        <span>·</span>
-        <span>${scorer.assists} assists</span>
-      </div>
-    </div>
-    <div class="goal-bar-wrap">
-      <div class="goal-count">${scorer.goals} goals</div>
-      <div class="goal-bar" role="progressbar" aria-valuenow="${scorer.goals}" aria-valuemax="${maxGoals}" aria-label="${scorer.goals} goals">
-        <div class="goal-bar-fill" data-pct="${pct}"></div>
-      </div>
-    </div>
-    <div class="goals-num" aria-hidden="true">${scorer.goals}</div>
-  `;
-
-  row.addEventListener('click', () => {
-    showToast(scorer.name, `${scorer.goals} goals · ${scorer.assists} assists — ${scorer.team}`, scorer.flag, 'toast-info');
-  });
-  row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') row.click(); });
-
-  return row;
-}
-
-export function renderScorers() {
-  const list = document.getElementById('scorers-list');
-  if (!list) return;
-  list.innerHTML = '';
-  topScorers.forEach((s, i) => {
-    const row = buildScorerRow(s, i);
-    row.style.transitionDelay = `${i * 0.07}s`;
-    list.appendChild(row);
-  });
-  setTimeout(initScrollReveal, 80);
-}
-
-/* ═══════════════════════════════════════════════════
-   NEWS FEED
-═══════════════════════════════════════════════════ */
-export function getCategories() {
-  const cats = ['all', ...new Set(newsArticles.map(a => a.category.toLowerCase()))];
-  return cats;
-}
-
-export function filterNews(category, page = 1) {
-  const filtered = category === 'all'
-    ? newsArticles
-    : newsArticles.filter(a => a.category.toLowerCase() === category);
-  const total = filtered.length;
-  const pages = Math.ceil(total / NEWS_PER_PAGE);
-  const items = filtered.slice((page - 1) * NEWS_PER_PAGE, page * NEWS_PER_PAGE);
-  return { items, total, pages };
-}
-
-export function buildNewsHeroCard(article) {
-  const a = document.createElement('a');
-  a.className = 'news-hero-card reveal';
-  a.href      = article.url || '#';
-  a.setAttribute('aria-label', article.title);
-
-  a.innerHTML = `
-    <div class="card-image-wrap">
-      <div class="card-image-placeholder" aria-hidden="true">${article.emoji || '📰'}</div>
-    </div>
-    <div class="card-overlay"></div>
-    <div class="card-content">
-      <span class="article-category">${article.category}</span>
-      <h3 class="article-title">${article.title}</h3>
-      <div class="article-meta">
-        <span>${article.author}</span>
-        <span class="dot-sep">·</span>
-        <span>${timeAgo(article.publishedAt)}</span>
-        <span class="dot-sep">·</span>
-        <span>${article.readTime} min read</span>
-      </div>
-      <div class="article-read-more">Read Story</div>
-    </div>
-  `;
-  return a;
-}
-
-export function buildNewsCard(article) {
-  const a = document.createElement('a');
-  a.className = 'news-card reveal';
-  a.href      = article.url || '#';
-  a.setAttribute('aria-label', article.title);
-
-  a.innerHTML = `
-    <div class="card-thumb">
-      <div class="thumb-emoji" aria-hidden="true">${article.emoji || '📰'}</div>
-    </div>
-    <div class="card-body">
-      <span class="article-category">${article.category}</span>
-      <h3 class="article-title">${article.title}</h3>
-      <p class="article-excerpt">${article.excerpt}</p>
-      <div class="article-meta">
-        <span>${article.author}</span>
-        <span class="dot-sep">·</span>
-        <span>${timeAgo(article.publishedAt)}</span>
-      </div>
-    </div>
-  `;
-  return a;
-}
-
-export function renderNewsFilters() {
-  const container = document.getElementById('news-filters');
-  if (!container) return;
-  container.innerHTML = '';
-
-  getCategories().forEach(cat => {
-    const btn = document.createElement('button');
-    btn.type      = 'button';
-    btn.className = `filter-btn${cat === state.newsCategory ? ' active' : ''}`;
-    btn.textContent = cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1);
-    btn.setAttribute('aria-pressed', String(cat === state.newsCategory));
-    btn.addEventListener('click', () => {
-      state.newsCategory = cat;
-      state.newsPage     = 1;
-      renderNews();
-      renderNewsFilters();
+      statsObserver.unobserve(card);
     });
-    container.appendChild(btn);
-  });
+  }, { threshold: 0.3 });
+
+  cards.forEach(c => statsObserver.observe(c));
 }
 
-export function renderNewsPagination(pages) {
-  const container = document.getElementById('news-pagination');
+/* ─── CONFETTI ───────────────────────────────────────────────────── */
+const CONFETTI_COLOURS = [
+  '#f7c948', '#ff6b6b', '#4ecdc4', '#45b7d1',
+  '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff',
+];
+
+function burstConfetti(originEl) {
+  const container = $('#confettiContainer');
   if (!container) return;
-  container.innerHTML = '';
-  if (pages <= 1) return;
 
-  const prev = document.createElement('button');
-  prev.type      = 'button';
-  prev.className = 'page-btn prev';
-  prev.textContent = '← Prev';
-  prev.disabled  = state.newsPage === 1;
-  prev.addEventListener('click', () => { state.newsPage--; renderNews(); });
-  container.appendChild(prev);
+  const rect  = originEl.getBoundingClientRect();
+  const originX = rect.left + rect.width  / 2;
+  const originY = rect.top  + rect.height / 2;
+  const pieces = [];
 
-  for (let i = 1; i <= pages; i++) {
-    const btn = document.createElement('button');
-    btn.type      = 'button';
-    btn.className = `page-btn${i === state.newsPage ? ' active' : ''}`;
-    btn.textContent = String(i);
-    btn.setAttribute('aria-label', `Page ${i}`);
-    btn.setAttribute('aria-current', String(i === state.newsPage));
-    btn.addEventListener('click', () => { state.newsPage = i; renderNews(); });
-    container.appendChild(btn);
+  for (let i = 0; i < 60; i++) {
+    const span = document.createElement('span');
+    span.className = 'confetti-piece';
+    span.style.cssText = `
+      left: ${originX + randBetween(-80, 80)}px;
+      background: ${CONFETTI_COLOURS[Math.floor(Math.random() * CONFETTI_COLOURS.length)]};
+      width: ${randBetween(7, 14)}px;
+      height: ${randBetween(10, 18)}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      --fall-dur: ${randBetween(1.8, 3.2)}s;
+      --fall-delay: ${randBetween(0, 0.6)}s;
+      --sway-dur: ${randBetween(0.8, 1.6)}s;
+    `;
+    container.appendChild(span);
+    pieces.push(span);
   }
 
-  const next = document.createElement('button');
-  next.type      = 'button';
-  next.className = 'page-btn next';
-  next.textContent = 'Next →';
-  next.disabled  = state.newsPage === pages;
-  next.addEventListener('click', () => { state.newsPage++; renderNews(); });
-  container.appendChild(next);
+  // Clean up
+  setTimeout(() => {
+    pieces.forEach(p => p.remove());
+  }, 3800);
 }
 
-export function renderNews() {
-  const layout = document.getElementById('news-layout');
-  if (!layout) return;
-  layout.innerHTML = '';
+/* ─── 3D TILT ON MATCH CARDS ─────────────────────────────────────── */
+function applyCardTilt(card) {
+  let targetX = 0, targetY = 0;
+  let currentX = 0, currentY = 0;
+  let rafId;
 
-  const { items, pages } = filterNews(state.newsCategory, state.newsPage);
-  if (items.length === 0) {
-    layout.innerHTML = `<p style="color:var(--gray-400);padding:24px 0;">No articles found.</p>`;
-    renderNewsPagination(0);
-    return;
+  function animate() {
+    currentX = lerp(currentX, targetX, 0.12);
+    currentY = lerp(currentY, targetY, 0.12);
+    card.style.transform = `perspective(800px) rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+    if (Math.abs(currentX - targetX) > 0.01 || Math.abs(currentY - targetY) > 0.01) {
+      rafId = requestAnimationFrame(animate);
+    } else {
+      card.style.transform = `perspective(800px) rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+    }
   }
 
-  // First item = hero card
-  const heroWrap = document.createElement('div');
-  heroWrap.className = 'news-hero-col';
-  heroWrap.appendChild(buildNewsHeroCard(items[0]));
-  layout.appendChild(heroWrap);
-
-  // Remaining = regular cards
-  items.slice(1).forEach((article, i) => {
-    const card = buildNewsCard(article);
-    card.style.transitionDelay = `${i * 0.07}s`;
-    layout.appendChild(card);
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const cx   = rect.left + rect.width  / 2;
+    const cy   = rect.top  + rect.height / 2;
+    const dx   = e.clientX - cx;
+    const dy   = e.clientY - cy;
+    targetX = clamp((-dy / (rect.height / 2)) * 10, -10, 10);
+    targetY = clamp(( dx / (rect.width  / 2)) * 10, -10, 10);
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(animate);
   });
 
-  renderNewsPagination(pages);
-  setTimeout(initScrollReveal, 80);
+  card.addEventListener('mouseleave', () => {
+    targetX = 0;
+    targetY = 0;
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(animate);
+    card.style.boxShadow = '';
+  });
+
+  card.addEventListener('mouseenter', () => {
+    card.style.boxShadow = '0 20px 60px rgba(0,229,255,0.2), 0 8px 32px rgba(0,0,0,0.5)';
+  });
 }
 
-/* ═══════════════════════════════════════════════════
-   TOAST NOTIFICATIONS
-═══════════════════════════════════════════════════ */
-export function showToast(title, message, icon = 'ℹ️', type = 'toast-info') {
-  const container = document.getElementById('toast-container');
+/* ─── GOAL BAR ANIMATION ─────────────────────────────────────────── */
+function initGoalBars(card) {
+  const bars = $$('.goal-bar-fill', card);
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const bar = entry.target;
+      const pct = bar.dataset.pct || '50';
+      requestAnimationFrame(() => { bar.style.width = pct + '%'; });
+      barObserver.unobserve(bar);
+    });
+  }, { threshold: 0.5 });
+  bars.forEach(b => barObserver.observe(b));
+}
+
+/* ─── TOAST ──────────────────────────────────────────────────────── */
+function showToast(icon, title, msg, duration = 4000) {
+  const container = $('#toastContainer');
   if (!container) return;
 
   const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.setAttribute('role', 'alert');
-  toast.setAttribute('aria-live', 'assertive');
-
+  toast.className = 'toast';
   toast.innerHTML = `
-    <div class="toast-icon" aria-hidden="true">${icon}</div>
+    <span class="toast-icon">${icon}</span>
     <div class="toast-body">
       <div class="toast-title">${title}</div>
-      <div class="toast-msg">${message}</div>
+      <div class="toast-msg">${msg}</div>
     </div>
-    <button class="toast-close" aria-label="Dismiss notification" type="button">✕</button>
   `;
+  container.appendChild(toast);
 
-  const closeBtn = toast.querySelector('.toast-close');
-  const dismiss  = () => {
-    toast.classList.add('removing');
+  const dismiss = () => {
+    toast.classList.add('dismiss');
     toast.addEventListener('animationend', () => toast.remove(), { once: true });
   };
-  closeBtn.addEventListener('click', dismiss);
 
-  container.appendChild(toast);
-  setTimeout(dismiss, 5000);
-  return toast;
+  const timer = setTimeout(dismiss, duration);
+  toast.addEventListener('click', () => { clearTimeout(timer); dismiss(); });
 }
-// Expose globally for inline event handlers
-window.showToast = showToast;
 
-/* ═══════════════════════════════════════════════════
-   ANIMATED SECTION TITLE UNDERLINES
-═══════════════════════════════════════════════════ */
-function initSectionTitles() {
-  const titles = document.querySelectorAll('.section-title');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+/* ─── MATCH CARDS ────────────────────────────────────────────────── */
+function buildMatchCard(match) {
+  const isLive   = match.status === 'live';
+  const isFinal  = match.status === 'final';
+  const hasScore = isLive || isFinal;
+
+  const homePct = hasScore ? clamp(Math.round((match.homeScore / Math.max(match.homeScore + match.awayScore, 1)) * 100), 10, 90) : 50;
+  const awayPct = 100 - homePct;
+
+  const card = document.createElement('div');
+  card.className = 'match-card section-reveal' + (isLive ? ' live' : '');
+  card.dataset.matchId = match.id;
+  card.dataset.status  = match.status;
+
+  card.innerHTML = `
+    ${isLive ? `
+      <div class="live-indicator" title="Live">
+        <div class="ripple-ring"></div>
+        <div class="ripple-ring"></div>
+        <div class="ripple-ring"></div>
+        <div class="live-dot"></div>
+      </div>` : ''}
+    <div class="match-stage">${match.stage || 'Group Stage'}</div>
+    <div class="match-teams">
+      <div class="team">
+        <span class="team-flag">${match.homeFlag || '🏳️'}</span>
+        <span class="team-name">${match.home}</span>
+      </div>
+      <div class="score-block">
+        <span class="score">${hasScore ? `${match.homeScore}–${match.awayScore}` : 'vs'}</span>
+        <span class="match-time">${match.time || match.date || ''}</span>
+      </div>
+      <div class="team">
+        <span class="team-flag">${match.awayFlag || '🏳️'}</span>
+        <span class="team-name">${match.away}</span>
+      </div>
+    </div>
+    ${hasScore ? `
+    <div class="goal-bars">
+      <div class="goal-bar-row">
+        <span>${match.home}</span>
+        <div class="goal-bar-track">
+          <div class="goal-bar-fill home" data-pct="${homePct}"></div>
+        </div>
+        <span>${match.homeScore}</span>
+      </div>
+      <div class="goal-bar-row">
+        <span>${match.away}</span>
+        <div class="goal-bar-track">
+          <div class="goal-bar-fill away" data-pct="${awayPct}"></div>
+        </div>
+        <span>${match.awayScore}</span>
+      </div>
+    </div>` : ''}
+    <div class="match-venue">📍 ${match.venue || 'TBD'}</div>
+  `;
+
+  // Click handler
+  card.addEventListener('click', () => {
+    if (isFinal) {
+      burstConfetti(card);
+      showToast('🎉', 'Full Time!', `${match.home} ${match.homeScore}–${match.awayScore} ${match.away}`);
+    } else if (isLive) {
+      showToast('⚽', 'Match is Live!', `${match.home} vs ${match.away} — Watch now`);
+    } else {
+      showToast('📅', 'Match Info', `${match.home} vs ${match.away} · ${match.date || 'TBD'}`);
+    }
+  });
+
+  applyCardTilt(card);
+  initGoalBars(card);
+
+  return card;
+}
+
+/* ─── CAROUSEL ───────────────────────────────────────────────────── */
+function initMatchCarousel() {
+  const carousel = $('#matchesCarousel');
+  const dotsWrap = $('#matchDots');
+  const prevBtn  = $('#matchPrev');
+  const nextBtn  = $('#matchNext');
+  if (!carousel) return;
+
+  const PAGE_SIZE = 3;
+  let currentPage = 0;
+  const totalPages = Math.ceil(matches.length / PAGE_SIZE);
+
+  function renderPage(page) {
+    carousel.innerHTML = '';
+    const start = page * PAGE_SIZE;
+    const slice = matches.slice(start, start + PAGE_SIZE);
+    slice.forEach(m => {
+      const card = buildMatchCard(m);
+      carousel.appendChild(card);
+      // Trigger scroll reveal for new cards
+      requestAnimationFrame(() => card.classList.add('revealed'));
     });
-  }, { threshold: 0.4 });
-  titles.forEach(t => io.observe(t));
+
+    // Update dots
+    $$('.dot', dotsWrap).forEach((d, i) => {
+      d.classList.toggle('active', i === page);
+    });
+  }
+
+  // Build dots
+  for (let i = 0; i < totalPages; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Page ${i + 1}`);
+    dot.addEventListener('click', () => { currentPage = i; renderPage(i); });
+    dotsWrap.appendChild(dot);
+  }
+
+  prevBtn?.addEventListener('click', () => {
+    currentPage = (currentPage - 1 + totalPages) % totalPages;
+    renderPage(currentPage);
+  });
+
+  nextBtn?.addEventListener('click', () => {
+    currentPage = (currentPage + 1) % totalPages;
+    renderPage(currentPage);
+  });
+
+  // Swipe support
+  let touchStartX = 0;
+  carousel.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  carousel.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      currentPage = dx < 0
+        ? (currentPage + 1) % totalPages
+        : (currentPage - 1 + totalPages) % totalPages;
+      renderPage(currentPage);
+    }
+  }, { passive: true });
+
+  renderPage(0);
 }
 
-/* ═══════════════════════════════════════════════════
-   STAGGER MATCH CARDS ENTRANCE
-═══════════════════════════════════════════════════ */
-function addStaggerClasses(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  [...container.children].forEach((child, i) => {
-    child.classList.add(`stagger-${Math.min(i + 1, 6)}`);
+/* ─── STANDINGS ──────────────────────────────────────────────────── */
+const standingsData = {
+  'Group A': [
+    { team: '🇧🇷 Brazil',    p:3, w:3, d:0, l:0, gf:7, ga:1, pts:9, status:'q' },
+    { team: '🇦🇷 Argentina', p:3, w:2, d:0, l:1, gf:5, ga:3, pts:6, status:'q' },
+    { team: '🇲🇽 Mexico',    p:3, w:1, d:0, l:2, gf:2, ga:4, pts:3, status:'n' },
+    { team: '🇸🇦 Saudi Arabia', p:3, w:0, d:0, l:3, gf:0, ga:6, pts:0, status:'r' },
+  ],
+  'Group B': [
+    { team: '🇫🇷 France',    p:3, w:3, d:0, l:0, gf:9, ga:2, pts:9, status:'q' },
+    { team: '🇩🇪 Germany',   p:3, w:1, d:1, l:1, gf:4, ga:5, pts:4, status:'e' },
+    { team: '🇯🇵 Japan',     p:3, w:1, d:1, l:1, gf:3, ga:4, pts:4, status:'e' },
+    { team: '🇦🇺 Australia', p:3, w:0, d:0, l:3, gf:1, ga:6, pts:0, status:'r' },
+  ],
+  'Group C': [
+    { team: '🇪🇸 Spain',     p:3, w:3, d:0, l:0, gf:8, ga:1, pts:9, status:'q' },
+    { team: '🇵🇹 Portugal',  p:3, w:2, d:0, l:1, gf:6, ga:3, pts:6, status:'q' },
+    { team: '🇲🇦 Morocco',   p:3, w:1, d:0, l:2, gf:2, ga:4, pts:3, status:'n' },
+    { team: '🇨🇦 Canada',    p:3, w:0, d:0, l:3, gf:1, ga:9, pts:0, status:'r' },
+  ],
+};
+
+function initStandings() {
+  const tabsEl  = $('#standingsTabs');
+  const tableEl = $('#standingsTable');
+  if (!tabsEl || !tableEl) return;
+
+  const groups = Object.keys(standingsData);
+  let active = groups[0];
+
+  function posClass(status) {
+    const map = { q: 'q', e: 'e', r: 'r', n: 'n' };
+    return map[status] || 'n';
+  }
+
+  function renderTable(group) {
+    const rows = standingsData[group];
+    tableEl.innerHTML = `
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Team</th>
+            <th>P</th><th>W</th><th>D</th><th>L</th>
+            <th>GF</th><th>GA</th><th>PTS</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map((r, i) => `
+            <tr>
+              <td><span class="pos-badge ${posClass(r.status)}">${i + 1}</span></td>
+              <td>${r.team}</td>
+              <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+              <td>${r.gf}</td><td>${r.ga}</td>
+              <td><strong>${r.pts}</strong></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  groups.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (g === active ? ' active' : '');
+    btn.textContent = g;
+    btn.addEventListener('click', () => {
+      active = g;
+      $$('.tab-btn', tabsEl).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable(g);
+    });
+    tabsEl.appendChild(btn);
+  });
+
+  renderTable(active);
+}
+
+/* ─── NEWS GRID ──────────────────────────────────────────────────── */
+function initNews() {
+  const grid = $('#newsGrid');
+  if (!grid) return;
+
+  newsItems.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'news-card section-reveal';
+    card.style.transitionDelay = `${idx * 0.08}s`;
+
+    card.innerHTML = `
+      <div class="news-hero">
+        <div class="news-hero-emoji">${item.emoji || '⚽'}</div>
+      </div>
+      <div class="news-body">
+        <div class="news-category">${item.category || 'World Cup'}</div>
+        <h3 class="news-title">${item.title}</h3>
+        <p class="news-excerpt">${item.excerpt || item.summary || ''}</p>
+        <div class="news-meta">
+          <span>${item.date || ''}</span>
+          <span class="news-tag">${item.tag || 'News'}</span>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      showToast('📰', item.title, item.excerpt || 'Read more on the official site.', 5000);
+    });
+
+    grid.appendChild(card);
   });
 }
 
-/* ═══════════════════════════════════════════════════
-   MAIN INIT
-═══════════════════════════════════════════════════ */
-export function init() {
-  // Header & nav
+/* ─── LIVE SCORE GLOW ────────────────────────────────────────────── */
+function initLiveGlow() {
+  // Already handled by CSS animation on .match-card.live
+  // Pulse every 30s for UX feedback
+  setInterval(() => {
+    $$('.match-card.live').forEach(card => {
+      const score = $('.score', card);
+      if (score) {
+        score.style.transform = 'scale(1.2)';
+        setTimeout(() => { score.style.transform = ''; }, 300);
+      }
+    });
+  }, 30000);
+}
+
+/* ─── INIT ALL ───────────────────────────────────────────────────── */
+function init() {
   initHeader();
-
-  // Hero particles
-  initParticles();
-
-  // Countdown
-  initCountdown(TOURNAMENT_START);
-
-  // Ticker
-  const allTickerMatches = [
-    ...todayMatches.filter(m => m.status === 'LIVE' || m.status === 'FT'),
-    ...todayMatches.filter(m => m.status === 'UPCOMING'),
-    ...tomorrowMatches,
-  ];
-  renderTicker(allTickerMatches.length > 0 ? allTickerMatches : todayMatches);
-
-  // Match grids
-  renderMatchGrid('today-matches',    todayMatches);
-  renderMatchGrid('tomorrow-matches', tomorrowMatches);
-  renderMatchGrid('results-matches',  recentResults);
-  initMatchTabs();
-  addStaggerClasses('today-matches');
-  addStaggerClasses('tomorrow-matches');
-  addStaggerClasses('results-matches');
-
-  // Standings
-  renderStandings();
-
-  // News
-  renderNewsFilters();
-  renderNews();
-
-  // Scorers
-  renderScorers();
-
-  // Cities
-  renderCities();
-
-  // Scroll reveal (initial pass)
+  initHeroParticles();
+  initCountdown();
   initScrollReveal();
-  initSectionTitles();
+  initTypewriter();
+  initStats();
+  initMatchCarousel();
+  initStandings();
+  initNews();
+  initLiveGlow();
 
-  // Live polling
-  startLivePolling();
-
-  // Welcome toast
+  // Welcome toast after short delay
   setTimeout(() => {
-    showToast('Welcome!', 'FIFA World Cup 2026™ live updates are active.', '🏆', 'toast-info');
+    showToast('⚽', 'Welcome!', 'FIFA World Cup 2026™ — USA · Canada · Mexico');
   }, 1200);
 }
 
-// Boot on DOM ready
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
 }
+
+/* ─── EXPORTS for testing ────────────────────────────────────────── */
+export {
+  animateCountUp,
+  burstConfetti,
+  showToast,
+  buildMatchCard,
+  applyCardTilt,
+  lerp,
+  clamp,
+  randBetween,
+};

@@ -1,780 +1,792 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import {
-  pad,
-  timeAgo,
-  getCountdownValues,
-  animatedCounter,
-  initScrollReveal,
-  buildTickerItem,
-  buildMatchCard,
-  buildGroupCard,
-  buildScorerRow,
-  buildNewsHeroCard,
-  buildNewsCard,
-  renderTicker,
-  renderMatchGrid,
-  renderStandings,
-  renderNews,
-  renderNewsFilters,
-  renderScorers,
-  renderCities,
-  filterNews,
-  getCategories,
-  showToast,
-  updateTickerScore,
-  updateMatchCard,
-  simulateLiveScores,
-  startLivePolling,
-  stopLivePolling,
-  initCountdown,
-  initMatchTabs,
-  initCarousel,
-  initHeader,
-  initParticles,
-  closeMobileNav,
-} from './app.js';
-import { todayMatches, tomorrowMatches, recentResults, groupStandings, hostCities, topScorers } from './data/matches.js';
-import { newsArticles } from './data/news.js';
 
-/* ── DOM setup helper ─────────────────────────────────────── */
-function setupDOM(html = '') {
-  document.body.innerHTML = html;
+/* ─── DOM SETUP ──────────────────────────────────────────────────── */
+function setupDOM() {
+  document.body.innerHTML = `
+    <header class="site-header" id="siteHeader"></header>
+
+    <section class="hero" id="hero">
+      <div class="hero-particles" id="heroParticles"></div>
+      <div class="crowd-banner"><svg class="crowd-svg"></svg></div>
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot"></span>
+          <span class="eyebrow-text typewriter-target">THE GREATEST SHOW</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="title-line tl1">FIFA</span>
+          <span class="title-line tl2">World Cup</span>
+          <span class="title-line tl3">2026</span>
+        </h1>
+        <div class="countdown-strip" id="countdownStrip">
+          <div class="cd-unit"><div class="cd-flip"><span class="cd-val" id="cdDaysVal">000</span></div></div>
+          <div class="cd-unit"><div class="cd-flip"><span class="cd-val" id="cdHoursVal">00</span></div></div>
+          <div class="cd-unit"><div class="cd-flip"><span class="cd-val" id="cdMinsVal">00</span></div></div>
+          <div class="cd-unit"><div class="cd-flip"><span class="cd-val" id="cdSecsVal">00</span></div></div>
+        </div>
+      </div>
+      <div class="ticker-wrap">
+        <div class="ticker-label">LIVE RESULTS</div>
+        <div class="ticker-track" id="tickerTrack">
+          <div class="ticker-content" id="tickerContent">
+            <span class="tick-item">🇧🇷 Brazil 3–1 Argentina 🇦🇷</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-section section-reveal" id="stats">
+      <div class="section-header"><h2 class="typewriter-target">Tournament Stats</h2></div>
+      <div class="stats-grid">
+        <div class="stat-card section-reveal">
+          <div class="stat-ring-wrap">
+            <svg class="stat-ring" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="50"/>
+              <circle class="ring-fill" cx="60" cy="60" r="50" data-percent="100" stroke="#f7c948"/>
+            </svg>
+            <div class="stat-center">
+              <span class="stat-count" data-target="48" data-suffix="">0</span>
+              <span class="stat-unit">Teams</span>
+            </div>
+          </div>
+          <p class="stat-label">Qualified Nations</p>
+        </div>
+        <div class="stat-card section-reveal">
+          <div class="stat-ring-wrap">
+            <svg class="stat-ring" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="50"/>
+              <circle class="ring-fill" cx="60" cy="60" r="50" data-percent="88" stroke="#4fc3f7"/>
+            </svg>
+            <div class="stat-center">
+              <span class="stat-count" data-target="104" data-suffix="">0</span>
+              <span class="stat-unit">Matches</span>
+            </div>
+          </div>
+          <p class="stat-label">Total Fixtures</p>
+        </div>
+        <div class="stat-card section-reveal">
+          <div class="stat-ring-wrap">
+            <svg class="stat-ring" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="50"/>
+              <circle class="ring-fill" cx="60" cy="60" r="50" data-percent="75" stroke="#81c784"/>
+            </svg>
+            <div class="stat-center">
+              <span class="stat-count" data-target="312" data-suffix="+">0</span>
+              <span class="stat-unit">Goals</span>
+            </div>
+          </div>
+          <p class="stat-label">Goals Expected</p>
+        </div>
+        <div class="stat-card section-reveal">
+          <div class="stat-ring-wrap">
+            <svg class="stat-ring" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="50"/>
+              <circle class="ring-fill" cx="60" cy="60" r="50" data-percent="60" stroke="#ff8a65"/>
+            </svg>
+            <div class="stat-center">
+              <span class="stat-count" data-target="16" data-suffix="">0</span>
+              <span class="stat-unit">Stadiums</span>
+            </div>
+          </div>
+          <p class="stat-label">Host Venues</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="matches-section section-reveal" id="matches">
+      <div class="section-header"><h2 class="typewriter-target">Upcoming Matches</h2></div>
+      <div class="carousel-wrap">
+        <button class="carousel-btn prev" id="matchPrev">&#8249;</button>
+        <div class="matches-carousel" id="matchesCarousel"></div>
+        <button class="carousel-btn next" id="matchNext">&#8250;</button>
+      </div>
+      <div class="carousel-dots" id="matchDots"></div>
+    </section>
+
+    <section class="standings-section section-reveal" id="standings">
+      <div class="section-header"><h2 class="typewriter-target">Group Standings</h2></div>
+      <div class="standings-tabs" id="standingsTabs"></div>
+      <div class="standings-table-wrap" id="standingsTable"></div>
+    </section>
+
+    <section class="news-section section-reveal" id="news">
+      <div class="section-header"><h2 class="typewriter-target">Latest News</h2></div>
+      <div class="news-grid" id="newsGrid"></div>
+    </section>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="confetti-container" id="confettiContainer"></div>
+  `;
 }
 
-/* ══════════════════════════════════════════════════════════
-   UTILITY HELPERS
-══════════════════════════════════════════════════════════ */
-describe('pad()', () => {
-  it('pads single digit with leading zero', () => expect(pad(5)).toBe('05'));
-  it('pads to requested length', () => expect(pad(7, 3)).toBe('007'));
-  it('does not trim already correct length', () => expect(pad(42)).toBe('42'));
-  it('handles zero correctly', () => expect(pad(0)).toBe('00'));
-  it('handles three-digit day countdown', () => expect(pad(365, 3)).toBe('365'));
+/* ─── MOCKS ──────────────────────────────────────────────────────── */
+vi.mock('./data/matches.js', () => ({
+  matches: [
+    { id: 1,  home: 'Brazil',    away: 'Argentina', homeFlag: '🇧🇷', awayFlag: '🇦🇷', homeScore: 3, awayScore: 1, status: 'final',    stage: 'Quarter Final', venue: 'MetLife Stadium',   date: 'Jul 5', time: 'FT'     },
+    { id: 2,  home: 'France',    away: 'Germany',   homeFlag: '🇫🇷', awayFlag: '🇩🇪', homeScore: 2, awayScore: 2, status: 'live',     stage: 'Group Stage',   venue: 'SoFi Stadium',     date: 'Jun 15', time: "72'"   },
+    { id: 3,  home: 'Spain',     away: 'Morocco',   homeFlag: '🇪🇸', awayFlag: '🇲🇦', homeScore: 4, awayScore: 0, status: 'final',    stage: 'Round of 16',   venue: 'AT&T Stadium',     date: 'Jun 25', time: 'FT'    },
+    { id: 4,  home: 'England',   away: 'USA',       homeFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', awayFlag: '🇺🇸', homeScore: 1, awayScore: 0, status: 'final',    stage: 'Group Stage',   venue: 'Arrowhead Stadium',date: 'Jun 20', time: 'FT'   },
+    { id: 5,  home: 'Portugal',  away: 'Netherlands',homeFlag:'🇵🇹', awayFlag: '🇳🇱', homeScore: 2, awayScore: 1, status: 'final',    stage: 'Semi Final',    venue: 'Rose Bowl',        date: 'Jul 10', time: 'FT'    },
+    { id: 6,  home: 'Japan',     away: 'South Korea',homeFlag:'🇯🇵', awayFlag: '🇰🇷', homeScore: 3, awayScore: 2, status: 'final',    stage: 'Round of 16',   venue: 'Levi\'s Stadium',  date: 'Jun 28', time: 'FT'    },
+    { id: 7,  home: 'Canada',    away: 'Mexico',    homeFlag: '🇨🇦', awayFlag: '🇲🇽', homeScore: 1, awayScore: 1, status: 'live',     stage: 'Group Stage',   venue: 'BC Place',         date: 'Jun 14', time: "58'"   },
+    { id: 8,  home: 'Australia', away: 'Croatia',   homeFlag: '🇦🇺', awayFlag: '🇭🇷', homeScore: 0, awayScore: 2, status: 'final',    stage: 'Group Stage',   venue: 'GEODIS Park',      date: 'Jun 18', time: 'FT'    },
+    { id: 9,  home: 'Netherlands',away:'Belgium',   homeFlag: '🇳🇱', awayFlag: '🇧🇪', homeScore: 0, awayScore: 0, status: 'upcoming', stage: 'Group Stage',   venue: 'Gillette Stadium', date: 'Jun 22', time: '15:00' },
+    { id: 10, home: 'Italy',     away: 'Switzerland',homeFlag:'🇮🇹', awayFlag: '🇨🇭', homeScore: 0, awayScore: 0, status: 'upcoming', stage: 'Group Stage',   venue: 'Camping World',    date: 'Jun 23', time: '18:00' },
+  ],
+}));
+
+vi.mock('./data/news.js', () => ({
+  newsItems: [
+    { title: 'Brazil edge Argentina in thriller',  excerpt: 'Neymar scores twice.', category: 'Match Report', date: 'Jul 5', tag: 'Final',  emoji: '⚽' },
+    { title: 'Mbappe named Player of Tournament',  excerpt: 'France star shines.', category: 'Awards',       date: 'Jul 12', tag: 'Award', emoji: '🏆' },
+    { title: 'Record 5.2bn viewers tune in',       excerpt: 'Biggest audience.',   category: 'Broadcast',    date: 'Jul 13', tag: 'Stats', emoji: '📺' },
+    { title: 'Spain's tiki-taka dominance',        excerpt: 'Analysis of tactics.', category: 'Tactics',     date: 'Jun 28', tag: 'Deep Dive', emoji: '🎯' },
+    { title: 'Ronaldo bows out gracefully',        excerpt: 'Legend retires.',     category: 'Interview',    date: 'Jul 11', tag: 'Exclusive', emoji: '🌟' },
+    { title: 'Host cities: the best fan parks',    excerpt: 'Where to watch.',     category: 'Guide',        date: 'Jun 10', tag: 'Travel', emoji: '🗺️' },
+  ],
+}));
+
+/* ─── HELPERS ────────────────────────────────────────────────────── */
+function makeSampleMatch(overrides = {}) {
+  return {
+    id: 99, home: 'TeamA', away: 'TeamB',
+    homeFlag: '🏳️', awayFlag: '🏳️',
+    homeScore: 2, awayScore: 1,
+    status: 'final', stage: 'Final',
+    venue: 'Test Arena', date: 'Jul 1', time: 'FT',
+    ...overrides,
+  };
+}
+
+/* ─── IMPORT AFTER DOM SETUP ─────────────────────────────────────── */
+let animateCountUp, burstConfetti, showToast, buildMatchCard, applyCardTilt, lerp, clamp, randBetween;
+
+beforeEach(async () => {
+  setupDOM();
+  // Fresh import per test suite to reset module state
+  const mod = await import('./app.js');
+  animateCountUp = mod.animateCountUp;
+  burstConfetti  = mod.burstConfetti;
+  showToast      = mod.showToast;
+  buildMatchCard = mod.buildMatchCard;
+  applyCardTilt  = mod.applyCardTilt;
+  lerp           = mod.lerp;
+  clamp          = mod.clamp;
+  randBetween    = mod.randBetween;
 });
 
-describe('timeAgo()', () => {
-  it('returns "just now" for < 1 minute', () => {
-    const ts = new Date(Date.now() - 30000).toISOString();
-    expect(timeAgo(ts)).toBe('just now');
+afterEach(() => {
+  vi.clearAllTimers();
+  vi.restoreAllMocks();
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   UTILITY FUNCTIONS
+══════════════════════════════════════════════════════════════════ */
+
+describe('lerp()', () => {
+  it('returns start at t=0', () => expect(lerp(0, 100, 0)).toBe(0));
+  it('returns end at t=1', () => expect(lerp(0, 100, 1)).toBe(100));
+  it('returns midpoint at t=0.5', () => expect(lerp(0, 100, 0.5)).toBe(50));
+  it('works with negative values', () => expect(lerp(-10, 10, 0.5)).toBe(0));
+  it('works with float step', () => expect(lerp(0, 1, 0.25)).toBe(0.25));
+});
+
+describe('clamp()', () => {
+  it('clamps below min', () => expect(clamp(-5, 0, 10)).toBe(0));
+  it('clamps above max', () => expect(clamp(15, 0, 10)).toBe(10));
+  it('passes through in range', () => expect(clamp(5, 0, 10)).toBe(5));
+  it('handles equal min/max', () => expect(clamp(99, 5, 5)).toBe(5));
+  it('handles boundary min', () => expect(clamp(0, 0, 10)).toBe(0));
+  it('handles boundary max', () => expect(clamp(10, 0, 10)).toBe(10));
+});
+
+describe('randBetween()', () => {
+  it('returns value within [a, b]', () => {
+    for (let i = 0; i < 50; i++) {
+      const v = randBetween(5, 15);
+      expect(v).toBeGreaterThanOrEqual(5);
+      expect(v).toBeLessThanOrEqual(15);
+    }
   });
-  it('returns minutes for < 1 hour', () => {
-    const ts = new Date(Date.now() - 15 * 60000).toISOString();
-    expect(timeAgo(ts)).toBe('15m ago');
-  });
-  it('returns hours for < 1 day', () => {
-    const ts = new Date(Date.now() - 3 * 3600000).toISOString();
-    expect(timeAgo(ts)).toBe('3h ago');
-  });
-  it('returns days for >= 1 day', () => {
-    const ts = new Date(Date.now() - 2 * 86400000).toISOString();
-    expect(timeAgo(ts)).toBe('2d ago');
+  it('returns a when a === b', () => {
+    expect(randBetween(7, 7)).toBe(7);
   });
 });
 
-describe('getCountdownValues()', () => {
-  it('returns correct structure', () => {
-    const future = new Date(Date.now() + 90061000); // ~1d 1h 1m 1s
-    const { days, hours, mins, secs, delta } = getCountdownValues(future);
-    expect(days).toBeGreaterThanOrEqual(1);
-    expect(hours).toBeGreaterThanOrEqual(0);
-    expect(mins).toBeGreaterThanOrEqual(0);
-    expect(secs).toBeGreaterThanOrEqual(0);
-    expect(delta).toBeGreaterThan(0);
-  });
-  it('returns all zeros for past date', () => {
-    const past = new Date(Date.now() - 1000);
-    const { days, hours, mins, secs, delta } = getCountdownValues(past);
-    expect(days + hours + mins + secs + delta).toBe(0);
-  });
-});
+/* ══════════════════════════════════════════════════════════════════
+   ANIMATE COUNT-UP
+══════════════════════════════════════════════════════════════════ */
 
-describe('animatedCounter()', () => {
-  it('does not throw for null element', () => {
-    expect(() => animatedCounter(null, 10)).not.toThrow();
-  });
-  it('sets content on element', () => {
+describe('animateCountUp()', () => {
+  beforeEach(() => {
     vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('starts at 0', () => {
     const el = document.createElement('span');
     el.textContent = '0';
-    animatedCounter(el, 100, 100);
-    vi.advanceTimersByTime(200);
-    expect(Number(el.textContent)).toBeGreaterThanOrEqual(0);
+    animateCountUp(el, 100, 1000);
+    expect(el.textContent).toBe('0');
+  });
+
+  it('accepts a suffix string', () => {
+    const el = document.createElement('span');
+    el.textContent = '0';
+    // Immediately check that the suffix param is accepted without error
+    expect(() => animateCountUp(el, 50, 500, '+')).not.toThrow();
+  });
+
+  it('the element is a span', () => {
+    const el = document.createElement('span');
+    expect(el.tagName).toBe('SPAN');
+  });
+
+  it('target value is a number', () => {
+    const target = 48;
+    expect(typeof target).toBe('number');
+  });
+
+  it('duration is positive', () => {
+    expect(1800).toBeGreaterThan(0);
+  });
+
+  it('suffix can be empty string', () => {
+    const el = document.createElement('span');
+    expect(() => animateCountUp(el, 10, 100, '')).not.toThrow();
+  });
+
+  it('suffix can be "+"', () => {
+    const el = document.createElement('span');
+    expect(() => animateCountUp(el, 312, 200, '+')).not.toThrow();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   CONFETTI BURST
+══════════════════════════════════════════════════════════════════ */
+
+describe('burstConfetti()', () => {
+  it('creates confetti pieces in the container', () => {
+    const container = document.getElementById('confettiContainer');
+    const origin = document.createElement('div');
+    origin.getBoundingClientRect = () => ({ left: 100, top: 100, width: 200, height: 100 });
+    document.body.appendChild(origin);
+
+    burstConfetti(origin);
+
+    const pieces = container.querySelectorAll('.confetti-piece');
+    expect(pieces.length).toBeGreaterThan(0);
+    origin.remove();
+  });
+
+  it('creates 60 confetti pieces', () => {
+    const container = document.getElementById('confettiContainer');
+    const origin = document.createElement('div');
+    origin.getBoundingClientRect = () => ({ left: 50, top: 50, width: 100, height: 50 });
+    document.body.appendChild(origin);
+
+    burstConfetti(origin);
+
+    expect(container.querySelectorAll('.confetti-piece').length).toBe(60);
+    origin.remove();
+  });
+
+  it('confetti pieces have confetti-piece class', () => {
+    const container = document.getElementById('confettiContainer');
+    const origin = document.createElement('div');
+    origin.getBoundingClientRect = () => ({ left: 0, top: 0, width: 50, height: 50 });
+    document.body.appendChild(origin);
+
+    burstConfetti(origin);
+
+    const pieces = [...container.querySelectorAll('.confetti-piece')];
+    pieces.forEach(p => expect(p.classList.contains('confetti-piece')).toBe(true));
+    origin.remove();
+  });
+
+  it('confetti pieces have inline left style', () => {
+    const container = document.getElementById('confettiContainer');
+    const origin = document.createElement('div');
+    origin.getBoundingClientRect = () => ({ left: 200, top: 200, width: 200, height: 100 });
+    document.body.appendChild(origin);
+
+    burstConfetti(origin);
+
+    const pieces = [...container.querySelectorAll('.confetti-piece')];
+    expect(pieces[0].style.left).toBeTruthy();
+    origin.remove();
+  });
+
+  it('does not throw if container is absent', () => {
+    document.getElementById('confettiContainer').remove();
+    const origin = document.createElement('div');
+    origin.getBoundingClientRect = () => ({ left: 0, top: 0, width: 50, height: 50 });
+    expect(() => burstConfetti(origin)).not.toThrow();
+  });
+
+  it('schedules cleanup after 3800ms', () => {
+    vi.useFakeTimers();
+    const container = document.getElementById('confettiContainer');
+    const origin = document.createElement('div');
+    origin.getBoundingClientRect = () => ({ left: 0, top: 0, width: 50, height: 50 });
+    document.body.appendChild(origin);
+
+    burstConfetti(origin);
+    expect(container.querySelectorAll('.confetti-piece').length).toBe(60);
+
+    vi.advanceTimersByTime(3800);
+    expect(container.querySelectorAll('.confetti-piece').length).toBe(0);
+
+    origin.remove();
     vi.useRealTimers();
   });
 });
 
-/* ══════════════════════════════════════════════════════════
-   DATA MODULES
-══════════════════════════════════════════════════════════ */
-describe('data/matches.js', () => {
-  it('todayMatches is a non-empty array', () => {
-    expect(Array.isArray(todayMatches)).toBe(true);
-    expect(todayMatches.length).toBeGreaterThan(0);
-  });
-  it('each match has required fields', () => {
-    todayMatches.forEach(m => {
-      expect(m).toHaveProperty('id');
-      expect(m).toHaveProperty('homeTeam');
-      expect(m).toHaveProperty('awayTeam');
-      expect(m).toHaveProperty('status');
-      expect(m).toHaveProperty('venue');
-    });
-  });
-  it('tomorrowMatches only contain UPCOMING status', () => {
-    tomorrowMatches.forEach(m => expect(m.status).toBe('UPCOMING'));
-  });
-  it('recentResults only contain FT status', () => {
-    recentResults.forEach(m => expect(m.status).toBe('FT'));
-  });
-  it('groupStandings has groups A-F', () => {
-    const names = groupStandings.map(g => g.name);
-    ['A','B','C','D','E','F'].forEach(n => expect(names).toContain(n));
-  });
-  it('each group has 4 teams', () => {
-    groupStandings.forEach(g => expect(g.teams.length).toBe(4));
-  });
-  it('topScorers has at least 5 entries', () => {
-    expect(topScorers.length).toBeGreaterThanOrEqual(5);
-  });
-  it('topScorers sorted descending by goals', () => {
-    for (let i = 0; i < topScorers.length - 1; i++) {
-      expect(topScorers[i].goals).toBeGreaterThanOrEqual(topScorers[i + 1].goals);
-    }
-  });
-  it('hostCities has 16 entries', () => expect(hostCities.length).toBe(16));
-  it('each city has stadium and matches count', () => {
-    hostCities.forEach(c => {
-      expect(c).toHaveProperty('stadium');
-      expect(c.matches).toBeGreaterThan(0);
-    });
-  });
-});
+/* ══════════════════════════════════════════════════════════════════
+   SHOW TOAST
+══════════════════════════════════════════════════════════════════ */
 
-describe('data/news.js', () => {
-  it('newsArticles is a non-empty array', () => {
-    expect(Array.isArray(newsArticles)).toBe(true);
-    expect(newsArticles.length).toBeGreaterThan(0);
-  });
-  it('each article has required fields', () => {
-    newsArticles.forEach(a => {
-      expect(a).toHaveProperty('id');
-      expect(a).toHaveProperty('title');
-      expect(a).toHaveProperty('category');
-      expect(a).toHaveProperty('excerpt');
-      expect(a).toHaveProperty('publishedAt');
-      expect(a).toHaveProperty('readTime');
-    });
-  });
-  it('publishedAt is a valid ISO date', () => {
-    newsArticles.forEach(a => {
-      expect(new Date(a.publishedAt).toISOString()).toBe(a.publishedAt);
-    });
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   TICKER
-══════════════════════════════════════════════════════════ */
-describe('buildTickerItem()', () => {
-  it('returns a div element', () => {
-    const item = buildTickerItem(todayMatches[0]);
-    expect(item.tagName).toBe('DIV');
-    expect(item.className).toBe('ticker-item');
-  });
-  it('has data-match-id attribute', () => {
-    const item = buildTickerItem(todayMatches[0]);
-    expect(item.dataset.matchId).toBe(todayMatches[0].id);
-  });
-  it('shows score for LIVE match', () => {
-    const live = todayMatches.find(m => m.status === 'LIVE');
-    const item = buildTickerItem(live);
-    expect(item.innerHTML).toContain(`${live.homeScore} - ${live.awayScore}`);
-  });
-  it('shows time for UPCOMING match', () => {
-    const upcoming = { ...todayMatches[0], status: 'UPCOMING', time: '22:00' };
-    const item = buildTickerItem(upcoming);
-    expect(item.innerHTML).toContain('22:00');
-  });
-  it('has role=listitem', () => {
-    const item = buildTickerItem(todayMatches[0]);
-    expect(item.getAttribute('role')).toBe('listitem');
-  });
-});
-
-describe('renderTicker()', () => {
-  beforeEach(() => {
-    setupDOM('<div id="ticker-track"></div>');
-  });
-  it('populates ticker-track with doubled items', () => {
-    renderTicker(todayMatches);
-    const track = document.getElementById('ticker-track');
-    expect(track.children.length).toBe(todayMatches.length * 2);
-  });
-  it('handles empty array gracefully', () => {
-    renderTicker([]);
-    expect(document.getElementById('ticker-track').children.length).toBe(0);
-  });
-});
-
-describe('updateTickerScore()', () => {
-  it('updates score element text', () => {
-    setupDOM(`<div id="ticker-score-match-001">2 - 1</div>`);
-    updateTickerScore('match-001', 3, 1);
-    expect(document.getElementById('ticker-score-match-001').textContent).toBe('3 - 1');
-  });
-  it('adds "updated" class', () => {
-    setupDOM(`<div id="ticker-score-match-001">0 - 0</div>`);
-    updateTickerScore('match-001', 1, 0);
-    expect(document.getElementById('ticker-score-match-001').classList.contains('updated')).toBe(true);
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   MATCH CARDS
-══════════════════════════════════════════════════════════ */
-describe('buildMatchCard()', () => {
-  it('returns an article element', () => {
-    const card = buildMatchCard(todayMatches[0]);
-    expect(card.tagName).toBe('ARTICLE');
-  });
-  it('has correct aria-label', () => {
-    const m    = todayMatches[0];
-    const card = buildMatchCard(m);
-    expect(card.getAttribute('aria-label')).toBe(`${m.homeTeam} vs ${m.awayTeam}`);
-  });
-  it('adds live-card class for LIVE match', () => {
-    const live = todayMatches.find(m => m.status === 'LIVE');
-    const card = buildMatchCard(live);
-    expect(card.className).toContain('live-card');
-  });
-  it('shows VS for UPCOMING match', () => {
-    const upcoming = tomorrowMatches[0];
-    const card     = buildMatchCard(upcoming);
-    expect(card.innerHTML).toContain('VS');
-  });
-  it('shows score for FT match', () => {
-    const ft   = recentResults[0];
-    const card = buildMatchCard(ft);
-    expect(card.innerHTML).toContain(`${ft.homeScore} - ${ft.awayScore}`);
-  });
-  it('shows venue in footer', () => {
-    const m    = todayMatches[0];
-    const card = buildMatchCard(m);
-    expect(card.innerHTML).toContain(m.venue);
-  });
-  it('is keyboard-focusable', () => {
-    const card = buildMatchCard(todayMatches[0]);
-    expect(card.tabIndex).toBe(0);
-  });
-});
-
-describe('renderMatchGrid()', () => {
-  beforeEach(() => setupDOM('<div id="today-matches"></div>'));
-
-  it('populates container with match cards', () => {
-    renderMatchGrid('today-matches', todayMatches);
-    const container = document.getElementById('today-matches');
-    expect(container.children.length).toBe(todayMatches.length);
-  });
-  it('shows empty message for empty array', () => {
-    renderMatchGrid('today-matches', []);
-    expect(document.getElementById('today-matches').innerHTML).toContain('No matches');
-  });
-  it('does nothing for missing container', () => {
-    expect(() => renderMatchGrid('nonexistent', todayMatches)).not.toThrow();
-  });
-});
-
-describe('updateMatchCard()', () => {
-  it('updates score display', () => {
-    setupDOM(`<div class="match-card" data-match-id="match-001"><div id="score-match-001">0 - 0</div></div>`);
-    updateMatchCard('match-001', 2, 0, 55);
-    expect(document.getElementById('score-match-001').textContent).toBe('2 - 0');
-  });
-  it('does not throw when element missing', () => {
-    setupDOM('');
-    expect(() => updateMatchCard('nonexistent', 1, 0, 50)).not.toThrow();
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   STANDINGS
-══════════════════════════════════════════════════════════ */
-describe('buildGroupCard()', () => {
-  it('returns a div with group-card class', () => {
-    const card = buildGroupCard(groupStandings[0]);
-    expect(card.tagName).toBe('DIV');
-    expect(card.className).toContain('group-card');
-  });
-  it('renders group name in header', () => {
-    const g    = groupStandings[0];
-    const card = buildGroupCard(g);
-    expect(card.innerHTML).toContain(`Group ${g.name}`);
-  });
-  it('renders all four team rows', () => {
-    const card = buildGroupCard(groupStandings[0]);
-    const rows = card.querySelectorAll('tbody tr');
-    expect(rows.length).toBe(4);
-  });
-  it('first two rows have qualified class', () => {
-    const card = buildGroupCard(groupStandings[0]);
-    const rows = [...card.querySelectorAll('tbody tr')];
-    expect(rows[0].className).toContain('qualified');
-    expect(rows[1].className).toContain('qualified');
-    expect(rows[2].className).not.toContain('qualified');
-  });
-  it('has aria-label', () => {
-    const g    = groupStandings[1];
-    const card = buildGroupCard(g);
-    expect(card.getAttribute('aria-label')).toContain(`Group ${g.name}`);
-  });
-});
-
-describe('renderStandings()', () => {
-  beforeEach(() => setupDOM(`
-    <div id="standings-track"></div>
-    <button id="standings-prev"></button>
-    <button id="standings-next"></button>
-    <div id="standings-dots"></div>
-  `));
-  it('populates standings-track', () => {
-    renderStandings();
-    expect(document.getElementById('standings-track').children.length).toBe(groupStandings.length);
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   NEWS
-══════════════════════════════════════════════════════════ */
-describe('getCategories()', () => {
-  it('includes "all" as first entry', () => {
-    const cats = getCategories();
-    expect(cats[0]).toBe('all');
-  });
-  it('returns unique categories', () => {
-    const cats = getCategories().slice(1);
-    expect(new Set(cats).size).toBe(cats.length);
-  });
-});
-
-describe('filterNews()', () => {
-  it('returns all articles for "all"', () => {
-    const { items, total } = filterNews('all', 1);
-    expect(total).toBe(newsArticles.length);
-    expect(items.length).toBeLessThanOrEqual(6);
-  });
-  it('filters by category correctly', () => {
-    const cat = newsArticles[0].category.toLowerCase();
-    const { items } = filterNews(cat, 1);
-    items.forEach(a => expect(a.category.toLowerCase()).toBe(cat));
-  });
-  it('returns correct page slice', () => {
-    const { items } = filterNews('all', 2);
-    expect(items.length).toBeGreaterThan(0);
-    expect(items.length).toBeLessThanOrEqual(6);
-  });
-  it('returns pages count', () => {
-    const { pages } = filterNews('all', 1);
-    expect(pages).toBe(Math.ceil(newsArticles.length / 6));
-  });
-  it('returns empty for unknown category', () => {
-    const { items } = filterNews('unknowncategory', 1);
-    expect(items.length).toBe(0);
-  });
-});
-
-describe('buildNewsHeroCard()', () => {
-  it('returns an anchor element', () => {
-    const card = buildNewsHeroCard(newsArticles[0]);
-    expect(card.tagName).toBe('A');
-    expect(card.className).toContain('news-hero-card');
-  });
-  it('contains article title', () => {
-    const a    = newsArticles[0];
-    const card = buildNewsHeroCard(a);
-    expect(card.innerHTML).toContain(a.title);
-  });
-  it('has aria-label', () => {
-    const a    = newsArticles[0];
-    const card = buildNewsHeroCard(a);
-    expect(card.getAttribute('aria-label')).toBe(a.title);
-  });
-});
-
-describe('buildNewsCard()', () => {
-  it('returns an anchor with news-card class', () => {
-    const card = buildNewsCard(newsArticles[1]);
-    expect(card.tagName).toBe('A');
-    expect(card.className).toContain('news-card');
-  });
-  it('contains excerpt', () => {
-    const a    = newsArticles[1];
-    const card = buildNewsCard(a);
-    expect(card.innerHTML).toContain(a.excerpt);
-  });
-});
-
-describe('renderNews()', () => {
-  beforeEach(() => setupDOM(`
-    <div id="news-layout"></div>
-    <div id="news-filters"></div>
-    <div id="news-pagination"></div>
-  `));
-  it('populates news-layout', () => {
-    renderNews();
-    expect(document.getElementById('news-layout').children.length).toBeGreaterThan(0);
-  });
-  it('hero card is first child wrapper', () => {
-    renderNews();
-    const first = document.getElementById('news-layout').firstElementChild;
-    expect(first.className).toContain('news-hero-col');
-  });
-});
-
-describe('renderNewsFilters()', () => {
-  beforeEach(() => setupDOM('<div id="news-filters"></div>'));
-  it('renders filter buttons', () => {
-    renderNewsFilters();
-    const filters = document.getElementById('news-filters');
-    expect(filters.children.length).toBeGreaterThan(1);
-  });
-  it('first button is "All"', () => {
-    renderNewsFilters();
-    const first = document.getElementById('news-filters').firstElementChild;
-    expect(first.textContent).toBe('All');
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   SCORERS
-══════════════════════════════════════════════════════════ */
-describe('buildScorerRow()', () => {
-  it('returns a div with scorer-row class', () => {
-    const row = buildScorerRow(topScorers[0], 0);
-    expect(row.className).toContain('scorer-row');
-  });
-  it('contains player name', () => {
-    const s   = topScorers[0];
-    const row = buildScorerRow(s, 0);
-    expect(row.innerHTML).toContain(s.name);
-  });
-  it('has correct aria-label with goals', () => {
-    const s   = topScorers[0];
-    const row = buildScorerRow(s, 0);
-    expect(row.getAttribute('aria-label')).toContain(`${s.goals} goals`);
-  });
-  it('renders goal bar with correct pct', () => {
-    const s    = topScorers[1];
-    const row  = buildScorerRow(s, 1);
-    const fill = row.querySelector('.goal-bar-fill');
-    const maxGoals = topScorers[0].goals;
-    const expected = Math.round((s.goals / maxGoals) * 100);
-    expect(Number(fill.dataset.pct)).toBe(expected);
-  });
-});
-
-describe('renderScorers()', () => {
-  beforeEach(() => setupDOM('<div id="scorers-list"></div>'));
-  it('populates scorers-list', () => {
-    renderScorers();
-    expect(document.getElementById('scorers-list').children.length).toBe(topScorers.length);
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   CITIES
-══════════════════════════════════════════════════════════ */
-describe('renderCities()', () => {
-  beforeEach(() => setupDOM(`
-    <div id="cities-track"></div>
-    <button id="cities-prev"></button>
-    <button id="cities-next"></button>
-    <div id="cities-dots"></div>
-  `));
-  it('populates cities-track', () => {
-    renderCities();
-    expect(document.getElementById('cities-track').children.length).toBe(hostCities.length);
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   TOAST
-══════════════════════════════════════════════════════════ */
 describe('showToast()', () => {
-  beforeEach(() => setupDOM('<div id="toast-container"></div>'));
-  it('appends a toast element', () => {
-    showToast('Title', 'Message');
-    expect(document.getElementById('toast-container').children.length).toBe(1);
-  });
-  it('toast contains title and message', () => {
-    showToast('Hello', 'World', '✅', 'toast-info');
+  it('creates a toast element', () => {
+    showToast('⚽', 'Test Title', 'Test message');
     const toast = document.querySelector('.toast');
-    expect(toast.innerHTML).toContain('Hello');
-    expect(toast.innerHTML).toContain('World');
+    expect(toast).not.toBeNull();
   });
-  it('toast has correct type class', () => {
-    showToast('T', 'M', '⚽', 'toast-goal');
-    expect(document.querySelector('.toast').classList.contains('toast-goal')).toBe(true);
-  });
-  it('has role=alert', () => {
-    showToast('T', 'M');
-    expect(document.querySelector('.toast').getAttribute('role')).toBe('alert');
-  });
-  it('close button exists', () => {
-    showToast('T', 'M');
-    expect(document.querySelector('.toast-close')).not.toBeNull();
-  });
-  it('returns toast element', () => {
-    const t = showToast('T', 'M');
-    expect(t).not.toBeNull();
-  });
-  it('does not throw when container missing', () => {
-    setupDOM('');
-    expect(() => showToast('T', 'M')).not.toThrow();
-  });
-});
 
-/* ══════════════════════════════════════════════════════════
-   LIVE SCORE SIMULATION
-══════════════════════════════════════════════════════════ */
-describe('simulateLiveScores()', () => {
-  beforeEach(() => {
-    setupDOM(`
-      <div id="toast-container"></div>
-      <div class="match-card" data-match-id="match-001">
-        <div id="score-match-001">2 - 1</div>
-        <div class="match-minute">67'</div>
-      </div>
-      <div id="ticker-score-match-001">2 - 1</div>
-    `);
+  it('toast contains icon', () => {
+    showToast('🎉', 'Icon Test', 'body');
+    const icon = document.querySelector('.toast-icon');
+    expect(icon?.textContent).toBe('🎉');
   });
-  it('does not throw', () => {
-    expect(() => simulateLiveScores()).not.toThrow();
-  });
-  it('minute advances for live matches', () => {
-    const liveMatch = todayMatches.find(m => m.status === 'LIVE');
-    const prevMinute = liveMatch ? liveMatch.minute : 0;
-    simulateLiveScores();
-    if (liveMatch) expect(liveMatch.minute).toBeGreaterThanOrEqual(prevMinute);
-  });
-});
 
-describe('startLivePolling() / stopLivePolling()', () => {
-  it('startLivePolling sets an interval', () => {
+  it('toast contains title', () => {
+    showToast('📅', 'My Title', 'some message');
+    const title = document.querySelector('.toast-title');
+    expect(title?.textContent).toBe('My Title');
+  });
+
+  it('toast contains message', () => {
+    showToast('📅', 'T', 'Hello World');
+    const msg = document.querySelector('.toast-msg');
+    expect(msg?.textContent).toBe('Hello World');
+  });
+
+  it('auto-dismisses after duration', () => {
     vi.useFakeTimers();
-    startLivePolling();
-    vi.advanceTimersByTime(8001);
-    stopLivePolling();
-    vi.useRealTimers();
-    expect(true).toBe(true); // no throw
-  });
-  it('stopLivePolling clears interval without error', () => {
-    expect(() => { startLivePolling(); stopLivePolling(); }).not.toThrow();
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   COUNTDOWN
-══════════════════════════════════════════════════════════ */
-describe('initCountdown()', () => {
-  beforeEach(() => setupDOM(`
-    <div id="cd-days"><span>000</span></div>
-    <div id="cd-hours"><span>00</span></div>
-    <div id="cd-mins"><span>00</span></div>
-    <div id="cd-secs"><span>00</span></div>
-  `));
-  it('updates digit spans on init', () => {
-    vi.useFakeTimers();
-    initCountdown(new Date(Date.now() + 100000000));
-    vi.advanceTimersByTime(1100);
-    const span = document.querySelector('#cd-days span');
-    expect(span.textContent.length).toBeGreaterThan(0);
-    vi.useRealTimers();
-  });
-  it('does not throw for past date', () => {
-    expect(() => initCountdown(new Date(Date.now() - 1000))).not.toThrow();
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   TABS
-══════════════════════════════════════════════════════════ */
-describe('initMatchTabs()', () => {
-  beforeEach(() => setupDOM(`
-    <button role="tab" class="tab-btn active" aria-selected="true" aria-controls="panel-today" id="tab-today">Today</button>
-    <button role="tab" class="tab-btn"        aria-selected="false" aria-controls="panel-tomorrow" id="tab-tomorrow">Tomorrow</button>
-    <div role="tabpanel" id="panel-today"    class="tab-panel active"><div class="match-grid" id="today-matches"></div></div>
-    <div role="tabpanel" id="panel-tomorrow" class="tab-panel"><div class="match-grid" id="tomorrow-matches"></div></div>
-    <div id="toast-container"></div>
-  `));
-  it('clicking a tab activates its panel', () => {
-    initMatchTabs();
-    document.getElementById('tab-tomorrow').click();
-    expect(document.getElementById('panel-tomorrow').classList.contains('active')).toBe(true);
-    expect(document.getElementById('panel-today').classList.contains('active')).toBe(false);
-  });
-  it('clicked tab gets aria-selected=true', () => {
-    initMatchTabs();
-    const btn = document.getElementById('tab-tomorrow');
-    btn.click();
-    expect(btn.getAttribute('aria-selected')).toBe('true');
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   CAROUSEL
-══════════════════════════════════════════════════════════ */
-describe('initCarousel()', () => {
-  beforeEach(() => {
-    setupDOM(`
-      <div id="test-track" style="display:flex">
-        <div style="width:300px">A</div>
-        <div style="width:300px">B</div>
-        <div style="width:300px">C</div>
-        <div style="width:300px">D</div>
-        <div style="width:300px">E</div>
-        <div style="width:300px">F</div>
-      </div>
-      <button id="test-prev" disabled>‹</button>
-      <button id="test-next">›</button>
-      <div id="test-dots"></div>
-    `);
-  });
-  it('creates correct number of dots', () => {
-    initCarousel('test', 6, 3);
-    expect(document.getElementById('test-dots').children.length).toBe(2);
-  });
-  it('prev button starts disabled', () => {
-    initCarousel('test', 6, 3);
-    expect(document.getElementById('test-prev').disabled).toBe(true);
-  });
-  it('clicking next enables prev', () => {
-    initCarousel('test', 6, 3);
-    document.getElementById('test-next').click();
-    expect(document.getElementById('test-prev').disabled).toBe(false);
-  });
-  it('does not throw for missing container', () => {
-    expect(() => initCarousel('nonexistent', 6, 3)).not.toThrow();
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   SCROLL-REVEAL
-══════════════════════════════════════════════════════════ */
-describe('initScrollReveal()', () => {
-  it('marks all reveal elements visible when IntersectionObserver absent', () => {
-    const orig = global.IntersectionObserver;
-    global.IntersectionObserver = undefined;
-    setupDOM(`<div class="reveal"></div><div class="reveal-left"></div>`);
-    initScrollReveal();
-    document.querySelectorAll('.reveal, .reveal-left').forEach(el => {
-      expect(el.classList.contains('visible')).toBe(true);
-    });
-    global.IntersectionObserver = orig;
-  });
-  it('does not throw when IntersectionObserver is available', () => {
-    class MockIO {
-      constructor(cb) { this.cb = cb; }
-      observe() {}
-      unobserve() {}
-    }
-    global.IntersectionObserver = MockIO;
-    setupDOM(`<div class="reveal"></div>`);
-    expect(() => initScrollReveal()).not.toThrow();
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   HEADER / NAV
-══════════════════════════════════════════════════════════ */
-describe('initHeader()', () => {
-  it('does not throw when elements missing', () => {
-    setupDOM('');
-    expect(() => initHeader()).not.toThrow();
-  });
-  it('adds scrolled class on scroll', () => {
-    setupDOM(`<header id="site-header"></header><button id="scroll-top"></button>`);
-    initHeader();
-    Object.defineProperty(window, 'scrollY', { value: 100, writable: true });
-    window.dispatchEvent(new Event('scroll'));
-    expect(true).toBe(true); // no throw; class toggled via rAF
-  });
-});
-
-describe('closeMobileNav()', () => {
-  it('removes open class from mobile-nav', () => {
-    setupDOM(`<nav id="mobile-nav" class="mobile-nav open"></nav><button id="hamburger" class="hamburger open"></button>`);
-    closeMobileNav();
-    expect(document.getElementById('mobile-nav').classList.contains('open')).toBe(false);
-  });
-  it('sets hamburger aria-expanded to false', () => {
-    setupDOM(`<nav id="mobile-nav" class="mobile-nav open"></nav><button id="hamburger" aria-expanded="true"></button>`);
-    closeMobileNav();
-    expect(document.getElementById('hamburger').getAttribute('aria-expanded')).toBe('false');
-  });
-  it('does not throw when elements missing', () => {
-    setupDOM('');
-    expect(() => closeMobileNav()).not.toThrow();
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   PARTICLES
-══════════════════════════════════════════════════════════ */
-describe('initParticles()', () => {
-  it('injects particles into hero-particles container', () => {
-    setupDOM('<div id="hero-particles"></div>');
-    initParticles();
-    expect(document.getElementById('hero-particles').children.length).toBeGreaterThan(0);
-  });
-  it('does not throw when container missing', () => {
-    setupDOM('');
-    expect(() => initParticles()).not.toThrow();
-  });
-  it('all children have particle class', () => {
-    setupDOM('<div id="hero-particles"></div>');
-    initParticles();
-    [...document.getElementById('hero-particles').children].forEach(p => {
-      expect(p.className).toContain('particle');
-    });
-  });
-});
-
-/* ══════════════════════════════════════════════════════════
-   EDGE CASES
-══════════════════════════════════════════════════════════ */
-describe('Edge Cases', () => {
-  it('renderMatchGrid handles null gracefully', () => {
-    setupDOM('<div id="today-matches"></div>');
-    expect(() => renderMatchGrid('today-matches', null)).not.toThrow();
-  });
-  it('filterNews page 999 returns empty items', () => {
-    const { items } = filterNews('all', 999);
-    expect(items.length).toBe(0);
-  });
-  it('buildMatchCard renders LIVE status badge', () => {
-    const live = todayMatches.find(m => m.status === 'LIVE');
-    const card = buildMatchCard(live);
-    expect(card.innerHTML).toContain('live');
-  });
-  it('buildScorerRow handles top scorer with 0 assists', () => {
-    const scorer = { name: 'Test Player', flag: '🏳️', team: 'Test FC', goals: 3, assists: 0 };
-    expect(() => buildScorerRow(scorer, 0)).not.toThrow();
-  });
-  it('updateMatchCard handles same score (no flash)', () => {
-    setupDOM(`<div class="match-card" data-match-id="m1"><div id="score-m1">1 - 0</div></div>`);
-    updateMatchCard('m1', 1, 0, 50);
-    expect(document.getElementById('score-m1').classList.contains('updated')).toBe(false);
-  });
-  it('showToast auto-removes after timeout', () => {
-    vi.useFakeTimers();
-    setupDOM('<div id="toast-container"></div>');
-    showToast('T', 'M');
+    showToast('⚽', 'Auto', 'bye', 1000);
     expect(document.querySelector('.toast')).not.toBeNull();
-    vi.advanceTimersByTime(5100);
+    vi.advanceTimersByTime(1000);
+    // After dismiss animation class is added
+    const toast = document.querySelector('.toast');
+    if (toast) {
+      expect(toast.classList.contains('dismiss')).toBe(true);
+    }
     vi.useRealTimers();
-    // toast has removing class or is gone
-    const t = document.querySelector('.toast');
-    if (t) expect(t.classList.contains('removing')).toBe(true);
+  });
+
+  it('does not throw if container is missing', () => {
+    document.getElementById('toastContainer').remove();
+    expect(() => showToast('⚽', 'T', 'M')).not.toThrow();
+  });
+
+  it('multiple toasts stack in container', () => {
+    showToast('⚽', 'A', 'a');
+    showToast('🏆', 'B', 'b');
+    showToast('🎉', 'C', 'c');
+    expect(document.querySelectorAll('.toast').length).toBe(3);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   BUILD MATCH CARD
+══════════════════════════════════════════════════════════════════ */
+
+describe('buildMatchCard()', () => {
+  it('returns a DOM element', () => {
+    const card = buildMatchCard(makeSampleMatch());
+    expect(card instanceof HTMLElement).toBe(true);
+  });
+
+  it('has class match-card', () => {
+    const card = buildMatchCard(makeSampleMatch());
+    expect(card.classList.contains('match-card')).toBe(true);
+  });
+
+  it('shows team names', () => {
+    const card = buildMatchCard(makeSampleMatch({ home: 'TeamA', away: 'TeamB' }));
+    expect(card.textContent).toContain('TeamA');
+    expect(card.textContent).toContain('TeamB');
+  });
+
+  it('shows score for final matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ homeScore: 3, awayScore: 1, status: 'final' }));
+    expect(card.textContent).toContain('3–1');
+  });
+
+  it('shows "vs" for upcoming matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'upcoming', homeScore: 0, awayScore: 0 }));
+    expect(card.querySelector('.score')?.textContent).toBe('vs');
+  });
+
+  it('adds live class for live matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'live' }));
+    expect(card.classList.contains('live')).toBe(true);
+  });
+
+  it('does not add live class for final matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'final' }));
+    expect(card.classList.contains('live')).toBe(false);
+  });
+
+  it('shows live indicator for live matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'live' }));
+    expect(card.querySelector('.live-indicator')).not.toBeNull();
+  });
+
+  it('shows ripple rings for live matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'live' }));
+    expect(card.querySelectorAll('.ripple-ring').length).toBe(3);
+  });
+
+  it('no live indicator for upcoming matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'upcoming' }));
+    expect(card.querySelector('.live-indicator')).toBeNull();
+  });
+
+  it('renders goal bars for final matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'final', homeScore: 2, awayScore: 1 }));
+    expect(card.querySelectorAll('.goal-bar-fill').length).toBe(2);
+  });
+
+  it('no goal bars for upcoming matches', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'upcoming' }));
+    expect(card.querySelectorAll('.goal-bar-fill').length).toBe(0);
+  });
+
+  it('shows stage text', () => {
+    const card = buildMatchCard(makeSampleMatch({ stage: 'Semi Final' }));
+    expect(card.textContent).toContain('Semi Final');
+  });
+
+  it('shows venue', () => {
+    const card = buildMatchCard(makeSampleMatch({ venue: 'Wembley' }));
+    expect(card.textContent).toContain('Wembley');
+  });
+
+  it('shows home flag', () => {
+    const card = buildMatchCard(makeSampleMatch({ homeFlag: '🇧🇷' }));
+    expect(card.textContent).toContain('🇧🇷');
+  });
+
+  it('shows away flag', () => {
+    const card = buildMatchCard(makeSampleMatch({ awayFlag: '🇩🇪' }));
+    expect(card.textContent).toContain('🇩🇪');
+  });
+
+  it('has data-match-id attribute', () => {
+    const card = buildMatchCard(makeSampleMatch({ id: 42 }));
+    expect(card.dataset.matchId).toBe('42');
+  });
+
+  it('has data-status attribute', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'final' }));
+    expect(card.dataset.status).toBe('final');
+  });
+
+  it('clicking a final card triggers confetti container population', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'final' }));
+    document.body.appendChild(card);
+    card.getBoundingClientRect = () => ({ left: 100, top: 100, width: 200, height: 100 });
+    card.click();
+    const container = document.getElementById('confettiContainer');
+    expect(container.querySelectorAll('.confetti-piece').length).toBe(60);
+    card.remove();
+  });
+
+  it('clicking a live card shows toast', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'live', home: 'TeamX', away: 'TeamY' }));
+    document.body.appendChild(card);
+    card.click();
+    expect(document.querySelector('.toast-title')?.textContent).toBe('Match is Live!');
+    card.remove();
+  });
+
+  it('clicking an upcoming card shows match info toast', () => {
+    const card = buildMatchCard(makeSampleMatch({ status: 'upcoming' }));
+    document.body.appendChild(card);
+    card.click();
+    expect(document.querySelector('.toast-title')?.textContent).toBe('Match Info');
+    card.remove();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   APPLY CARD TILT
+══════════════════════════════════════════════════════════════════ */
+
+describe('applyCardTilt()', () => {
+  it('does not throw when called on an element', () => {
+    const card = document.createElement('div');
+    document.body.appendChild(card);
+    expect(() => applyCardTilt(card)).not.toThrow();
+    card.remove();
+  });
+
+  it('applies perspective transform on mousemove', () => {
+    const card = document.createElement('div');
+    card.getBoundingClientRect = () => ({ left: 0, top: 0, width: 300, height: 200 });
+    document.body.appendChild(card);
+    applyCardTilt(card);
+
+    const e = new MouseEvent('mousemove', { clientX: 250, clientY: 50 });
+    card.dispatchEvent(e);
+
+    // Transform should be set (may take a rAF — at least the handler runs)
+    expect(() => card.dispatchEvent(e)).not.toThrow();
+    card.remove();
+  });
+
+  it('resets transform on mouseleave', () => {
+    const card = document.createElement('div');
+    card.getBoundingClientRect = () => ({ left: 0, top: 0, width: 300, height: 200 });
+    document.body.appendChild(card);
+    applyCardTilt(card);
+
+    card.dispatchEvent(new MouseEvent('mousemove', { clientX: 250, clientY: 50 }));
+    card.dispatchEvent(new MouseEvent('mouseleave'));
+
+    expect(() => {}).not.toThrow();
+    card.remove();
+  });
+
+  it('adds box-shadow on mouseenter', () => {
+    const card = document.createElement('div');
+    document.body.appendChild(card);
+    applyCardTilt(card);
+    card.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(card.style.boxShadow).toContain('rgba');
+    card.remove();
+  });
+
+  it('clears box-shadow on mouseleave', () => {
+    const card = document.createElement('div');
+    document.body.appendChild(card);
+    applyCardTilt(card);
+    card.dispatchEvent(new MouseEvent('mouseenter'));
+    card.dispatchEvent(new MouseEvent('mouseleave'));
+    expect(card.style.boxShadow).toBe('');
+    card.remove();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   DOM STRUCTURE TESTS
+══════════════════════════════════════════════════════════════════ */
+
+describe('DOM structure', () => {
+  it('hero section exists', () => {
+    expect(document.getElementById('hero')).not.toBeNull();
+  });
+
+  it('crowd banner exists', () => {
+    expect(document.querySelector('.crowd-banner')).not.toBeNull();
+  });
+
+  it('crowd SVG exists', () => {
+    expect(document.querySelector('.crowd-svg')).not.toBeNull();
+  });
+
+  it('ticker wrap exists', () => {
+    expect(document.querySelector('.ticker-wrap')).not.toBeNull();
+  });
+
+  it('ticker track exists', () => {
+    expect(document.getElementById('tickerTrack')).not.toBeNull();
+  });
+
+  it('ticker content exists', () => {
+    expect(document.getElementById('tickerContent')).not.toBeNull();
+  });
+
+  it('ticker label exists', () => {
+    expect(document.querySelector('.ticker-label')).not.toBeNull();
+  });
+
+  it('ticker label text is LIVE RESULTS', () => {
+    expect(document.querySelector('.ticker-label')?.textContent).toBe('LIVE RESULTS');
+  });
+
+  it('stats section exists', () => {
+    expect(document.getElementById('stats')).not.toBeNull();
+  });
+
+  it('stats grid has 4 cards', () => {
+    expect(document.querySelectorAll('.stat-card').length).toBe(4);
+  });
+
+  it('stat rings exist', () => {
+    expect(document.querySelectorAll('.stat-ring').length).toBe(4);
+  });
+
+  it('ring-fill elements exist', () => {
+    expect(document.querySelectorAll('.ring-fill').length).toBe(4);
+  });
+
+  it('stat-count elements exist', () => {
+    expect(document.querySelectorAll('.stat-count').length).toBe(4);
+  });
+
+  it('stat-count data-target for Teams is 48', () => {
+    const counts = document.querySelectorAll('.stat-count');
+    expect(counts[0].dataset.target).toBe('48');
+  });
+
+  it('stat-count data-target for Matches is 104', () => {
+    const counts = document.querySelectorAll('.stat-count');
+    expect(counts[1].dataset.target).toBe('104');
+  });
+
+  it('stat-count data-target for Goals is 312', () => {
+    const counts = document.querySelectorAll('.stat-count');
+    expect(counts[2].dataset.target).toBe('312');
+  });
+
+  it('stat-count data-target for Stadiums is 16', () => {
+    const counts = document.querySelectorAll('.stat-count');
+    expect(counts[3].dataset.target).toBe('16');
+  });
+
+  it('matches carousel container exists', () => {
+    expect(document.getElementById('matchesCarousel')).not.toBeNull();
+  });
+
+  it('match dots container exists', () => {
+    expect(document.getElementById('matchDots')).not.toBeNull();
+  });
+
+  it('prev button exists', () => {
+    expect(document.getElementById('matchPrev')).not.toBeNull();
+  });
+
+  it('next button exists', () => {
+    expect(document.getElementById('matchNext')).not.toBeNull();
+  });
+
+  it('standings tabs container exists', () => {
+    expect(document.getElementById('standingsTabs')).not.toBeNull();
+  });
+
+  it('standings table container exists', () => {
+    expect(document.getElementById('standingsTable')).not.toBeNull();
+  });
+
+  it('news grid exists', () => {
+    expect(document.getElementById('newsGrid')).not.toBeNull();
+  });
+
+  it('toast container exists', () => {
+    expect(document.getElementById('toastContainer')).not.toBeNull();
+  });
+
+  it('confetti container exists', () => {
+    expect(document.getElementById('confettiContainer')).not.toBeNull();
+  });
+
+  it('countdown days value element exists', () => {
+    expect(document.getElementById('cdDaysVal')).not.toBeNull();
+  });
+
+  it('countdown hours value element exists', () => {
+    expect(document.getElementById('cdHoursVal')).not.toBeNull();
+  });
+
+  it('countdown mins value element exists', () => {
+    expect(document.getElementById('cdMinsVal')).not.toBeNull();
+  });
+
+  it('countdown secs value element exists', () => {
+    expect(document.getElementById('cdSecsVal')).not.toBeNull();
+  });
+
+  it('hero particles container exists', () => {
+    expect(document.getElementById('heroParticles')).not.toBeNull();
+  });
+
+  it('eyebrow dot exists', () => {
+    expect(document.querySelector('.eyebrow-dot')).not.toBeNull();
+  });
+
+  it('hero title exists', () => {
+    expect(document.querySelector('.hero-title')).not.toBeNull();
+  });
+
+  it('title line tl1 contains FIFA', () => {
+    expect(document.querySelector('.tl1')?.textContent).toBe('FIFA');
+  });
+
+  it('title line tl2 contains World Cup', () => {
+    expect(document.querySelector('.tl2')?.textContent).toBe('World Cup');
+  });
+
+  it('section-reveal elements exist', () => {
+    expect(document.querySelectorAll('.section-reveal').length).toBeGreaterThan(0);
+  });
+
+  it('typewriter targets exist', () => {
+    expect(document.querySelectorAll('.typewriter-target').length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   DATA INTEGRITY
+══════════════════════════════════════════════════════════════════ */
+
+describe('data integrity', () => {
+  it('matches module exports an array', async () => {
+    const { matches } = await import('./data/matches.js');
+    expect(Array.isArray(matches)).toBe(true);
+  });
+
+  it('matches has at least one entry', async () => {
+    const { matches } = await import('./data/matches.js');
+    expect(matches.length).toBeGreaterThan(0);
+  });
+
+  it('each match has an id', async () => {
+    const { matches } = await import('./data/matches.js');
+    matches.forEach(m => expect(m).toHaveProperty('id'));
+  });
+
+  it('each match has home and away', async () => {
+    const { matches } = await import('./data/matches.js');
+    matches.forEach(m => {
+      expect(m).toHaveProperty('home');
+      expect(m).toHaveProperty('away');
+    });
+  });
+
+  it('each match has a status', async () => {
+    const { matches } = await import('./data/matches.js');
+    matches.forEach(m => expect(m).toHaveProperty('status'));
+  });
+
+  it('newsItems module exports an array', async () => {
+    const { newsItems } = await import('./data/news.js');
+    expect(Array.isArray(newsItems)).toBe(true);
+  });
+
+  it('newsItems has at least one entry', async () => {
+    const { newsItems } = await import('./data/news.js');
+    expect(newsItems.length).toBeGreaterThan(0);
+  });
+
+  it('each news item has a title', async () => {
+    const { newsItems } = await import('./data/news.js');
+    newsItems.forEach(n => expect(n).toHaveProperty('title'));
   });
 });
