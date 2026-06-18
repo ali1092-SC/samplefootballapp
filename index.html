@@ -1,2242 +1,1599 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FIFA World Cup 2026 — Official Fan Showcase</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-/* =====================================================
-   CSS CUSTOM PROPERTIES
-   ===================================================== */
-:root {
-  --fifa-navy:       #0a1628;
-  --fifa-blue:       #1a3a6e;
-  --fifa-gold:       #c9a227;
-  --fifa-gold-light: #f5d675;
-  --fifa-red:        #c1272d;
-  --fifa-white:      #f5f5f0;
-  --fifa-silver:     #b0b8c8;
-  --glow-gold: 0 0 40px rgba(201,162,39,0.4);
-}
-
-/* =====================================================
-   RESET & BASE
-   ===================================================== */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; font-size: 16px; }
-
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--fifa-navy);
-  color: var(--fifa-white);
-  overflow-x: hidden;
-  line-height: 1.5;
-}
-
-img, svg { display: block; }
-
-a { text-decoration: none; color: inherit; }
-
-button { cursor: pointer; font-family: inherit; }
-
-ul { list-style: none; }
-
-:focus-visible {
-  outline: 2px solid var(--fifa-gold);
-  outline-offset: 3px;
-}
-
-/* =====================================================
-   TYPOGRAPHY HELPERS
-   ===================================================== */
-.bebas { font-family: 'Bebas Neue', sans-serif; }
-.oswald { font-family: 'Oswald', sans-serif; }
-.inter { font-family: 'Inter', sans-serif; }
-
-/* =====================================================
-   SECTION SHARED STYLES
-   ===================================================== */
-.section-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-section {
-  padding: 90px 0;
-}
-
-.section-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--fifa-gold);
-  border-bottom: 1px solid var(--fifa-gold);
-  display: inline-block;
-  padding-bottom: 4px;
-  margin-bottom: 14px;
-}
-
-.section-heading {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(36px, 6vw, 64px);
-  letter-spacing: 1px;
-  color: var(--fifa-white);
-  margin-bottom: 10px;
-  line-height: 1;
-}
-
-.section-heading em {
-  font-style: normal;
-  color: var(--fifa-gold);
-}
-
-.section-sub {
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  color: var(--fifa-silver);
-  max-width: 560px;
-  margin-bottom: 40px;
-}
-
-/* =====================================================
-   FADE ANIMATIONS (prefers-reduced-motion guarded)
-   ===================================================== */
-@media (prefers-reduced-motion: no-preference) {
-  .fade-up {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.55s ease, transform 0.55s ease;
-  }
-  .fade-up.in-view {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .fade-left {
-    opacity: 0;
-    transform: translateX(-24px);
-    transition: opacity 0.55s ease, transform 0.55s ease;
-  }
-  .fade-left.in-view {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  /* Hero logo float */
-  @keyframes logoFloat {
-    0%, 100% { transform: translateY(0px); }
-    50%       { transform: translateY(-6px); }
-  }
-  .logo-float {
-    animation: logoFloat 4s ease-in-out infinite;
-  }
-
-  /* Live dot pulse */
-  @keyframes livePulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50%       { transform: scale(1.4); opacity: 0.7; }
-  }
-  .live-dot {
-    animation: livePulse 1.2s ease-in-out infinite;
-  }
-
-  /* Scroll indicator */
-  @keyframes scrollBob {
-    0%, 100% { transform: translateY(0); }
-    50%       { transform: translateY(6px); }
-  }
-  .scroll-indicator-line {
-    animation: scrollBob 2s ease-in-out infinite;
-  }
-
-  /* Ticker */
-  @keyframes tickerMove {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .ticker-track {
-    animation: tickerMove 26s linear infinite;
-  }
-
-  /* LIVE badge pulse */
-  @keyframes badgePulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.3; }
-  }
-  .live-badge-pulse {
-    animation: badgePulse 1.1s ease-in-out infinite;
-  }
-
-  /* Player card top border */
-  .player-card::before {
-    transform: scaleX(0);
-    transition: transform 0.25s ease;
-  }
-  .player-card:hover::before {
-    transform: scaleX(1);
-  }
-}
-
-/* =====================================================
-   CANVAS (animated footballs)
-   ===================================================== */
-#ball-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.16;
-}
-
-/* =====================================================
-   NAVIGATION
-   ===================================================== */
-#main-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  height: 64px;
-  padding: 0 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(10,22,40,0.93);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(201,162,39,0.18);
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-#main-nav.scrolled {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-}
-
-.nav-logo-wrap { display: flex; align-items: center; }
-
-.nav-links {
-  display: flex;
-  gap: 28px;
-  align-items: center;
-}
-
-.nav-links a {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--fifa-silver);
-  transition: color 0.2s;
-}
-.nav-links a:hover { color: var(--fifa-gold); }
-
-.nav-ticket-btn {
-  background: var(--fifa-gold);
-  color: var(--fifa-navy);
-  padding: 8px 20px;
-  border-radius: 3px;
-  border: none;
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  transition: opacity 0.2s;
-}
-.nav-ticket-btn:hover { opacity: 0.85; }
-
-.hamburger {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: var(--fifa-white);
-  cursor: pointer;
-}
-
-.mobile-menu {
-  display: none;
-  flex-direction: column;
-  background: var(--fifa-navy);
-  border-top: 1px solid rgba(201,162,39,0.18);
-  padding: 12px 0;
-}
-.mobile-menu.open { display: flex; }
-.mobile-menu-wrap {
-  position: fixed;
-  top: 64px;
-  left: 0;
-  right: 0;
-  z-index: 99;
-}
-.mobile-menu a {
-  padding: 12px 24px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--fifa-silver);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.mobile-menu a:hover { color: var(--fifa-gold); }
-
-@media (max-width: 768px) {
-  .nav-links, .nav-ticket-btn { display: none; }
-  .hamburger { display: block; }
-  #main-nav { padding: 0 20px; }
-}
-
-/* =====================================================
-   HERO SECTION
-   ===================================================== */
-#hero {
-  min-height: 100vh;
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 100px 20px 60px;
-  overflow: hidden;
-}
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(to bottom, transparent 65%, var(--fifa-navy) 100%),
-    radial-gradient(ellipse 75% 55% at 50% 62%, rgba(26,58,110,0.5) 0%, transparent 100%),
-    var(--fifa-navy);
-}
-
-/* Pitch lines SVG overlay */
-.hero-pitch {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.04;
-  pointer-events: none;
-}
-
-.live-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(193,39,45,0.12);
-  border: 1px solid rgba(193,39,45,0.35);
-  border-radius: 100px;
-  padding: 7px 16px;
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  color: #ff6b6b;
-  margin-bottom: 28px;
-  letter-spacing: 0.3px;
-}
-
-.live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #ff6b6b;
-  flex-shrink: 0;
-}
-
-.hero-logo-wrap {
-  margin-bottom: 24px;
-  filter: drop-shadow(var(--glow-gold));
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero-logo-wrap { animation: logoFloat 4s ease-in-out infinite; }
-}
-
-.hero-headline {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(72px, 14vw, 190px);
-  line-height: 0.86;
-  letter-spacing: -1px;
-  background: linear-gradient(135deg, #ffffff 0%, var(--fifa-gold) 55%, #ffffff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 4px;
-}
-
-.hero-subheading {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(18px, 3.5vw, 48px);
-  color: var(--fifa-silver);
-  letter-spacing: 5px;
-  margin-bottom: 28px;
-}
-
-.hero-flags {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 44px;
-  color: var(--fifa-white);
-}
-
-.hero-flags span[aria-hidden] { margin: 0 6px; opacity: 0.5; }
-
-/* Countdown */
-.countdown {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 48px;
-}
-
-.cd-block {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(201,162,39,0.2);
-  border-radius: 6px;
-  padding: 16px 22px;
-  min-width: 84px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.cd-num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 54px;
-  line-height: 1;
-  color: var(--fifa-gold);
-}
-
-.cd-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  color: var(--fifa-silver);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-/* CTA Buttons */
-.hero-ctas {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 60px;
-}
-
-.btn-primary {
-  background: var(--fifa-gold);
-  color: var(--fifa-navy);
-  padding: 13px 34px;
-  border-radius: 3px;
-  border: none;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--glow-gold);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--fifa-white);
-  padding: 13px 34px;
-  border-radius: 3px;
-  border: 1px solid rgba(255,255,255,0.3);
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: border-color 0.2s, color 0.2s;
-}
-.btn-secondary:hover {
-  border-color: var(--fifa-gold);
-  color: var(--fifa-gold);
-}
-
-/* Scroll indicator */
-.scroll-indicator {
-  position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  color: var(--fifa-silver);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.scroll-indicator-line {
-  width: 1px;
-  height: 28px;
-  background: linear-gradient(to bottom, var(--fifa-silver), transparent);
-}
-
-/* =====================================================
-   LIVE SCORES TICKER
-   ===================================================== */
-#ticker {
-  position: relative;
-  width: 100%;
-  background: var(--fifa-red);
-  border-top: 2px solid rgba(255,255,255,0.12);
-  border-bottom: 2px solid rgba(255,255,255,0.12);
-  overflow: hidden;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  z-index: 3;
-}
-
-.ticker-label {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 2;
-  background: rgba(0,0,0,0.3);
-  display: flex;
-  align-items: center;
-  padding: 0 18px;
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #fff;
-  white-space: nowrap;
-}
-
-.ticker-scroll {
-  overflow: hidden;
-  margin-left: 90px;
-  width: 100%;
-}
-
-.ticker-track {
-  display: flex;
-  white-space: nowrap;
-  will-change: transform;
-}
-
-.ticker-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 36px;
-  border-right: 1px solid rgba(255,255,255,0.18);
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.ticker-score {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
-  background: rgba(0,0,0,0.25);
-  padding: 2px 10px;
-  border-radius: 3px;
-}
-
-.ticker-live {
-  font-size: 9px;
-  font-weight: 700;
-  background: #fff;
-  color: var(--fifa-red);
-  padding: 2px 6px;
-  border-radius: 2px;
-}
-
-.ticker-ft {
-  font-size: 9px;
-  font-weight: 700;
-  background: #fff;
-  color: var(--fifa-navy);
-  padding: 2px 6px;
-  border-radius: 2px;
-}
-
-/* =====================================================
-   STATS STRIP
-   ===================================================== */
-#stats {
-  background: var(--fifa-blue);
-  border-top: 3px solid var(--fifa-gold);
-  border-bottom: 3px solid var(--fifa-gold);
-  padding: 0;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-}
-
-.stat-item {
-  padding: 30px 16px;
-  text-align: center;
-  border-right: 1px solid rgba(255,255,255,0.07);
-}
-.stat-item:last-child { border-right: none; }
-
-.stat-num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 56px;
-  color: var(--fifa-gold);
-  line-height: 1;
-  display: block;
-}
-
-.stat-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  color: var(--fifa-silver);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-top: 4px;
-  display: block;
-}
-
-/* =====================================================
-   VENUES
-   ===================================================== */
-#venues {
-  background: var(--fifa-navy);
-}
-
-.venues-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-top: 0;
-}
-
-.venue-card {
-  border: 0.5px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.25s ease, border-color 0.25s ease;
-  background: var(--fifa-navy);
-}
-.venue-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(201,162,39,0.5);
-}
-
-.venue-img {
-  height: 155px;
-  background: linear-gradient(160deg, var(--fifa-blue), #0d2140);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 56px;
-  position: relative;
-}
-.venue-img::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(to bottom, rgba(10,22,40,0), rgba(10,22,40,0.8));
-}
-
-.venue-info {
-  padding: 18px 20px;
-}
-
-.venue-city {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 22px;
-  color: var(--fifa-white);
-  line-height: 1;
-}
-
-.venue-name {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  color: var(--fifa-silver);
-  margin: 4px 0 10px;
-}
-
-.venue-cap {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--fifa-gold);
-}
-
-/* =====================================================
-   GROUP STAGE
-   ===================================================== */
-#groups {
-  background: linear-gradient(160deg, var(--fifa-navy) 0%, var(--fifa-blue) 50%, var(--fifa-navy) 100%);
-}
-
-.groups-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 14px;
-  margin-top: 40px;
-}
-
-.group-card {
-  background: rgba(10,22,40,0.65);
-  border: 1px solid rgba(201,162,39,0.18);
-  border-radius: 8px;
-  padding: 20px;
-  transition: border-color 0.25s ease;
-}
-.group-card:hover { border-color: rgba(201,162,39,0.45); }
-
-.group-card.hidden-group { display: none; }
-
-.group-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.group-letter {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 34px;
-  color: var(--fifa-gold);
-  line-height: 1;
-}
-
-.group-badge {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  color: var(--fifa-silver);
-  background: rgba(255,255,255,0.07);
-  padding: 3px 8px;
-  border-radius: 3px;
-}
-
-.team-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.team-row:last-child { border-bottom: none; }
-
-.team-flag { font-size: 20px; }
-
-.team-name {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  color: var(--fifa-white);
-  flex: 1;
-}
-
-.team-pts {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px;
-  color: var(--fifa-gold);
-}
-
-.groups-toggle {
-  display: block;
-  margin: 24px auto 0;
-  background: none;
-  border: 1px solid rgba(201,162,39,0.35);
-  color: var(--fifa-gold);
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 10px 28px;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-.groups-toggle:hover {
-  background: rgba(201,162,39,0.1);
-}
-
-/* =====================================================
-   PLAYER SPOTLIGHT
-   ===================================================== */
-#players {
-  background: var(--fifa-navy);
-}
-
-.players-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-  gap: 20px;
-  margin-top: 0;
-}
-
-.player-card {
-  background: rgba(255,255,255,0.04);
-  border: 0.5px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  padding: 24px 18px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.25s ease, border-color 0.25s ease;
-}
-.player-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(201,162,39,0.38);
-}
-
-.player-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--fifa-gold);
-}
-
-.player-jersey {
-  position: absolute;
-  right: 10px;
-  top: 8px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 66px;
-  color: rgba(255,255,255,0.05);
-  line-height: 1;
-  pointer-events: none;
-}
-
-.player-emoji {
-  font-size: 50px;
-  margin-bottom: 10px;
-  display: block;
-}
-
-.player-name {
-  font-family: 'Oswald', sans-serif;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--fifa-white);
-  margin-bottom: 3px;
-}
-
-.player-nation {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  color: var(--fifa-silver);
-  margin-bottom: 12px;
-}
-
-.player-stat-num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 30px;
-  color: var(--fifa-gold);
-  display: block;
-  line-height: 1;
-}
-
-.player-stat-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  color: var(--fifa-silver);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* =====================================================
-   TIMELINE
-   ===================================================== */
-#schedule {
-  background: linear-gradient(160deg, var(--fifa-navy), var(--fifa-blue));
-}
-
-.timeline-wrap {
-  max-width: 800px;
-  margin: 40px auto 0;
-  padding-left: 44px;
-  position: relative;
-}
-
-.timeline-wrap::before {
-  content: '';
-  position: absolute;
-  left: 14px;
-  top: 4px;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, var(--fifa-gold), rgba(201,162,39,0.1));
-}
-
-.t-event {
-  position: relative;
-  margin-bottom: 36px;
-}
-
-.t-event:last-child { margin-bottom: 0; }
-
-.t-dot {
-  position: absolute;
-  left: -36px;
-  top: 4px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--fifa-gold);
-  box-shadow: 0 0 0 5px rgba(201,162,39,0.18);
-  flex-shrink: 0;
-}
-
-.t-date {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: var(--fifa-gold);
-  text-transform: uppercase;
-}
-
-.t-title {
-  font-family: 'Oswald', sans-serif;
-  font-size: 19px;
-  font-weight: 600;
-  color: var(--fifa-white);
-  margin: 3px 0;
-}
-
-.t-desc {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  color: var(--fifa-silver);
-}
-
-/* =====================================================
-   PREDICTOR
-   ===================================================== */
-#predictor {
-  background: var(--fifa-navy);
-}
-
-.predictor-card {
-  max-width: 580px;
-  margin: 40px auto 0;
-  background: rgba(26,58,110,0.38);
-  border: 1px solid rgba(201,162,39,0.22);
-  border-radius: 12px;
-  padding: 40px;
-  text-align: center;
-}
-
-.predictor-match {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-
-.predictor-team {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.predictor-team-flag { font-size: 48px; }
-
-.predictor-team-name {
-  font-family: 'Oswald', sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--fifa-white);
-}
-
-.predictor-vs {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 38px;
-  color: var(--fifa-gold);
-  opacity: 0.55;
-}
-
-.predictor-instruction {
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  color: var(--fifa-silver);
-  margin-bottom: 16px;
-}
-
-.score-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  /* role="radiogroup" applied in HTML */
-}
-
-.score-btn {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: var(--fifa-white);
-  padding: 10px 18px;
-  border-radius: 4px;
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  transition: all 0.15s;
-}
-.score-btn:hover { background: rgba(201,162,39,0.15); border-color: var(--fifa-gold); }
-.score-btn[aria-pressed="true"] {
-  background: var(--fifa-gold);
-  color: var(--fifa-navy);
-  border-color: transparent;
-}
-
-.predict-submit {
-  width: 100%;
-  background: var(--fifa-gold);
-  color: var(--fifa-navy);
-  padding: 14px;
-  border-radius: 4px;
-  border: none;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: opacity 0.2s, background 0.3s;
-}
-.predict-submit:hover { opacity: 0.87; }
-.predict-submit.locked { background: #1D9E75; }
-
-#predict-result {
-  margin-top: 16px;
-  min-height: 28px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  color: var(--fifa-silver);
-  transition: opacity 0.3s, transform 0.3s;
-  opacity: 0;
-  transform: translateY(6px);
-}
-#predict-result.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* =====================================================
-   FOOTER
-   ===================================================== */
-#footer {
-  background: rgba(0,0,0,0.42);
-  border-top: 1px solid rgba(201,162,39,0.18);
-  padding: 40px 24px;
-  text-align: center;
-}
-
-.footer-logo-wrap { margin-bottom: 16px; display: flex; justify-content: center; }
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-}
-
-.footer-links a {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  color: var(--fifa-silver);
-  transition: color 0.2s;
-}
-.footer-links a:hover { color: var(--fifa-gold); }
-
-.footer-flags {
-  font-size: 18px;
-  margin-bottom: 16px;
-  letter-spacing: 4px;
-}
-
-.footer-legal {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  color: rgba(255,255,255,0.22);
-  max-width: 640px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-/* =====================================================
-   RESPONSIVE
-   ===================================================== */
-@media (max-width: 1024px) {
-  .stats-grid { grid-template-columns: repeat(3, 1fr); }
-  .venues-grid { grid-template-columns: repeat(2, 1fr); }
-  .players-grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-@media (max-width: 768px) {
-  section { padding: 60px 0; }
-  .section-inner { padding: 0 16px; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); }
-  .venues-grid { grid-template-columns: 1fr; }
-  .players-grid { grid-template-columns: repeat(2, 1fr); }
-  .groups-grid { grid-template-columns: repeat(2, 1fr); }
-  .predictor-card { padding: 24px 16px; }
-  .hero-ctas { flex-direction: column; align-items: center; }
-  .countdown { gap: 6px; }
-  .cd-block { padding: 12px 14px; min-width: 70px; }
-  .cd-num { font-size: 40px; }
-}
-
-@media (max-width: 375px) {
-  .section-heading { font-size: 32px; }
-  .groups-grid { grid-template-columns: 1fr; }
-  .players-grid { grid-template-columns: 1fr; }
-  .hero-headline { font-size: 64px; }
-  .timeline-wrap { padding-left: 32px; }
-  .t-dot { left: -24px; }
-  .timeline-wrap::before { left: 6px; }
-}
-
-/* =====================================================
-   REDUCE MOTION FALLBACKS
-   ===================================================== */
-@media (prefers-reduced-motion: reduce) {
-  .fade-up, .fade-left {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
-  .ticker-track { animation: none !important; }
-  .live-dot { animation: none !important; }
-  .live-badge-pulse { animation: none !important; }
-  .scroll-indicator-line { animation: none !important; }
-  .hero-logo-wrap { animation: none !important; }
-  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIFA World Cup 2026 — We Are 26</title>
+  <meta name="description" content="FIFA World Cup 2026 — 48 nations, 3 countries, 1 trophy. Official fan showcase for the greatest tournament on Earth." />
+  <meta property="og:title" content="FIFA World Cup 2026 — We Are 26" />
+  <meta property="og:description" content="48 nations, 3 countries, 1 trophy. Official fan showcase." />
+  <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23000'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f5d675'/%3E%3Cstop offset='0.5' stop-color='%23c9a227'/%3E%3Cstop offset='1' stop-color='%23a07a10'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='100' y='120' font-size='120' text-anchor='middle' fill='url(%23g)' font-family='Arial Black'%3E26%3C/text%3E%3C/svg%3E" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f5d675'/%3E%3Cstop offset='0.5' stop-color='%23c9a227'/%3E%3Cstop offset='1' stop-color='%23a07a10'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ctext x='16' y='24' font-size='22' text-anchor='middle' fill='url(%23g)' font-family='Arial Black'%3E26%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & TOKENS ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold-light:  #f5d675;
+      --gold-mid:    #c9a227;
+      --gold-dark:   #a07a10;
+      --black:       #000000;
+      --black-soft:  #0a0a0a;
+      --black-card:  #111111;
+      --black-border:#1e1e1e;
+      --white:       #ffffff;
+      --grey:        #aaaaaa;
+      --grey-dark:   #555555;
+      --red:         #e63946;
+      --blue:        #1d3557;
+      --nav-h:       64px;
+      --radius:      12px;
+      --transition:  0.35s cubic-bezier(.4,0,.2,1);
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ─── SVG LOGO SIZES ─────────────────────────────────────── */
+    .logo-hero    { width: 260px; height: 260px; }
+    .logo-nav     { width: 48px;  height: 48px;  }
+    .logo-section { width: 80px;  height: 80px;  }
+    .logo-footer  { width: 120px; height: 120px; }
+    .logo-canvas  { width: 180px; height: 180px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10; opacity: 0.92; }
+    @media (max-width: 768px) {
+      .logo-hero    { width: 180px; height: 180px; }
+      .logo-section { width: 60px;  height: 60px;  }
+      .logo-footer  { width: 90px;  height: 90px;  }
+      .logo-canvas  { width: 130px; height: 130px; }
+    }
+    @media (max-width: 480px) {
+      .logo-hero    { width: 140px; height: 140px; }
+      .logo-nav     { width: 38px;  height: 38px;  }
+      .logo-section { width: 50px;  height: 50px;  }
+      .logo-canvas  { width: 110px; height: 110px; }
+    }
+
+    /* ─── SKIP LINK ──────────────────────────────────────────── */
+    .skip-link {
+      position: absolute; top: -100px; left: 1rem;
+      background: var(--gold-mid); color: var(--black);
+      padding: .5rem 1rem; border-radius: 4px; font-weight: 700; z-index: 9999;
+      transition: top var(--transition);
+    }
+    .skip-link:focus { top: 1rem; }
+
+    /* ─── NAVBAR ─────────────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--nav-h); z-index: 1000;
+      background: rgba(0,0,0,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--black-border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem;
+      transition: background var(--transition);
+    }
+    .navbar.scrolled { background: rgba(0,0,0,.98); box-shadow: 0 2px 20px rgba(201,162,39,.15); }
+    .nav-brand {
+      display: flex; align-items: center; gap: .75rem;
+      text-decoration: none; color: var(--white);
+    }
+    .nav-brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .nav-brand-text .brand-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: .08em; color: var(--gold-light); }
+    .nav-brand-text .brand-year  { font-size: .65rem; letter-spacing: .2em; color: var(--grey); text-transform: uppercase; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--grey); text-decoration: none; font-size: .85rem;
+      font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      transition: color var(--transition); position: relative; padding-bottom: 4px;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 2px; background: var(--gold-mid); transform: scaleX(0);
+      transition: transform var(--transition); transform-origin: center;
+    }
+    .nav-links a:hover, .nav-links a:focus { color: var(--gold-light); }
+    .nav-links a:hover::after, .nav-links a:focus::after { transform: scaleX(1); }
+    .nav-toggle { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; padding: 4px; }
+    .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--gold-light); border-radius: 2px; transition: var(--transition); }
+    @media (max-width: 768px) {
+      .nav-links { display: none; position: absolute; top: var(--nav-h); left: 0; right: 0; background: rgba(0,0,0,.97); flex-direction: column; gap: 0; padding: 1rem 0; border-bottom: 1px solid var(--black-border); }
+      .nav-links.open { display: flex; }
+      .nav-links li a { padding: .75rem 2rem; display: block; }
+      .nav-toggle { display: flex; }
+      .nav-brand-text .brand-title { font-size: 1.1rem; }
+    }
+
+    /* ─── HERO ───────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      background: radial-gradient(ellipse at center 30%, #0d0d0d 0%, #000 70%);
+      padding-top: var(--nav-h);
+    }
+    #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .hero-content {
+      position: relative; z-index: 5;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: 2rem; padding: 2rem 1rem;
+    }
+    .hero-logo-wrap {
+      position: relative;
+      filter: drop-shadow(0 0 40px rgba(201,162,39,.5));
+      animation: logoFloat 6s ease-in-out infinite;
+    }
+    @keyframes logoFloat {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-12px); }
+    }
+    @media (prefers-reduced-motion: reduce) { .hero-logo-wrap { animation: none; } }
+    .hero-tagline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 8vw, 6rem);
+      letter-spacing: .12em; line-height: 1;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-mid));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(.95rem, 2vw, 1.2rem); color: var(--grey);
+      max-width: 560px; line-height: 1.7;
+    }
+    .hero-badges { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .badge {
+      padding: .4rem 1.2rem; border: 1px solid var(--gold-dark);
+      border-radius: 100px; font-size: .78rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--gold-light); background: rgba(201,162,39,.08);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .badge:hover { background: rgba(201,162,39,.18); border-color: var(--gold-mid); }
+
+    /* ─── COUNTDOWN ──────────────────────────────────────────── */
+    #countdown {
+      background: var(--black-card); border-top: 1px solid var(--black-border);
+      border-bottom: 1px solid var(--black-border);
+      padding: 3rem 2rem; text-align: center;
+    }
+    .countdown-wrap { display: flex; justify-content: center; gap: 1px; flex-wrap: wrap; }
+    .cd-unit {
+      display: flex; flex-direction: column; align-items: center;
+      min-width: 90px; padding: 1rem 1.5rem;
+      background: var(--black-soft); border-radius: var(--radius);
+      position: relative;
+    }
+    .cd-unit + .cd-unit::before {
+      content: ':'; position: absolute; left: -16px; top: 50%;
+      transform: translateY(-60%); font-size: 2rem; color: var(--gold-mid);
+      font-family: 'Bebas Neue', sans-serif; line-height: 1;
+    }
+    .cd-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      color: var(--gold-light); line-height: 1;
+      text-shadow: 0 0 20px rgba(245,214,117,.3);
+    }
+    .cd-label { font-size: .65rem; letter-spacing: .18em; text-transform: uppercase; color: var(--grey); margin-top: .4rem; }
+    .countdown-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: .25em; color: var(--grey); margin-bottom: 2rem; text-transform: uppercase; }
+    .countdown-event-date { margin-top: 1.5rem; font-size: .85rem; color: var(--gold-mid); font-weight: 600; letter-spacing: .1em; }
+
+    /* ─── TICKER ─────────────────────────────────────────────── */
+    .ticker-wrap {
+      overflow: hidden; background: var(--gold-mid);
+      padding: .6rem 0; border-top: 2px solid var(--gold-light);
+      border-bottom: 2px solid var(--gold-dark);
+    }
+    .ticker-track {
+      display: flex; gap: 0; width: max-content;
+      animation: tickerScroll 40s linear infinite;
+    }
+    .ticker-track:hover { animation-play-state: paused; }
+    @keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .ticker-item {
+      white-space: nowrap; padding: 0 2.5rem;
+      font-size: .78rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--black);
+    }
+    .ticker-sep { color: var(--black); opacity: .4; }
+
+    /* ─── SECTION SHARED ─────────────────────────────────────── */
+    section { padding: 6rem 2rem; }
+    .section-header {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+    .section-header-text { flex: 1; }
+    .section-label {
+      font-size: .72rem; letter-spacing: .25em; text-transform: uppercase;
+      color: var(--gold-mid); font-weight: 700; margin-bottom: .4rem;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      letter-spacing: .08em; line-height: 1;
+      background: linear-gradient(135deg, var(--white) 0%, var(--gold-light) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .section-desc { color: var(--grey); font-size: .95rem; margin-top: .6rem; max-width: 520px; }
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+
+    /* ─── STATS BAR ──────────────────────────────────────────── */
+    #stats {
+      background: var(--black-card);
+      border-top: 1px solid var(--black-border);
+      border-bottom: 1px solid var(--black-border);
+      padding: 4rem 2rem;
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 2rem; max-width: 1000px; margin: 0 auto; text-align: center;
+    }
+    .stat-item { display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+    .stat-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      color: var(--gold-light); line-height: 1;
+    }
+    .stat-unit { color: var(--gold-mid); font-size: .9em; margin-left: 2px; }
+    .stat-label { font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; color: var(--grey); }
+
+    /* ─── VENUES ─────────────────────────────────────────────── */
+    #venues { background: var(--black-soft); }
+    .venues-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .venue-card {
+      background: var(--black-card); border: 1px solid var(--black-border);
+      border-radius: var(--radius); overflow: hidden;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      cursor: default;
+    }
+    .venue-card:hover, .venue-card:focus-within {
+      transform: translateY(-6px);
+      border-color: var(--gold-dark);
+      box-shadow: 0 16px 40px rgba(201,162,39,.15);
+    }
+    .venue-img {
+      width: 100%; height: 180px; object-fit: cover;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; position: relative; overflow: hidden;
+    }
+    .venue-img::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.8) 100%);
+    }
+    .venue-flag { position: absolute; top: 12px; right: 12px; font-size: 1.8rem; z-index: 2; }
+    .venue-body { padding: 1.2rem 1.4rem 1.5rem; }
+    .venue-city { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: .06em; color: var(--gold-light); margin-bottom: .3rem; }
+    .venue-name { font-size: .82rem; color: var(--grey); margin-bottom: .6rem; }
+    .venue-capacity { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--black); background: var(--gold-mid); padding: .25rem .7rem; border-radius: 100px; }
+
+    /* ─── GROUPS ─────────────────────────────────────────────── */
+    #groups { background: var(--black); }
+    .groups-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.2rem;
+    }
+    .group-card {
+      background: var(--black-card); border: 1px solid var(--black-border);
+      border-radius: var(--radius); padding: 1.2rem;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .group-card:hover { border-color: var(--gold-dark); transform: translateY(-3px); }
+    .group-letter {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+      color: var(--gold-mid); margin-bottom: .8rem; line-height: 1;
+    }
+    .group-team { display: flex; align-items: center; gap: .6rem; padding: .4rem 0; border-bottom: 1px solid var(--black-border); }
+    .group-team:last-child { border-bottom: none; }
+    .team-flag { font-size: 1.3rem; line-height: 1; }
+    .team-name { font-size: .85rem; font-weight: 600; color: var(--white); }
+    .team-rank  { margin-left: auto; font-size: .72rem; color: var(--grey); font-weight: 600; }
+
+    /* ─── PLAYERS ────────────────────────────────────────────── */
+    #players { background: var(--black-soft); }
+    .players-filter { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .filter-btn {
+      padding: .4rem 1rem; border: 1px solid var(--black-border); border-radius: 100px;
+      background: none; color: var(--grey); font-size: .78rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-btn.active, .filter-btn:hover { background: var(--gold-mid); color: var(--black); border-color: var(--gold-mid); }
+    .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+    .player-card {
+      background: var(--black-card); border: 1px solid var(--black-border);
+      border-radius: var(--radius); overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+    .player-card:hover, .player-card:focus-within {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.6);
+      border-color: var(--gold-dark);
+    }
+    .player-avatar {
+      height: 180px; background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; position: relative;
+    }
+    .player-avatar::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 60px; background: linear-gradient(to top, var(--black-card), transparent);
+    }
+    .player-number {
+      position: absolute; top: 10px; left: 12px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+      color: var(--gold-mid); opacity: .4; line-height: 1;
+    }
+    .player-body { padding: 1rem 1.2rem 1.4rem; }
+    .player-name { font-weight: 900; font-size: 1rem; margin-bottom: .25rem; color: var(--white); }
+    .player-meta { font-size: .78rem; color: var(--grey); display: flex; gap: .8rem; flex-wrap: wrap; }
+    .player-pos {
+      display: inline-block; font-size: .65rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--black); background: var(--gold-mid);
+      padding: .2rem .6rem; border-radius: 100px; margin-top: .4rem;
+    }
+    .player-card[data-pos="GK"] .player-pos { background: var(--red); color: var(--white); }
+    .player-card[data-pos="DEF"] .player-pos { background: var(--blue); color: var(--white); }
+
+    /* ─── TIMELINE ───────────────────────────────────────────── */
+    #timeline { background: var(--black); }
+    .timeline-line {
+      position: relative; max-width: 860px; margin: 0 auto;
+      padding-left: 3rem;
+    }
+    .timeline-line::before {
+      content: ''; position: absolute; left: 14px; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(to bottom, var(--gold-mid) 0%, var(--gold-dark) 100%);
+    }
+    .tl-item {
+      position: relative; margin-bottom: 2.5rem;
+      padding: 1.4rem 1.6rem; background: var(--black-card);
+      border: 1px solid var(--black-border); border-radius: var(--radius);
+    }
+    .tl-item::before {
+      content: ''; position: absolute; left: -2.4rem; top: 1.6rem;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--gold-mid); border: 3px solid var(--black);
+      box-shadow: 0 0 12px rgba(201,162,39,.5);
+    }
+    .tl-date { font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-mid); font-weight: 700; margin-bottom: .4rem; }
+    .tl-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: .05em; color: var(--white); margin-bottom: .4rem; }
+    .tl-desc { font-size: .88rem; color: var(--grey); line-height: 1.6; }
+
+    /* ─── PREDICTOR ──────────────────────────────────────────── */
+    #predictor { background: var(--black-soft); }
+    .predictor-card {
+      max-width: 640px; margin: 0 auto;
+      background: var(--black-card); border: 1px solid var(--black-border);
+      border-radius: calc(var(--radius) * 2); padding: 2.5rem;
+    }
+    .predictor-logo-wrap { text-align: center; margin-bottom: 2rem; }
+    .predictor-logo-wrap svg { filter: drop-shadow(0 0 20px rgba(201,162,39,.4)); }
+    .predictor-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .08em; text-align: center; color: var(--gold-light); margin-bottom: .4rem; }
+    .predictor-subtitle { text-align: center; color: var(--grey); font-size: .88rem; margin-bottom: 2rem; }
+    .predictor-form { display: flex; flex-direction: column; gap: 1.2rem; }
+    .form-group { display: flex; flex-direction: column; gap: .4rem; }
+    .form-label { font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-mid); }
+    .form-select, .form-input {
+      width: 100%; padding: .75rem 1rem;
+      background: var(--black-soft); border: 1px solid var(--black-border);
+      border-radius: var(--radius); color: var(--white);
+      font-family: 'Inter', sans-serif; font-size: .9rem;
+      transition: border-color var(--transition);
+      appearance: none;
+    }
+    .form-select:focus, .form-input:focus {
+      outline: none; border-color: var(--gold-mid);
+      box-shadow: 0 0 0 3px rgba(201,162,39,.15);
+    }
+    .form-select option { background: var(--black-card); }
+    .vs-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: end; }
+    .vs-label { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--gold-mid); text-align: center; }
+    .predict-btn {
+      width: 100%; padding: 1rem; margin-top: .5rem;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold-mid));
+      color: var(--black); font-weight: 900; font-size: 1rem;
+      letter-spacing: .1em; text-transform: uppercase;
+      border: none; border-radius: var(--radius); cursor: pointer;
+      transition: all var(--transition); position: relative; overflow: hidden;
+    }
+    .predict-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(255,255,255,0); transition: background var(--transition);
+    }
+    .predict-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,162,39,.35); }
+    .predict-btn:hover::after { background: rgba(255,255,255,.1); }
+    .predict-btn:active { transform: translateY(0); }
+    .predictor-result {
+      margin-top: 1.5rem; padding: 1.4rem;
+      background: rgba(201,162,39,.08); border: 1px solid rgba(201,162,39,.2);
+      border-radius: var(--radius); text-align: center;
+      display: none;
+    }
+    .predictor-result.show { display: block; animation: fadeIn .4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .result-score { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--gold-light); letter-spacing: .12em; line-height: 1; }
+    .result-teams { font-size: .82rem; color: var(--grey); margin-top: .4rem; }
+
+    /* ─── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      background: var(--black-card); border-top: 1px solid var(--black-border);
+      padding: 4rem 2rem 2rem;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 1.5fr repeat(3, 1fr);
+      gap: 3rem; max-width: 1280px; margin: 0 auto 3rem;
+    }
+    .footer-brand { display: flex; flex-direction: column; gap: 1.2rem; }
+    .footer-brand-inner { display: flex; align-items: center; gap: 1rem; }
+    .footer-brand-text { display: flex; flex-direction: column; gap: .2rem; }
+    .footer-brand-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: .08em; color: var(--gold-light); }
+    .footer-brand-sub { font-size: .72rem; letter-spacing: .18em; color: var(--grey); text-transform: uppercase; }
+    .footer-tagline { font-size: .88rem; color: var(--grey); line-height: 1.6; max-width: 260px; }
+    .footer-col-title { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: .15em; color: var(--gold-mid); margin-bottom: 1rem; text-transform: uppercase; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .footer-links a { color: var(--grey); text-decoration: none; font-size: .85rem; transition: color var(--transition); }
+    .footer-links a:hover { color: var(--gold-light); }
+    .footer-bottom {
+      border-top: 1px solid var(--black-border); padding-top: 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; max-width: 1280px; margin: 0 auto;
+    }
+    .footer-logo-row { display: flex; align-items: center; gap: .75rem; }
+    .footer-copy { font-size: .75rem; color: var(--grey-dark); }
+    .footer-copy a { color: var(--grey); text-decoration: none; }
+    .footer-copy a:hover { color: var(--gold-light); }
+    @media (max-width: 900px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ─── BACK TO TOP ────────────────────────────────────────── */
+    .back-top {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 500;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--gold-mid); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity var(--transition), transform var(--transition), background var(--transition);
+    }
+    .back-top.show { opacity: 1; transform: translateY(0); }
+    .back-top:hover { background: var(--gold-light); }
+    .back-top svg { width: 20px; height: 20px; stroke: var(--black); stroke-width: 2.5; fill: none; }
+
+    /* ─── UTILITY ────────────────────────────────────────────── */
+    .gold { color: var(--gold-light); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  </style>
 </head>
 <body>
 
-<!-- =====================================================
-     CANVAS — Animated Footballs
-     ===================================================== -->
-<canvas id="ball-canvas" aria-hidden="true"></canvas>
+<!-- ═══ HIDDEN SVG DEFS — LOGO SYMBOL ════════════════════════════════ -->
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
 
-<!-- =====================================================
-     NAVIGATION
-     ===================================================== -->
-<nav id="main-nav" role="navigation" aria-label="Main navigation">
-  <div class="nav-logo-wrap">
-    <!-- FIFA 2026 Logo — .logo-nav -->
-    <svg class="logo-nav" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg" aria-label="FIFA World Cup 2026" role="img" style="height:36px;width:auto;">
-      <defs>
-        <linearGradient id="goldGrad-nav" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#f5d675"/>
-          <stop offset="50%" stop-color="#c9a227"/>
-          <stop offset="100%" stop-color="#a07a10"/>
-        </linearGradient>
-        <radialGradient id="trophyGrad-nav" cx="50%" cy="35%" r="55%">
-          <stop offset="0%" stop-color="#f5e88a"/>
-          <stop offset="100%" stop-color="#c9a227"/>
-        </radialGradient>
-        <filter id="trophyShadow-nav">
-          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#c9a227" flood-opacity="0.7"/>
-        </filter>
-      </defs>
-      <rect width="280" height="380" rx="4" fill="#0a1628"/>
-      <rect x="1" y="1" width="278" height="378" rx="4" fill="none" stroke="#c9a227" stroke-width="2"/>
-      <!-- Numeral 2 -->
-      <g fill="url(#goldGrad-nav)">
-        <rect x="60" y="28" width="160" height="22" rx="3"/>
-        <rect x="172" y="28" width="48" height="80" rx="3"/>
-        <rect x="60" y="88" width="160" height="22" rx="3"/>
-        <rect x="60" y="88" width="48" height="80" rx="3"/>
-        <rect x="60" y="148" width="160" height="22" rx="3"/>
+    <!-- Gold gradient shared by all logo instances -->
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#f5d675"/>
+      <stop offset="50%"  stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#a07a10"/>
+    </linearGradient>
+
+    <!-- Radial gold for trophy -->
+    <radialGradient id="trophyGrad" cx="50%" cy="35%" r="60%">
+      <stop offset="0%"   stop-color="#f5e88a"/>
+      <stop offset="60%"  stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#a07a10"/>
+    </radialGradient>
+
+    <!-- Trophy drop-shadow filter -->
+    <filter id="trophyShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#c9a227" flood-opacity="0.7"/>
+    </filter>
+
+    <!-- Outer glow for logo -->
+    <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!--
+      ══════════════════════════════════════════════════════════
+       FIFA WORLD CUP 2026 — OFFICIAL LOGO SYMBOL
+       ViewBox: 0 0 300 400
+       LAYER 1: Geometric "2" (top)    — gold gradient
+       LAYER 2: Geometric "6" (bottom) — gold gradient
+       LAYER 3: Trophy silhouette      — radial gold, centered
+       LAYER 4: "FIFA WORLD CUP" text  — gold
+       LAYER 5: "2026" year text       — gold
+       LAYER 6: "WE ARE 26" tagline    — white / light gold
+      ══════════════════════════════════════════════════════════
+    -->
+    <symbol id="wc2026-logo" viewBox="0 0 300 420" role="img" aria-label="FIFA World Cup 2026 Official Logo">
+
+      <!-- Black background panel -->
+      <rect width="300" height="420" fill="#000000" rx="8"/>
+
+      <!-- ── LAYER 1: Geometric "2" (top-left quadrant) ── -->
+      <g fill="url(#goldGrad)">
+        <!-- Top bar of "2" -->
+        <rect x="28" y="30" width="94" height="20" rx="4"/>
+        <!-- Top-right corner quarter-circle arc for "2" -->
+        <path d="M92 30 Q122 30 122 60 L102 60 Q102 46 92 46 Z"/>
+        <!-- Right side descender -->
+        <rect x="102" y="50" width="20" height="50" rx="2"/>
+        <!-- Middle diagonal / shelf of "2" -->
+        <path d="M28 118 L122 100 L122 120 L48 135 Z"/>
+        <!-- Bottom bar of "2" -->
+        <rect x="28" y="132" width="94" height="22" rx="4"/>
       </g>
-      <!-- Numeral 6 -->
-      <g fill="url(#goldGrad-nav)">
-        <rect x="60" y="192" width="160" height="22" rx="3"/>
-        <rect x="60" y="192" width="48" height="80" rx="3"/>
-        <rect x="60" y="252" width="160" height="22" rx="3"/>
-        <rect x="172" y="252" width="48" height="80" rx="3"/>
-        <rect x="60" y="312" width="160" height="22" rx="3"/>
+
+      <!-- ── LAYER 2: Geometric "6" (bottom-right quadrant) ── -->
+      <g fill="url(#goldGrad)">
+        <!-- Upper curve of "6" -->
+        <path d="M178 30 Q252 30 252 90 L232 90 Q232 48 200 44 L178 44 Z"/>
+        <!-- Left stem of "6" -->
+        <rect x="178" y="30" width="20" height="130" rx="2"/>
+        <!-- Lower bowl of "6" -->
+        <path d="M178 140 L252 140 Q272 140 272 175 Q272 212 232 216 L198 216 Q178 212 178 190 L178 160 L198 160 L198 195 Q198 198 215 198 Q232 198 252 185 Q252 158 232 158 L178 158 Z"/>
       </g>
-      <!-- Trophy Silhouette -->
-      <g filter="url(#trophyShadow-nav)" fill="url(#trophyGrad-nav)">
-        <rect x="116" y="316" width="48" height="18" rx="2"/>
-        <rect x="108" y="306" width="64" height="14" rx="2"/>
-        <rect x="124" y="210" width="32" height="96" rx="3"/>
-        <ellipse cx="140" cy="205" rx="52" ry="36"/>
-        <ellipse cx="140" cy="185" rx="40" ry="28"/>
-        <path d="M106 185 Q88 175 84 155 Q80 135 106 130 L106 185Z"/>
-        <path d="M174 185 Q192 175 196 155 Q200 135 174 130 L174 185Z"/>
-        <circle cx="118" cy="118" r="10"/>
-        <circle cx="162" cy="118" r="10"/>
-        <path d="M118 108 Q140 90 162 108"/>
-        <circle cx="140" cy="88" r="14"/>
+
+      <!-- ── LAYER 3: Trophy silhouette (centered, spanning both halves) ── -->
+      <g filter="url(#trophyShadow)">
+        <!-- Pedestal base tier 3 (widest) -->
+        <path d="M108 388 L192 388 L196 376 L104 376 Z" fill="url(#trophyGrad)"/>
+        <!-- Pedestal tier 2 -->
+        <path d="M112 376 L188 376 L184 364 L116 364 Z" fill="url(#trophyGrad)"/>
+        <!-- Pedestal tier 1 -->
+        <path d="M118 364 L182 364 L178 350 L122 350 Z" fill="url(#trophyGrad)"/>
+        <!-- Stem base -->
+        <rect x="136" y="290" width="28" height="62" rx="3" fill="url(#trophyGrad)"/>
+        <!-- Cup body — wide symmetrical bowl -->
+        <path d="M110 210 Q100 230 104 260 Q110 290 150 292 Q190 290 196 260 Q200 230 190 210 Q178 195 150 192 Q122 195 110 210 Z" fill="url(#trophyGrad)"/>
+        <!-- Cup base ring -->
+        <rect x="126" y="285" width="48" height="12" rx="4" fill="url(#trophyGrad)"/>
+        <!-- Left figure (human silhouette with arms up) -->
+        <circle cx="126" cy="185" r="9" fill="url(#trophyGrad)"/>
+        <path d="M126 194 Q118 188 112 178 L118 175 Q122 183 126 186 Z" fill="url(#trophyGrad)"/>
+        <path d="M126 194 Q122 208 122 218 L130 218 Q130 208 126 194 Z" fill="url(#trophyGrad)"/>
+        <!-- Right figure -->
+        <circle cx="174" cy="185" r="9" fill="url(#trophyGrad)"/>
+        <path d="M174 194 Q182 188 188 178 L182 175 Q178 183 174 186 Z" fill="url(#trophyGrad)"/>
+        <path d="M174 194 Q178 208 178 218 L170 218 Q170 208 174 194 Z" fill="url(#trophyGrad)"/>
+        <!-- Globe held between figures -->
+        <circle cx="150" cy="172" r="20" fill="url(#trophyGrad)"/>
+        <path d="M130 172 Q150 160 170 172 Q150 184 130 172 Z" fill="rgba(0,0,0,0.2)"/>
+        <path d="M150 152 Q158 172 150 192 Q142 172 150 152 Z" fill="rgba(0,0,0,0.15)"/>
       </g>
-      <!-- FIFA wordmark -->
-      <text x="140" y="354" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="38" fill="#ffffff" letter-spacing="4">FIFA</text>
-      <!-- Host nations -->
-      <text x="140" y="372" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" fill="#b0b8c8" letter-spacing="1.5">CANADA · MEXICO · USA</text>
+
+      <!-- ── LAYER 4: "FIFA" wordmark ── -->
+      <g fill="url(#goldGrad)">
+        <!-- F — with diagonal cut bars -->
+        <rect x="28" y="244" width="5" height="30" rx="1"/>
+        <rect x="28" y="244" width="18" height="5" rx="1"/>
+        <rect x="28" y="256" width="14" height="4" rx="1"/>
+        <!-- I -->
+        <rect x="52" y="244" width="5" height="30" rx="1"/>
+        <!-- F -->
+        <rect x="63" y="244" width="5" height="30" rx="1"/>
+        <rect x="63" y="244" width="18" height="5" rx="1"/>
+        <rect x="63" y="256" width="14" height="4" rx="1"/>
+        <!-- A -->
+        <path d="M84 274 L91 244 L98 244 L105 274 L100 274 L96 262 L93 262 L89 274 Z"/>
+        <rect x="90" y="258" width="9" height="3" rx="1"/>
+      </g>
+
+      <!-- "WORLD CUP" text -->
+      <text x="150" y="302" font-family="'Arial Black', sans-serif" font-size="11" font-weight="900" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="3">WORLD CUP</text>
+
+      <!-- ── LAYER 5: "2026" year display ── -->
+      <text x="150" y="326" font-family="'Arial Black', sans-serif" font-size="22" font-weight="900" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="4">2026</text>
+
+      <!-- ── LAYER 6: "WE ARE 26" tagline ── -->
+      <text x="150" y="346" font-family="'Arial', sans-serif" font-size="9" font-weight="700" fill="#f5d675" text-anchor="middle" letter-spacing="4" opacity="0.9">WE ARE 26</text>
+
+      <!-- Thin gold rule under tagline -->
+      <line x1="80" y1="352" x2="220" y2="352" stroke="#c9a227" stroke-width="0.8" opacity="0.6"/>
+
+      <!-- Host country flags / dots row -->
+      <g opacity="0.85">
+        <circle cx="120" cy="364" r="6" fill="#B22234"/><!-- USA -->
+        <text x="120" y="367.5" font-size="8" text-anchor="middle" fill="#fff" font-family="Arial">🇺🇸</text>
+        <circle cx="150" cy="364" r="6" fill="#FF0000"/><!-- CA -->
+        <text x="150" y="367.5" font-size="8" text-anchor="middle" fill="#fff" font-family="Arial">🇨🇦</text>
+        <circle cx="180" cy="364" r="6" fill="#006847"/><!-- MX -->
+        <text x="180" y="367.5" font-size="8" text-anchor="middle" fill="#fff" font-family="Arial">🇲🇽</text>
+      </g>
+
+      <!-- Decorative corner stars -->
+      <text x="16"  y="24"  font-size="10" fill="#c9a227" opacity="0.5">★</text>
+      <text x="276" y="24"  font-size="10" fill="#c9a227" opacity="0.5">★</text>
+      <text x="16"  y="414" font-size="10" fill="#c9a227" opacity="0.5">★</text>
+      <text x="276" y="414" font-size="10" fill="#c9a227" opacity="0.5">★</text>
+
+    </symbol>
+
+  </defs>
+</svg>
+<!-- ═══ END SVG DEFS ═══════════════════════════════════════════════════ -->
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ═══ NAVBAR ════════════════════════════════════════════════════════ -->
+<nav class="navbar" role="navigation" aria-label="Main navigation" id="navbar">
+  <a href="#hero" class="nav-brand" aria-label="FIFA World Cup 2026 Home">
+    <svg class="logo-nav" aria-hidden="true" focusable="false">
+      <use href="#wc2026-logo"/>
     </svg>
-  </div>
-
-  <ul class="nav-links" role="list">
+    <span class="nav-brand-text">
+      <span class="brand-title">World Cup 2026</span>
+      <span class="brand-year">USA · Canada · Mexico</span>
+    </span>
+  </a>
+  <ul class="nav-links" id="nav-links" role="list">
     <li><a href="#venues">Venues</a></li>
     <li><a href="#groups">Groups</a></li>
-    <li><a href="#players">Stars</a></li>
-    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#players">Players</a></li>
+    <li><a href="#timeline">Timeline</a></li>
     <li><a href="#predictor">Predictor</a></li>
   </ul>
-
-  <button class="nav-ticket-btn" type="button">Get Tickets</button>
-  <button class="hamburger" type="button" aria-label="Open navigation menu" aria-expanded="false" id="hamburger-btn">☰</button>
+  <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
-<!-- Mobile Menu -->
-<div class="mobile-menu-wrap" id="mobile-menu-wrap" aria-hidden="true">
-  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation">
-    <a href="#venues">Venues</a>
-    <a href="#groups">Groups</a>
-    <a href="#players">Stars</a>
-    <a href="#schedule">Schedule</a>
-    <a href="#predictor">Predictor</a>
-  </nav>
-</div>
+<!-- ═══ HERO ══════════════════════════════════════════════════════════ -->
+<main id="main-content">
+<section id="hero" aria-label="Hero — FIFA World Cup 2026">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
 
-<!-- =====================================================
-     SECTION 2 — HERO
-     ===================================================== -->
-<section id="hero" aria-labelledby="hero-heading">
-  <div class="hero-bg" aria-hidden="true">
-    <!-- Pitch lines SVG overlay -->
-    <svg class="hero-pitch" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect width="1440" height="900" fill="none" stroke="#ffffff" stroke-width="1"/>
-      <line x1="720" y1="0" x2="720" y2="900" stroke="#ffffff" stroke-width="1"/>
-      <circle cx="720" cy="450" r="120" fill="none" stroke="#ffffff" stroke-width="1"/>
-      <rect x="0" y="270" width="200" height="360" fill="none" stroke="#ffffff" stroke-width="1"/>
-      <rect x="1240" y="270" width="200" height="360" fill="none" stroke="#ffffff" stroke-width="1"/>
-      <rect x="0" y="360" width="80" height="180" fill="none" stroke="#ffffff" stroke-width="1"/>
-      <rect x="1360" y="360" width="80" height="180" fill="none" stroke="#ffffff" stroke-width="1"/>
-      <circle cx="0" cy="450" r="100" fill="none" stroke="#ffffff" stroke-width="1"/>
-      <circle cx="1440" cy="450" r="100" fill="none" stroke="#ffffff" stroke-width="1"/>
-    </svg>
+  <div class="hero-content">
+    <!-- HERO LOGO — large display size with float animation -->
+    <div class="hero-logo-wrap" role="img" aria-label="FIFA World Cup 2026 Official Logo">
+      <svg class="logo-hero" aria-hidden="true" focusable="false">
+        <use href="#wc2026-logo"/>
+      </svg>
+    </div>
+
+    <h1 class="hero-tagline">WE ARE 26</h1>
+    <p class="hero-sub">
+      The world's biggest sporting event returns — 48 nations, 3 host countries,
+      16 iconic cities and one golden trophy. The 2026 FIFA World Cup
+      rewrites history.
+    </p>
+    <div class="hero-badges" role="list" aria-label="Tournament highlights">
+      <span class="badge" role="listitem">48 Nations</span>
+      <span class="badge" role="listitem">3 Host Countries</span>
+      <span class="badge" role="listitem">16 Venues</span>
+      <span class="badge" role="listitem">104 Matches</span>
+      <span class="badge" role="listitem">June–July 2026</span>
+    </div>
   </div>
+</section>
 
-  <!-- Live badge -->
-  <div class="live-badge" role="status" aria-label="Live event in progress">
-    <span class="live-dot" aria-hidden="true"></span>
-    <span>LIVE NOW · 2026 TOURNAMENT IN PROGRESS</span>
-  </div>
-
-  <!-- Hero Logo -->
-  <div class="hero-logo-wrap" aria-hidden="true">
-    <svg class="logo-hero" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg" style="width:220px;" aria-hidden="true">
-      <defs>
-        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#f5d675"/>
-          <stop offset="50%" stop-color="#c9a227"/>
-          <stop offset="100%" stop-color="#a07a10"/>
-        </linearGradient>
-        <radialGradient id="trophyGrad" cx="50%" cy="35%" r="55%">
-          <stop offset="0%" stop-color="#f5e88a"/>
-          <stop offset="100%" stop-color="#c9a227"/>
-        </radialGradient>
-        <filter id="trophyShadow">
-          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#c9a227" flood-opacity="0.7"/>
-        </filter>
-      </defs>
-      <rect width="280" height="380" rx="4" fill="#0a1628"/>
-      <rect x="1" y="1" width="278" height="378" rx="4" fill="none" stroke="#c9a227" stroke-width="2"/>
-      <!-- Numeral 2 -->
-      <g fill="url(#goldGrad)">
-        <rect x="60" y="28" width="160" height="22" rx="3"/>
-        <rect x="172" y="28" width="48" height="80" rx="3"/>
-        <rect x="60" y="88" width="160" height="22" rx="3"/>
-        <rect x="60" y="88" width="48" height="80" rx="3"/>
-        <rect x="60" y="148" width="160" height="22" rx="3"/>
-      </g>
-      <!-- Numeral 6 -->
-      <g fill="url(#goldGrad)">
-        <rect x="60" y="192" width="160" height="22" rx="3"/>
-        <rect x="60" y="192" width="48" height="80" rx="3"/>
-        <rect x="60" y="252" width="160" height="22" rx="3"/>
-        <rect x="172" y="252" width="48" height="80" rx="3"/>
-        <rect x="60" y="312" width="160" height="22" rx="3"/>
-      </g>
-      <!-- Trophy -->
-      <g filter="url(#trophyShadow)" fill="url(#trophyGrad)">
-        <rect x="116" y="316" width="48" height="18" rx="2"/>
-        <rect x="108" y="306" width="64" height="14" rx="2"/>
-        <rect x="124" y="210" width="32" height="96" rx="3"/>
-        <ellipse cx="140" cy="205" rx="52" ry="36"/>
-        <ellipse cx="140" cy="185" rx="40" ry="28"/>
-        <path d="M106 185 Q88 175 84 155 Q80 135 106 130 L106 185Z"/>
-        <path d="M174 185 Q192 175 196 155 Q200 135 174 130 L174 185Z"/>
-        <circle cx="118" cy="118" r="10"/>
-        <circle cx="162" cy="118" r="10"/>
-        <path d="M118 108 Q140 90 162 108" fill="none" stroke="url(#trophyGrad)" stroke-width="4"/>
-        <circle cx="140" cy="88" r="14"/>
-      </g>
-      <!-- FIFA -->
-      <text x="140" y="354" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="38" fill="#ffffff" letter-spacing="4">FIFA</text>
-      <text x="140" y="372" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" fill="#b0b8c8" letter-spacing="1.5">CANADA · MEXICO · USA</text>
-    </svg>
-  </div>
-
-  <h1 class="hero-headline" id="hero-heading">WE ARE 26</h1>
-  <p class="hero-subheading">USA · CANADA · MEXICO · 2026</p>
-
-  <p class="hero-flags">
-    <span aria-hidden="true">🇺🇸</span> United States
-    <span aria-hidden="true"> ✦ </span>
-    <span aria-hidden="true">🇨🇦</span> Canada
-    <span aria-hidden="true"> ✦ </span>
-    <span aria-hidden="true">🇲🇽</span> Mexico
-  </p>
-
-  <!-- Countdown -->
-  <div class="countdown" id="countdown" role="timer" aria-live="polite" aria-atomic="true" aria-label="Countdown to FIFA World Cup 2026 opening match">
-    <div class="cd-block">
-      <span class="cd-num" id="cd-days">000</span>
+<!-- ═══ COUNTDOWN ════════════════════════════════════════════════════ -->
+<section id="countdown" aria-label="Countdown to FIFA World Cup 2026" aria-live="polite" aria-atomic="true">
+  <div class="countdown-title" aria-hidden="true">⚽ Kickoff Countdown</div>
+  <div class="countdown-wrap" role="timer" aria-label="Time until tournament">
+    <div class="cd-unit">
+      <span class="cd-val" id="cd-days" aria-label="days">--</span>
       <span class="cd-label">Days</span>
     </div>
-    <div class="cd-block">
-      <span class="cd-num" id="cd-hours">00</span>
+    <div class="cd-unit">
+      <span class="cd-val" id="cd-hours" aria-label="hours">--</span>
       <span class="cd-label">Hours</span>
     </div>
-    <div class="cd-block">
-      <span class="cd-num" id="cd-mins">00</span>
-      <span class="cd-label">Minutes</span>
+    <div class="cd-unit">
+      <span class="cd-val" id="cd-mins" aria-label="minutes">--</span>
+      <span class="cd-label">Mins</span>
     </div>
-    <div class="cd-block">
-      <span class="cd-num" id="cd-secs">00</span>
-      <span class="cd-label">Seconds</span>
+    <div class="cd-unit">
+      <span class="cd-val" id="cd-secs" aria-label="seconds">--</span>
+      <span class="cd-label">Secs</span>
     </div>
   </div>
-
-  <!-- CTAs -->
-  <div class="hero-ctas">
-    <a href="#groups" class="btn-primary">Explore the Draw</a>
-    <a href="#predictor" class="btn-secondary">Make a Prediction</a>
-  </div>
-
-  <!-- Scroll indicator -->
-  <div class="scroll-indicator" aria-hidden="true">
-    <span>Scroll</span>
-    <div class="scroll-indicator-line"></div>
-  </div>
+  <p class="countdown-event-date">Opening Match · MetLife Stadium · June 11, 2026</p>
 </section>
 
-<!-- =====================================================
-     SECTION 3 — LIVE SCORES TICKER
-     ===================================================== -->
-<div id="ticker" aria-hidden="true" role="marquee">
-  <div class="ticker-label">
-    <span>⚽ LIVE</span>
-  </div>
-  <div class="ticker-scroll">
-    <div class="ticker-track" id="ticker-track">
-      <!-- Items rendered by JS to avoid repetition -->
-    </div>
+<!-- ═══ NEWS TICKER ═══════════════════════════════════════════════════ -->
+<div class="ticker-wrap" aria-label="Latest news ticker" role="marquee">
+  <div class="ticker-track" aria-hidden="true" id="ticker-track">
+    <span class="ticker-item">🏆 FIFA World Cup 2026 — USA · Canada · Mexico</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">48 Nations Competing For The First Time In History</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">Opening Match: June 11, 2026 · MetLife Stadium, New York</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">Final: July 19, 2026 · MetLife Stadium</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">16 World-Class Venues Across 3 Countries</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">104 Matches · 48 Teams · 1 Trophy</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">WE ARE 26 — The Greatest Show On Earth Returns</span>
+    <span class="ticker-sep">★</span>
+    <!-- Duplicate for seamless loop -->
+    <span class="ticker-item">🏆 FIFA World Cup 2026 — USA · Canada · Mexico</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">48 Nations Competing For The First Time In History</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">Opening Match: June 11, 2026 · MetLife Stadium, New York</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">Final: July 19, 2026 · MetLife Stadium</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">16 World-Class Venues Across 3 Countries</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">104 Matches · 48 Teams · 1 Trophy</span>
+    <span class="ticker-sep">★</span>
+    <span class="ticker-item">WE ARE 26 — The Greatest Show On Earth Returns</span>
+    <span class="ticker-sep">★</span>
   </div>
 </div>
 
-<!-- =====================================================
-     SECTION 4 — STATS STRIP
-     ===================================================== -->
-<section id="stats" aria-labelledby="stats-heading" class="stats-strip">
-  <h2 id="stats-heading" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Tournament Statistics</h2>
+<!-- ═══ STATS ═════════════════════════════════════════════════════════ -->
+<section id="stats" aria-label="Tournament statistics">
   <div class="stats-grid">
-    <div class="stat-item fade-up">
-      <span class="stat-num" data-target="48" id="stat-teams">0</span>
-      <span class="stat-label">Teams</span>
+    <div class="stat-item reveal">
+      <span class="stat-val"><span class="count-up" data-target="48">0</span></span>
+      <span class="stat-label">Competing Nations</span>
     </div>
-    <div class="stat-item fade-up">
-      <span class="stat-num" data-target="104" id="stat-matches">0</span>
-      <span class="stat-label">Matches</span>
+    <div class="stat-item reveal">
+      <span class="stat-val"><span class="count-up" data-target="16">0</span></span>
+      <span class="stat-label">Host Venues</span>
     </div>
-    <div class="stat-item fade-up">
-      <span class="stat-num" data-target="16" id="stat-cities">0</span>
-      <span class="stat-label">Host Cities</span>
+    <div class="stat-item reveal">
+      <span class="stat-val"><span class="count-up" data-target="104">0</span></span>
+      <span class="stat-label">Total Matches</span>
     </div>
-    <div class="stat-item fade-up">
-      <span class="stat-num" id="stat-viewers">5B+</span>
-      <span class="stat-label">Expected Viewers</span>
+    <div class="stat-item reveal">
+      <span class="stat-val"><span class="count-up" data-target="5">0</span><span class="stat-unit">B+</span></span>
+      <span class="stat-label">Viewers Worldwide</span>
     </div>
-    <div class="stat-item fade-up">
-      <span class="stat-num" data-target="3" id="stat-nations">0</span>
-      <span class="stat-label">Host Nations</span>
+    <div class="stat-item reveal">
+      <span class="stat-val"><span class="count-up" data-target="3">0</span></span>
+      <span class="stat-label">Host Countries</span>
     </div>
-    <div class="stat-item fade-up">
-      <span class="stat-num" id="stat-prize">$100M</span>
-      <span class="stat-label">Prize Fund</span>
+    <div class="stat-item reveal">
+      <span class="stat-val"><span class="count-up" data-target="39">0</span></span>
+      <span class="stat-label">Days of Football</span>
     </div>
   </div>
 </section>
 
-<!-- =====================================================
-     SECTION 5 — VENUES
-     ===================================================== -->
-<section id="venues" aria-labelledby="venues-heading">
-  <div class="section-inner">
-    <span class="section-label fade-left">Host Stadiums</span>
-    <h2 class="section-heading fade-left" id="venues-heading">ICONIC <em>VENUES</em></h2>
-    <p class="section-sub fade-left">World-class arenas across three nations hosting the greatest sporting event on Earth.</p>
-    <div class="venues-grid">
-      <div class="venue-card fade-up">
-        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
-        <div class="venue-info">
-          <div class="venue-city">New York / NJ</div>
+<!-- ═══ VENUES ════════════════════════════════════════════════════════ -->
+<section id="venues" aria-label="Host venues">
+  <div class="container">
+    <div class="section-header reveal">
+      <svg class="logo-section" aria-hidden="true" focusable="false">
+        <use href="#wc2026-logo"/>
+      </svg>
+      <div class="section-header-text">
+        <div class="section-label">Destinations</div>
+        <h2 class="section-title">Host Venues</h2>
+        <p class="section-desc">16 iconic stadiums across the United States, Canada and Mexico — each a cathedral of football.</p>
+      </div>
+    </div>
+
+    <div class="venues-grid" role="list" aria-label="List of host venues">
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="MetLife Stadium, New York">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇺🇸</span>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city">New York / New Jersey</div>
           <div class="venue-name">MetLife Stadium</div>
-          <div class="venue-cap"><span aria-hidden="true">⚽</span> 82,500 seats · <strong>FINAL</strong></div>
+          <span class="venue-capacity">82,500 seats · Final Venue</span>
         </div>
-      </div>
-      <div class="venue-card fade-up">
-        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
-        <div class="venue-info">
-          <div class="venue-city">Mexico City</div>
-          <div class="venue-name">Estadio Azteca</div>
-          <div class="venue-cap"><span aria-hidden="true">⚽</span> 87,523 seats · <strong>OPENING MATCH</strong></div>
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="SoFi Stadium, Los Angeles">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇺🇸</span>
         </div>
-      </div>
-      <div class="venue-card fade-up">
-        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
-        <div class="venue-info">
+        <div class="venue-body">
           <div class="venue-city">Los Angeles</div>
           <div class="venue-name">SoFi Stadium</div>
-          <div class="venue-cap"><span aria-hidden="true">⚽</span> 70,000 seats · <strong>SEMI-FINAL</strong></div>
+          <span class="venue-capacity">70,240 seats</span>
         </div>
-      </div>
-      <div class="venue-card fade-up">
-        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
-        <div class="venue-info">
-          <div class="venue-city">Dallas</div>
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="AT&T Stadium, Dallas">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇺🇸</span>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city">Dallas / Fort Worth</div>
           <div class="venue-name">AT&amp;T Stadium</div>
-          <div class="venue-cap"><span aria-hidden="true">⚽</span> 80,000 seats · <strong>QUARTER-FINAL</strong></div>
+          <span class="venue-capacity">80,000 seats</span>
         </div>
-      </div>
-      <div class="venue-card fade-up">
-        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
-        <div class="venue-info">
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="NRG Stadium, Houston">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇺🇸</span>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city">Houston</div>
+          <div class="venue-name">NRG Stadium</div>
+          <span class="venue-capacity">72,220 seats</span>
+        </div>
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="Hard Rock Stadium, Miami">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇺🇸</span>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city">Miami</div>
+          <div class="venue-name">Hard Rock Stadium</div>
+          <span class="venue-capacity">65,326 seats</span>
+        </div>
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="Empower Field, Denver">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇺🇸</span>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city">Denver</div>
+          <div class="venue-name">Empower Field at Mile High</div>
+          <span class="venue-capacity">76,125 seats</span>
+        </div>
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="Levi's Stadium, San Francisco">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇺🇸</span>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city">San Francisco Bay Area</div>
+          <div class="venue-name">Levi's Stadium</div>
+          <span class="venue-capacity">68,500 seats</span>
+        </div>
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="Estadio Azteca, Mexico City">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇲🇽</span>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city">Mexico City</div>
+          <div class="venue-name">Estadio Azteca</div>
+          <span class="venue-capacity">87,523 seats · Historic</span>
+        </div>
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="BMO Field, Toronto">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇨🇦</span>
+        </div>
+        <div class="venue-body">
+          <div class="venue-city">Toronto</div>
+          <div class="venue-name">BMO Field / Rogers Centre</div>
+          <span class="venue-capacity">45,000 seats</span>
+        </div>
+      </article>
+
+      <article class="venue-card reveal" role="listitem" tabindex="0" aria-label="BC Place, Vancouver">
+        <div class="venue-img" aria-hidden="true" role="img">
+          <div style="color:#f5d675;font-size:2.5rem">🏟️</div>
+          <span class="venue-flag">🇨🇦</span>
+        </div>
+        <div class="venue-body">
           <div class="venue-city">Vancouver</div>
           <div class="venue-name">BC Place</div>
-          <div class="venue-cap"><span aria-hidden="true">⚽</span> 54,500 seats · <strong>GROUP STAGE</strong></div>
+          <span class="venue-capacity">54,500 seats</span>
         </div>
-      </div>
-      <div class="venue-card fade-up">
-        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
-        <div class="venue-info">
-          <div class="venue-city">San Francisco</div>
-          <div class="venue-name">Levi's Stadium</div>
-          <div class="venue-cap"><span aria-hidden="true">⚽</span> 68,500 seats · <strong>GROUP STAGE</strong></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- =====================================================
-     SECTION 6 — GROUP STAGE DRAW
-     ===================================================== -->
-<section id="groups" aria-labelledby="groups-heading">
-  <div class="section-inner">
-    <span class="section-label fade-left">Group Stage</span>
-    <h2 class="section-heading fade-left" id="groups-heading">THE <em>DRAW</em></h2>
-    <p class="section-sub fade-left">48 nations divided into 12 groups competing for a place in the round of 32.</p>
-
-    <div class="groups-grid" id="groups-grid">
-      <!-- Group A -->
-      <div class="group-card fade-up">
-        <div class="group-header">
-          <span class="group-letter">A</span>
-          <span class="group-badge">GROUP A</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇺🇸</span><span class="team-name">United States</span><span class="team-pts">6</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class="team-name">England</span><span class="team-pts">4</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇮🇷</span><span class="team-name">Iran</span><span class="team-pts">3</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🏴󠁧󠁢󠁷󠁬󠁳󠁿</span><span class="team-name">Wales</span><span class="team-pts">0</span></div>
-      </div>
-      <!-- Group B -->
-      <div class="group-card fade-up">
-        <div class="group-header">
-          <span class="group-letter">B</span>
-          <span class="group-badge">GROUP B</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇦🇷</span><span class="team-name">Argentina</span><span class="team-pts">9</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇲🇽</span><span class="team-name">Mexico</span><span class="team-pts">4</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇵🇱</span><span class="team-name">Poland</span><span class="team-pts">3</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇸🇦</span><span class="team-name">Saudi Arabia</span><span class="team-pts">1</span></div>
-      </div>
-      <!-- Group C -->
-      <div class="group-card fade-up">
-        <div class="group-header">
-          <span class="group-letter">C</span>
-          <span class="group-badge">GROUP C</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇫🇷</span><span class="team-name">France</span><span class="team-pts">7</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇩🇰</span><span class="team-name">Denmark</span><span class="team-pts">5</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇹🇳</span><span class="team-name">Tunisia</span><span class="team-pts">2</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇦🇺</span><span class="team-name">Australia</span><span class="team-pts">1</span></div>
-      </div>
-      <!-- Group D -->
-      <div class="group-card fade-up">
-        <div class="group-header">
-          <span class="group-letter">D</span>
-          <span class="group-badge">GROUP D</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇧🇷</span><span class="team-name">Brazil</span><span class="team-pts">9</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇭</span><span class="team-name">Switzerland</span><span class="team-pts">4</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇲</span><span class="team-name">Cameroon</span><span class="team-pts">3</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇷🇸</span><span class="team-name">Serbia</span><span class="team-pts">0</span></div>
-      </div>
-      <!-- Group E -->
-      <div class="group-card fade-up">
-        <div class="group-header">
-          <span class="group-letter">E</span>
-          <span class="group-badge">GROUP E</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇪🇸</span><span class="team-name">Spain</span><span class="team-pts">7</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇯🇵</span><span class="team-name">Japan</span><span class="team-pts">6</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇩🇪</span><span class="team-name">Germany</span><span class="team-pts">3</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇷</span><span class="team-name">Costa Rica</span><span class="team-pts">0</span></div>
-      </div>
-      <!-- Group F -->
-      <div class="group-card fade-up">
-        <div class="group-header">
-          <span class="group-letter">F</span>
-          <span class="group-badge">GROUP F</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇧🇪</span><span class="team-name">Belgium</span><span class="team-pts">6</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇦</span><span class="team-name">Canada</span><span class="team-pts">4</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇭🇷</span><span class="team-name">Croatia</span><span class="team-pts">4</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇲🇦</span><span class="team-name">Morocco</span><span class="team-pts">3</span></div>
-      </div>
-      <!-- Group G (hidden) -->
-      <div class="group-card hidden-group fade-up">
-        <div class="group-header">
-          <span class="group-letter">G</span>
-          <span class="group-badge">GROUP G</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇳🇱</span><span class="team-name">Netherlands</span><span class="team-pts">7</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇪🇨</span><span class="team-name">Ecuador</span><span class="team-pts">4</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇸🇳</span><span class="team-name">Senegal</span><span class="team-pts">3</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇶🇦</span><span class="team-name">Qatar</span><span class="team-pts">0</span></div>
-      </div>
-      <!-- Group H (hidden) -->
-      <div class="group-card hidden-group fade-up">
-        <div class="group-header">
-          <span class="group-letter">H</span>
-          <span class="group-badge">GROUP H</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇵🇹</span><span class="team-name">Portugal</span><span class="team-pts">9</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇺🇾</span><span class="team-name">Uruguay</span><span class="team-pts">5</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇬🇭</span><span class="team-name">Ghana</span><span class="team-pts">1</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇰🇷</span><span class="team-name">South Korea</span><span class="team-pts">1</span></div>
-      </div>
-      <!-- Group I (hidden) -->
-      <div class="group-card hidden-group fade-up">
-        <div class="group-header">
-          <span class="group-letter">I</span>
-          <span class="group-badge">GROUP I</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇩🇪</span><span class="team-name">Germany</span><span class="team-pts">7</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇴</span><span class="team-name">Colombia</span><span class="team-pts">5</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇵🇦</span><span class="team-name">Panama</span><span class="team-pts">2</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇹🇿</span><span class="team-name">Tanzania</span><span class="team-pts">0</span></div>
-      </div>
-      <!-- Group J (hidden) -->
-      <div class="group-card hidden-group fade-up">
-        <div class="group-header">
-          <span class="group-letter">J</span>
-          <span class="group-badge">GROUP J</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇮🇹</span><span class="team-name">Italy</span><span class="team-pts">6</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇲🇽</span><span class="team-name">Mexico</span><span class="team-pts">5</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇺🇦</span><span class="team-name">Ukraine</span><span class="team-pts">3</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇸🇿</span><span class="team-name">Eswatini</span><span class="team-pts">0</span></div>
-      </div>
-      <!-- Group K (hidden) -->
-      <div class="group-card hidden-group fade-up">
-        <div class="group-header">
-          <span class="group-letter">K</span>
-          <span class="group-badge">GROUP K</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇳🇬</span><span class="team-name">Nigeria</span><span class="team-pts">7</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇦🇹</span><span class="team-name">Austria</span><span class="team-pts">4</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇿🇦</span><span class="team-name">South Africa</span><span class="team-pts">3</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇸🇻</span><span class="team-name">El Salvador</span><span class="team-pts">0</span></div>
-      </div>
-      <!-- Group L (hidden) -->
-      <div class="group-card hidden-group fade-up">
-        <div class="group-header">
-          <span class="group-letter">L</span>
-          <span class="group-badge">GROUP L</span>
-        </div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇱</span><span class="team-name">Chile</span><span class="team-pts">6</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇷🇴</span><span class="team-name">Romania</span><span class="team-pts">4</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇿🇲</span><span class="team-name">Zambia</span><span class="team-pts">3</span></div>
-        <div class="team-row"><span class="team-flag" aria-hidden="true">🇯🇲</span><span class="team-name">Jamaica</span><span class="team-pts">1</span></div>
-      </div>
-    </div>
-
-    <button class="groups-toggle fade-up" id="groups-toggle" type="button">VIEW ALL 12 GROUPS ↓</button>
-  </div>
-</section>
-
-<!-- =====================================================
-     SECTION 7 — PLAYER SPOTLIGHT
-     ===================================================== -->
-<section id="players" aria-labelledby="players-heading">
-  <div class="section-inner">
-    <span class="section-label fade-left">Player Spotlight</span>
-    <h2 class="section-heading fade-left" id="players-heading">WORLD <em>STARS</em></h2>
-    <p class="section-sub fade-left">The legends who will write history at the 2026 FIFA World Cup.</p>
-    <div class="players-grid">
-
-      <article class="player-card fade-up" aria-label="Kylian Mbappé">
-        <span class="player-jersey" aria-hidden="true">10</span>
-        <span class="player-emoji" aria-hidden="true">⚡</span>
-        <div class="player-name">Kylian Mbappé</div>
-        <div class="player-nation"><span aria-hidden="true">🇫🇷</span> France</div>
-        <span class="player-stat-num">8</span>
-        <span class="player-stat-label">Goals</span>
-      </article>
-
-      <article class="player-card fade-up" aria-label="Erling Haaland">
-        <span class="player-jersey" aria-hidden="true">9</span>
-        <span class="player-emoji" aria-hidden="true">🎯</span>
-        <div class="player-name">Erling Haaland</div>
-        <div class="player-nation"><span aria-hidden="true">🇳🇴</span> Norway</div>
-        <span class="player-stat-num">6</span>
-        <span class="player-stat-label">Goals</span>
-      </article>
-
-      <article class="player-card fade-up" aria-label="Vinícius Jr.">
-        <span class="player-jersey" aria-hidden="true">11</span>
-        <span class="player-emoji" aria-hidden="true">🌪️</span>
-        <div class="player-name">Vinícius Jr.</div>
-        <div class="player-nation"><span aria-hidden="true">🇧🇷</span> Brazil</div>
-        <span class="player-stat-num">5</span>
-        <span class="player-stat-label">Goal + Assist</span>
-      </article>
-
-      <article class="player-card fade-up" aria-label="Pedri">
-        <span class="player-jersey" aria-hidden="true">8</span>
-        <span class="player-emoji" aria-hidden="true">💫</span>
-        <div class="player-name">Pedri</div>
-        <div class="player-nation"><span aria-hidden="true">🇪🇸</span> Spain</div>
-        <span class="player-stat-num">94%</span>
-        <span class="player-stat-label">Pass Accuracy</span>
-      </article>
-
-      <article class="player-card fade-up" aria-label="Bukayo Saka">
-        <span class="player-jersey" aria-hidden="true">7</span>
-        <span class="player-emoji" aria-hidden="true">🔥</span>
-        <div class="player-name">Bukayo Saka</div>
-        <div class="player-nation"><span aria-hidden="true">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span> England</div>
-        <span class="player-stat-num">7</span>
-        <span class="player-stat-label">Key Passes</span>
-      </article>
-
-      <article class="player-card fade-up" aria-label="Jude Bellingham">
-        <span class="player-jersey" aria-hidden="true">10</span>
-        <span class="player-emoji" aria-hidden="true">🏆</span>
-        <div class="player-name">Jude Bellingham</div>
-        <div class="player-nation"><span aria-hidden="true">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span> England</div>
-        <span class="player-stat-num">4</span>
-        <span class="player-stat-label">Match Goals</span>
       </article>
 
     </div>
   </div>
 </section>
 
-<!-- =====================================================
-     SECTION 8 — TOURNAMENT TIMELINE
-     ===================================================== -->
-<section id="schedule" aria-labelledby="schedule-heading">
-  <div class="section-inner">
-    <span class="section-label fade-left">Tournament Calendar</span>
-    <h2 class="section-heading fade-left" id="schedule-heading">ROAD TO <em>GLORY</em></h2>
-    <div class="timeline-wrap">
+<!-- ═══ GROUPS ════════════════════════════════════════════════════════ -->
+<section id="groups" aria-label="Tournament groups">
+  <div class="container">
+    <div class="section-header reveal">
+      <svg class="logo-section" aria-hidden="true" focusable="false">
+        <use href="#wc2026-logo"/>
+      </svg>
+      <div class="section-header-text">
+        <div class="section-label">Stage One</div>
+        <h2 class="section-title">Group Stage</h2>
+        <p class="section-desc">12 groups of 4 teams. The top 2 from each group, plus the 8 best third-placed teams, advance.</p>
+      </div>
+    </div>
 
-      <div class="t-event fade-up">
-        <div class="t-dot" aria-hidden="true"></div>
-        <div class="t-date">June 11, 2026</div>
-        <div class="t-title">Opening Match</div>
-        <div class="t-desc">Estadio Azteca, Mexico City — The world holds its breath as the 48-nation tournament begins.</div>
+    <div class="groups-grid" role="list" aria-label="Tournament groups">
+
+      <div class="group-card reveal" role="listitem" aria-label="Group A">
+        <div class="group-letter" aria-hidden="true">A</div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇺🇸</span><span class="team-name">United States</span><span class="team-rank">#13</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class="team-name">England</span><span class="team-rank">#5</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇵🇦</span><span class="team-name">Panama</span><span class="team-rank">#43</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇸🇳</span><span class="team-name">Senegal</span><span class="team-rank">#21</span></div>
       </div>
 
-      <div class="t-event fade-up">
-        <div class="t-dot" aria-hidden="true"></div>
-        <div class="t-date">June 11 – July 2, 2026</div>
-        <div class="t-title">Group Stage</div>
-        <div class="t-desc">48 nations, 12 groups, 64 matches — every point matters in the race to qualify.</div>
+      <div class="group-card reveal" role="listitem" aria-label="Group B">
+        <div class="group-letter" aria-hidden="true">B</div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇦🇷</span><span class="team-name">Argentina</span><span class="team-rank">#1</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇫🇷</span><span class="team-name">France</span><span class="team-rank">#2</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇨🇱</span><span class="team-name">Chile</span><span class="team-rank">#37</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇳🇬</span><span class="team-name">Nigeria</span><span class="team-rank">#28</span></div>
       </div>
 
-      <div class="t-event fade-up">
-        <div class="t-dot" aria-hidden="true"></div>
-        <div class="t-date">July 4–9, 2026</div>
-        <div class="t-title">Round of 32</div>
-        <div class="t-desc">Knockout football begins — one result, one chance, one dream on the line.</div>
+      <div class="group-card reveal" role="listitem" aria-label="Group C">
+        <div class="group-letter" aria-hidden="true">C</div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇧🇷</span><span class="team-name">Brazil</span><span class="team-rank">#4</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇩🇪</span><span class="team-name">Germany</span><span class="team-rank">#12</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇨🇴</span><span class="team-name">Colombia</span><span class="team-rank">#9</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇯🇵</span><span class="team-name">Japan</span><span class="team-rank">#17</span></div>
       </div>
 
-      <div class="t-event fade-up">
-        <div class="t-dot" aria-hidden="true"></div>
-        <div class="t-date">July 11–14, 2026</div>
-        <div class="t-title">Round of 16 &amp; Quarter-Finals</div>
-        <div class="t-desc">The last 16 battle it out — eight nations will be eliminated over four incredible days.</div>
+      <div class="group-card reveal" role="listitem" aria-label="Group D">
+        <div class="group-letter" aria-hidden="true">D</div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇪🇸</span><span class="team-name">Spain</span><span class="team-rank">#7</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇵🇹</span><span class="team-name">Portugal</span><span class="team-rank">#6</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇲🇽</span><span class="team-name">Mexico</span><span class="team-rank">#15</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇰🇷</span><span class="team-name">South Korea</span><span class="team-rank">#23</span></div>
       </div>
 
-      <div class="t-event fade-up">
-        <div class="t-dot" aria-hidden="true"></div>
-        <div class="t-date">July 18–19, 2026</div>
-        <div class="t-title">Semi-Finals</div>
-        <div class="t-desc">New York and Los Angeles host the last four — who survives to reach the Final?</div>
+      <div class="group-card reveal" role="listitem" aria-label="Group E">
+        <div class="group-letter" aria-hidden="true">E</div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class="team-name">Netherlands</span><span class="team-rank">#8</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇺🇾</span><span class="team-name">Uruguay</span><span class="team-rank">#11</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇨🇦</span><span class="team-name">Canada</span><span class="team-rank">#48</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇲🇦</span><span class="team-name">Morocco</span><span class="team-rank">#14</span></div>
       </div>
 
-      <div class="t-event fade-up">
-        <div class="t-dot" aria-hidden="true"></div>
-        <div class="t-date">July 22, 2026</div>
-        <div class="t-title">Third Place Play-off</div>
-        <div class="t-desc">Two fallen giants compete for bronze — the last consolation prize of the tournament.</div>
-      </div>
-
-      <div class="t-event fade-up">
-        <div class="t-dot" aria-hidden="true"></div>
-        <div class="t-date">July 23, 2026 <span aria-hidden="true">🏆</span></div>
-        <div class="t-title">THE FINAL</div>
-        <div class="t-desc">MetLife Stadium, East Rutherford, New Jersey — the greatest stage in world football.</div>
+      <div class="group-card reveal" role="listitem" aria-label="Group F">
+        <div class="group-letter" aria-hidden="true">F</div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇧🇪</span><span class="team-name">Belgium</span><span class="team-rank">#3</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇨🇷</span><span class="team-name">Croatia</span><span class="team-rank">#10</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇪🇨</span><span class="team-name">Ecuador</span><span class="team-rank">#30</span></div>
+        <div class="group-team"><span class="team-flag" aria-hidden="true">🇬🇭</span><span class="team-name">Ghana</span><span class="team-rank">#56</span></div>
       </div>
 
     </div>
   </div>
 </section>
 
-<!-- =====================================================
-     SECTION 9 — MATCH PREDICTOR
-     ===================================================== -->
-<section id="predictor" aria-labelledby="predictor-heading">
-  <div class="section-inner" style="text-align:center;">
-    <span class="section-label fade-left">Interactive</span>
-    <h2 class="section-heading fade-left" id="predictor-heading">WHO WINS <em>TODAY?</em></h2>
-    <p class="section-sub fade-left" style="margin:0 auto 0;">Pick a scoreline for the Argentina vs France showdown and see your prediction.</p>
-
-    <div class="predictor-card fade-up">
-      <div class="predictor-match">
-        <div class="predictor-team">
-          <span class="predictor-team-flag" aria-hidden="true">🇦🇷</span>
-          <span class="predictor-team-name">Argentina</span>
-        </div>
-        <span class="predictor-vs" aria-hidden="true">VS</span>
-        <div class="predictor-team">
-          <span class="predictor-team-flag" aria-hidden="true">🇫🇷</span>
-          <span class="predictor-team-name">France</span>
-        </div>
+<!-- ═══ PLAYERS ═══════════════════════════════════════════════════════ -->
+<section id="players" aria-label="Star players to watch">
+  <div class="container">
+    <div class="section-header reveal">
+      <svg class="logo-section" aria-hidden="true" focusable="false">
+        <use href="#wc2026-logo"/>
+      </svg>
+      <div class="section-header-text">
+        <div class="section-label">Stars</div>
+        <h2 class="section-title">Players to Watch</h2>
+        <p class="section-desc">World-class talent destined to define the 2026 tournament.</p>
       </div>
+    </div>
 
-      <p class="predictor-instruction">Pick your predicted score:</p>
+    <div class="players-filter" role="group" aria-label="Filter players by position">
+      <button class="filter-btn active" data-filter="all" aria-pressed="true">All Players</button>
+      <button class="filter-btn" data-filter="FWD" aria-pressed="false">Forwards</button>
+      <button class="filter-btn" data-filter="MID" aria-pressed="false">Midfield</button>
+      <button class="filter-btn" data-filter="DEF" aria-pressed="false">Defence</button>
+      <button class="filter-btn" data-filter="GK" aria-pressed="false">Goalkeepers</button>
+    </div>
 
-      <div class="score-buttons" role="radiogroup" aria-label="Predicted score">
-        <button class="score-btn" role="radio" aria-pressed="false" data-score="1-0" onclick="pickScore(this,'1-0')">1–0</button>
-        <button class="score-btn" role="radio" aria-pressed="false" data-score="2-0" onclick="pickScore(this,'2-0')">2–0</button>
-        <button class="score-btn" role="radio" aria-pressed="false" data-score="1-1" onclick="pickScore(this,'1-1')">1–1</button>
-        <button class="score-btn" role="radio" aria-pressed="false" data-score="2-1" onclick="pickScore(this,'2-1')">2–1</button>
-        <button class="score-btn" role="radio" aria-pressed="false" data-score="0-1" onclick="pickScore(this,'0-1')">0–1</button>
-        <button class="score-btn" role="radio" aria-pressed="false" data-score="0-2" onclick="pickScore(this,'0-2')">0–2</button>
-        <button class="score-btn" role="radio" aria-pressed="false" data-score="3-1" onclick="pickScore(this,'3-1')">3–1</button>
-        <button class="score-btn" role="radio" aria-pressed="false" data-score="1-3" onclick="pickScore(this,'1-3')">1–3</button>
-      </div>
+    <div class="players-grid" id="players-grid" role="list" aria-label="Player cards">
 
-      <button class="predict-submit" id="predict-submit" type="button" onclick="submitPrediction()">LOCK IN PREDICTION</button>
-      <p id="predict-result" aria-live="polite" aria-atomic="true"></p>
+      <article class="player-card reveal" data-pos="FWD" role="listitem" tabindex="0" aria-label="Lionel Messi, Forward, Argentina">
+        <div class="player-avatar" aria-hidden="true">⚽<span class="player-number">10</span></div>
+        <div class="player-body">
+          <div class="player-name">Lionel Messi</div>
+          <div class="player-meta"><span>🇦🇷 Argentina</span><span>Inter Miami CF</span></div>
+          <span class="player-pos">FWD</span>
+        </div>
+      </article>
+
+      <article class="player-card reveal" data-pos="FWD" role="listitem" tabindex="0" aria-label="Kylian Mbappé, Forward, France">
+        <div class="player-avatar" aria-hidden="true">⚡<span class="player-number">10</span></div>
+        <div class="player-body">
+          <div class="player-name">Kylian Mbappé</div>
+          <div class="player-meta"><span>🇫🇷 France</span><span>Real Madrid</span></div>
+          <span class="player-pos">FWD</span>
+        </div>
+      </article>
+
+      <article class="player-card reveal" data-pos="FWD" role="listitem" tabindex="0" aria-label="Erling Haaland, Forward, Norway">
+        <div class="player-avatar" aria-hidden="true">💪<span class="player-number">9</span></div>
+        <div class="player-body">
+          <div class="player-name">Erling Haaland</div>
+          <div class="player-meta"><span>🇳🇴 Norway</span><span>Man City</span></div>
+          <span class="player-pos">FWD</span>
+        </div>
+      </article>
+
+      <article class="player-card reveal" data-pos="FWD" role="listitem" tabindex="0" aria-label="Vinícius Jr., Forward, Brazil">
+        <div class="player-avatar" aria-hidden="true">🌟<span class="player-number">7</span></div>
+        <div class="player-body">
+          <div class="player-name">Vinícius Jr.</div>
+          <div class="player-meta"><span>🇧🇷 Brazil</span><span>Real Madrid</span></div>
+          <span class="player-pos">FWD</span>
+        </div>
+      </article>
+
+      <article class="player-card reveal" data-pos="MID" role="listitem" tabindex="0" aria-label="Pedri, Midfielder, Spain">
+        <div class="player-avatar" aria-hidden="true">🎯<span class="player-number">8</span></div>
+        <div class="player-body">
+          <div class="player-name">Pedri</div>
+          <div class="player-meta"><span>🇪🇸 Spain</span><span>FC Barcelona</span></div>
+          <span class="player-pos">MID</span>
+        </div>
+      </article>
+
+      <article class="player-card reveal" data-pos="MID" role="listitem" tabindex="0" aria-label="Jude Bellingham, Midfielder, England">
+        <div class="player-avatar" aria-hidden="true">🦅<span class="player-number">10</span></div>
+        <div class="player-body">
+          <div class="player-name">Jude Bellingham</div>
+          <div class="player-meta"><span>🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</span><span>Real Madrid</span></div>
+          <span class="player-pos">MID</span>
+        </div>
+      </article>
+
+      <article class="player-card reveal" data-pos="DEF" role="listitem" tabindex="0" aria-label="Rúben Dias, Defender, Portugal">
+        <div class="player-avatar" aria-hidden="true">🛡️<span class="player-number">4</span></div>
+        <div class="player-body">
+          <div class="player-name">Rúben Dias</div>
+          <div class="player-meta"><span>🇵🇹 Portugal</span><span>Man City</span></div>
+          <span class="player-pos">DEF</span>
+        </div>
+      </article>
+
+      <article class="player-card reveal" data-pos="GK" role="listitem" tabindex="0" aria-label="Alisson Becker, Goalkeeper, Brazil">
+        <div class="player-avatar" aria-hidden="true">🧤<span class="player-number">1</span></div>
+        <div class="player-body">
+          <div class="player-name">Alisson Becker</div>
+          <div class="player-meta"><span>🇧🇷 Brazil</span><span>Liverpool FC</span></div>
+          <span class="player-pos">GK</span>
+        </div>
+      </article>
+
     </div>
   </div>
 </section>
 
-<!-- =====================================================
-     SECTION 10 — FOOTER
-     ===================================================== -->
-<footer id="footer" role="contentinfo">
-  <div class="footer-logo-wrap" aria-hidden="true">
-    <svg class="logo-footer" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg" style="width:80px;" aria-hidden="true">
-      <defs>
-        <linearGradient id="goldGrad-f" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#f5d675"/>
-          <stop offset="50%" stop-color="#c9a227"/>
-          <stop offset="100%" stop-color="#a07a10"/>
-        </linearGradient>
-        <radialGradient id="trophyGrad-f" cx="50%" cy="35%" r="55%">
-          <stop offset="0%" stop-color="#f5e88a"/>
-          <stop offset="100%" stop-color="#c9a227"/>
-        </radialGradient>
-        <filter id="trophyShadow-f">
-          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#c9a227" flood-opacity="0.7"/>
-        </filter>
-      </defs>
-      <rect width="280" height="380" rx="4" fill="#0a1628"/>
-      <rect x="1" y="1" width="278" height="378" rx="4" fill="none" stroke="#c9a227" stroke-width="2"/>
-      <g fill="url(#goldGrad-f)">
-        <rect x="60" y="28" width="160" height="22" rx="3"/>
-        <rect x="172" y="28" width="48" height="80" rx="3"/>
-        <rect x="60" y="88" width="160" height="22" rx="3"/>
-        <rect x="60" y="88" width="48" height="80" rx="3"/>
-        <rect x="60" y="148" width="160" height="22" rx="3"/>
-      </g>
-      <g fill="url(#goldGrad-f)">
-        <rect x="60" y="192" width="160" height="22" rx="3"/>
-        <rect x="60" y="192" width="48" height="80" rx="3"/>
-        <rect x="60" y="252" width="160" height="22" rx="3"/>
-        <rect x="172" y="252" width="48" height="80" rx="3"/>
-        <rect x="60" y="312" width="160" height="22" rx="3"/>
-      </g>
-      <g filter="url(#trophyShadow-f)" fill="url(#trophyGrad-f)">
-        <rect x="116" y="316" width="48" height="18" rx="2"/>
-        <rect x="108" y="306" width="64" height="14" rx="2"/>
-        <rect x="124" y="210" width="32" height="96" rx="3"/>
-        <ellipse cx="140" cy="205" rx="52" ry="36"/>
-        <ellipse cx="140" cy="185" rx="40" ry="28"/>
-        <path d="M106 185 Q88 175 84 155 Q80 135 106 130 L106 185Z"/>
-        <path d="M174 185 Q192 175 196 155 Q200 135 174 130 L174 185Z"/>
-        <circle cx="118" cy="118" r="10"/>
-        <circle cx="162" cy="118" r="10"/>
-        <circle cx="140" cy="88" r="14"/>
-      </g>
-      <text x="140" y="354" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="38" fill="#ffffff" letter-spacing="4">FIFA</text>
-      <text x="140" y="372" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" fill="#b0b8c8" letter-spacing="1.5">CANADA · MEXICO · USA</text>
-    </svg>
+<!-- ═══ TIMELINE ══════════════════════════════════════════════════════ -->
+<section id="timeline" aria-label="Tournament timeline">
+  <div class="container">
+    <div class="section-header reveal">
+      <svg class="logo-section" aria-hidden="true" focusable="false">
+        <use href="#wc2026-logo"/>
+      </svg>
+      <div class="section-header-text">
+        <div class="section-label">Schedule</div>
+        <h2 class="section-title">Tournament Timeline</h2>
+        <p class="section-desc">Key milestones from the opening whistle to the Final.</p>
+      </div>
+    </div>
+
+    <div class="timeline-line" role="list" aria-label="Tournament timeline events">
+
+      <div class="tl-item reveal" role="listitem">
+        <div class="tl-date">June 11, 2026</div>
+        <div class="tl-title">🏟️ Opening Ceremony &amp; First Match</div>
+        <div class="tl-desc">The curtain rises at MetLife Stadium, New York/New Jersey. The USA kicks off the most-watched sporting event in history against a yet-to-be-confirmed opponent.</div>
+      </div>
+
+      <div class="tl-item reveal" role="listitem">
+        <div class="tl-date">June 11 – July 2, 2026</div>
+        <div class="tl-title">⚽ Group Stage — 12 Groups</div>
+        <div class="tl-desc">48 teams compete across 12 groups of 4. The top 2 from each group plus the 8 best third-placed teams qualify for the Round of 32.</div>
+      </div>
+
+      <div class="tl-item reveal" role="listitem">
+        <div class="tl-date">July 4 – July 9, 2026</div>
+        <div class="tl-title">🏆 Round of 32 (First Knockout Round)</div>
+        <div class="tl-desc">For the first time in World Cup history, 32 teams enter the knockout round — an unprecedented expansion of drama and upsets.</div>
+      </div>
+
+      <div class="tl-item reveal" role="listitem">
+        <div class="tl-date">July 10 – July 13, 2026</div>
+        <div class="tl-title">⚡ Round of 16</div>
+        <div class="tl-desc">16 survivors battle for a quarter-final place. This is where legends are made and fairy-tales end.</div>
+      </div>
+
+      <div class="tl-item reveal" role="listitem">
+        <div class="tl-date">July 14 – July 15, 2026</div>
+        <div class="tl-title">🔥 Quarter-Finals</div>
+        <div class="tl-desc">The elite 8 clash across prime stadiums in all three host nations, bringing the tournament to its most electric phase.</div>
+      </div>
+
+      <div class="tl-item reveal" role="listitem">
+        <div class="tl-date">July 17 – July 18, 2026</div>
+        <div class="tl-title">🌟 Semi-Finals</div>
+        <div class="tl-desc">Four teams, two matches. The world watches to see who will contest football's ultimate prize on July 19.</div>
+      </div>
+
+      <div class="tl-item reveal" role="listitem">
+        <div class="tl-date">July 19, 2026</div>
+        <div class="tl-title">🏅 The Final — MetLife Stadium</div>
+        <div class="tl-desc">Two nations. One trophy. One moment of glory. The FIFA World Cup 2026 Final at MetLife Stadium, East Rutherford, New Jersey — the greatest match on Earth.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PREDICTOR ══════════════════════════════════════════════════════ -->
+<section id="predictor" aria-label="Match score predictor">
+  <div class="container">
+    <div class="section-header reveal">
+      <svg class="logo-section" aria-hidden="true" focusable="false">
+        <use href="#wc2026-logo"/>
+      </svg>
+      <div class="section-header-text">
+        <div class="section-label">Interactive</div>
+        <h2 class="section-title">Score Predictor</h2>
+        <p class="section-desc">Pick your matchup and get a simulated score prediction.</p>
+      </div>
+    </div>
+
+    <div class="predictor-card reveal" role="form" aria-label="Score predictor form">
+      <!-- Logo centred at top of predictor card -->
+      <div class="predictor-logo-wrap" aria-hidden="true">
+        <svg class="logo-section" aria-hidden="true" focusable="false">
+          <use href="#wc2026-logo"/>
+        </svg>
+      </div>
+      <h3 class="predictor-title">Predict the Score</h3>
+      <p class="predictor-subtitle">Who will win? Let the algorithm decide.</p>
+
+      <form class="predictor-form" id="predictor-form" aria-label="Match predictor" novalidate>
+        <div class="vs-row">
+          <div class="form-group">
+            <label class="form-label" for="team-a">Home Team</label>
+            <select class="form-select" id="team-a" name="teamA" required aria-required="true">
+              <option value="" disabled selected>Select team…</option>
+              <option value="Argentina">🇦🇷 Argentina</option>
+              <option value="France">🇫🇷 France</option>
+              <option value="Brazil">🇧🇷 Brazil</option>
+              <option value="Spain">🇪🇸 Spain</option>
+              <option value="England">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</option>
+              <option value="Germany">🇩🇪 Germany</option>
+              <option value="Portugal">🇵🇹 Portugal</option>
+              <option value="Netherlands">🇳🇱 Netherlands</option>
+              <option value="Belgium">🇧🇪 Belgium</option>
+              <option value="Croatia">🇭🇷 Croatia</option>
+              <option value="USA">🇺🇸 USA</option>
+              <option value="Mexico">🇲🇽 Mexico</option>
+              <option value="Canada">🇨🇦 Canada</option>
+              <option value="Morocco">🇲🇦 Morocco</option>
+              <option value="Senegal">🇸🇳 Senegal</option>
+              <option value="Japan">🇯🇵 Japan</option>
+            </select>
+          </div>
+          <div class="vs-label" aria-hidden="true">VS</div>
+          <div class="form-group">
+            <label class="form-label" for="team-b">Away Team</label>
+            <select class="form-select" id="team-b" name="teamB" required aria-required="true">
+              <option value="" disabled selected>Select team…</option>
+              <option value="Argentina">🇦🇷 Argentina</option>
+              <option value="France">🇫🇷 France</option>
+              <option value="Brazil">🇧🇷 Brazil</option>
+              <option value="Spain">🇪🇸 Spain</option>
+              <option value="England">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</option>
+              <option value="Germany">🇩🇪 Germany</option>
+              <option value="Portugal">🇵🇹 Portugal</option>
+              <option value="Netherlands">🇳🇱 Netherlands</option>
+              <option value="Belgium">🇧🇪 Belgium</option>
+              <option value="Croatia">🇭🇷 Croatia</option>
+              <option value="USA">🇺🇸 USA</option>
+              <option value="Mexico">🇲🇽 Mexico</option>
+              <option value="Canada">🇨🇦 Canada</option>
+              <option value="Morocco">🇲🇦 Morocco</option>
+              <option value="Senegal">🇸🇳 Senegal</option>
+              <option value="Japan">🇯🇵 Japan</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="match-stage">Match Stage</label>
+          <select class="form-select" id="match-stage" name="stage">
+            <option value="group">Group Stage</option>
+            <option value="r32">Round of 32</option>
+            <option value="r16">Round of 16</option>
+            <option value="qf">Quarter-Final</option>
+            <option value="sf">Semi-Final</option>
+            <option value="final">The Final</option>
+          </select>
+        </div>
+        <button type="submit" class="predict-btn" aria-label="Generate score prediction">
+          ⚽ Generate Prediction
+        </button>
+      </form>
+
+      <div class="predictor-result" id="predictor-result" aria-live="polite" aria-atomic="true" role="status">
+        <div class="result-score" id="result-score" aria-label="Predicted score"></div>
+        <div class="result-teams" id="result-teams"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════════════ -->
+<footer role="contentinfo" aria-label="Site footer">
+  <div class="footer-grid">
+
+    <div class="footer-brand">
+      <div class="footer-brand-inner">
+        <svg class="logo-footer" aria-label="FIFA World Cup 2026 Logo" focusable="false">
+          <use href="#wc2026-logo"/>
+        </svg>
+        <div class="footer-brand-text">
+          <span class="footer-brand-title">World Cup 2026</span>
+          <span class="footer-brand-sub">USA · Canada · Mexico</span>
+        </div>
+      </div>
+      <p class="footer-tagline">The greatest show on Earth. 48 nations. 3 countries. One golden trophy. We Are 26.</p>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Tournament</div>
+      <ul class="footer-links">
+        <li><a href="#venues">Host Venues</a></li>
+        <li><a href="#groups">Group Stage</a></li>
+        <li><a href="#timeline">Timeline</a></li>
+        <li><a href="#players">Star Players</a></li>
+        <li><a href="#predictor">Score Predictor</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Host Nations</div>
+      <ul class="footer-links">
+        <li><a href="#venues">🇺🇸 United States</a></li>
+        <li><a href="#venues">🇨🇦 Canada</a></li>
+        <li><a href="#venues">🇲🇽 Mexico</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Information</div>
+      <ul class="footer-links">
+        <li><a href="https://www.fifa.com" target="_blank" rel="noopener noreferrer">FIFA.com ↗</a></li>
+        <li><a href="#countdown">Countdown</a></li>
+        <li><a href="#stats">Statistics</a></li>
+      </ul>
+    </div>
+
   </div>
 
-  <ul class="footer-links" role="list">
-    <li><a href="#venues">Venues</a></li>
-    <li><a href="#groups">Groups</a></li>
-    <li><a href="#players">Stars</a></li>
-    <li><a href="#schedule">Schedule</a></li>
-    <li><a href="#predictor">Predictor</a></li>
-  </ul>
-
-  <div class="footer-flags" aria-label="Host nations: United States, Canada, Mexico">
-    <span aria-hidden="true">🇺🇸</span>
-    <span aria-hidden="true">🇨🇦</span>
-    <span aria-hidden="true">🇲🇽</span>
+  <div class="footer-bottom">
+    <div class="footer-logo-row">
+      <svg class="logo-nav" aria-label="FIFA World Cup 2026" focusable="false">
+        <use href="#wc2026-logo"/>
+      </svg>
+      <span style="font-family:'Bebas Neue',sans-serif;letter-spacing:.1em;color:var(--gold-mid);font-size:1rem">WE ARE 26</span>
+    </div>
+    <p class="footer-copy">
+      &copy; 2026 FIFA World Cup Fan Showcase. Built with ❤️ for the beautiful game.
+      <br><a href="https://www.fifa.com" target="_blank" rel="noopener noreferrer">Official site: fifa.com</a>
+    </p>
   </div>
-
-  <p class="footer-legal">
-    &copy; 2026 FIFA&trade; — This is a fan-made showcase for educational purposes.<br>
-    FIFA&trade; and FIFA World Cup&trade; are registered trademarks of Fédération Internationale de Football Association.
-  </p>
 </footer>
 
-<!-- =====================================================
-     JAVASCRIPT
-     ===================================================== -->
+<!-- ─── BACK TO TOP ────────────────────────────────────────────────── -->
+<button class="back-top" id="back-top" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<!-- ═══ JAVASCRIPT ════════════════════════════════════════════════════ -->
 <script>
-(function() {
-  'use strict';
+'use strict';
 
-  /* =====================================================
-     CANVAS — ANIMATED FOOTBALLS
-     ===================================================== */
-  const canvas = document.getElementById('ball-canvas');
-  const ctx = canvas.getContext('2d');
-  let W = window.innerWidth;
-  let H = window.innerHeight;
-  canvas.width = W;
-  canvas.height = H;
+/* ── NAVBAR SCROLL ─────────────────────────────────────────────── */
+const navbar  = document.getElementById('navbar');
+const backTop = document.getElementById('back-top');
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  navbar.classList.toggle('scrolled', y > 60);
+  backTop.classList.toggle('show', y > 400);
+}, { passive: true });
 
-  const ballSizes = [16, 24, 32, 38, 44];
+backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-  function rand(min, max) {
-    return Math.random() * (max - min) + min;
+/* ── MOBILE NAV TOGGLE ─────────────────────────────────────────── */
+const navToggle = document.getElementById('nav-toggle');
+const navLinks  = document.getElementById('nav-links');
+
+navToggle.addEventListener('click', () => {
+  const open = navLinks.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', String(open));
+});
+
+// Close on link click
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  });
+});
+
+/* ── COUNTDOWN ─────────────────────────────────────────────────── */
+const TARGET_DATE = new Date('2026-06-11T19:00:00-04:00'); // MetLife, EDT
+
+function updateCountdown () {
+  const now  = new Date();
+  const diff = TARGET_DATE - now;
+
+  if (diff <= 0) {
+    ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => {
+      document.getElementById(id).textContent = '00';
+    });
+    return;
   }
 
-  function randSign() {
-    return Math.random() > 0.5 ? 1 : -1;
+  const days  = Math.floor(diff / 864e5);
+  const hours = Math.floor((diff % 864e5) / 36e5);
+  const mins  = Math.floor((diff % 36e5)  / 6e4);
+  const secs  = Math.floor((diff % 6e4)   / 1e3);
+
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('cd-days').textContent  = String(days);
+  document.getElementById('cd-hours').textContent = pad(hours);
+  document.getElementById('cd-mins').textContent  = pad(mins);
+  document.getElementById('cd-secs').textContent  = pad(secs);
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ── HERO CANVAS — football animation ─────────────────────────── */
+(function initCanvas () {
+  const canvas = document.getElementById('hero-canvas');
+  if (!canvas) return;
+  const ctx    = canvas.getContext('2d');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let W, H, balls;
+
+  function resize () {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
   }
 
-  const balls = ballSizes.map((r, i) => ({
-    x: rand(r, W - r),
-    y: rand(r, H - r),
-    vx: rand(0.4, 1.8) * randSign(),
-    vy: rand(0.4, 1.8) * randSign(),
-    r: r,
-    rot: rand(0, Math.PI * 2),
-    rotSpeed: rand(0.015, 0.03) * randSign()
-  }));
-
-  function pentagon(ctx, cx, cy, radius) {
-    ctx.beginPath();
-    for (let i = 0; i < 5; i++) {
-      const angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
-      const px = cx + radius * Math.cos(angle);
-      const py = cy + radius * Math.sin(angle);
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
+  function createBall () {
+    const r = 18 + Math.random() * 18;
+    return {
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      vx: (Math.random() - .5) * 1.4,
+      vy: (Math.random() - .5) * 1.4,
+      r,
+      rot: Math.random() * Math.PI * 2,
+      rotV: (Math.random() - .5) * .02,
+      alpha: .08 + Math.random() * .12
+    };
   }
 
-  function drawBall(ctx, ball) {
+  function initBalls () {
+    balls = Array.from({ length: 14 }, createBall);
+  }
+
+  function drawBall (b) {
     ctx.save();
-    ctx.translate(ball.x, ball.y);
-    ctx.rotate(ball.rot);
+    ctx.globalAlpha = b.alpha;
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.rot);
 
-    const r = ball.r;
-
-    // Shadow glow
-    ctx.shadowBlur = 14;
-    ctx.shadowColor = 'rgba(201,162,39,0.35)';
-
-    // Main circle
+    // White sphere
+    const grad = ctx.createRadialGradient(-b.r*.3, -b.r*.3, b.r*.05, 0, 0, b.r);
+    grad.addColorStop(0, 'rgba(255,255,255,.8)');
+    grad.addColorStop(1, 'rgba(200,200,200,.2)');
     ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(201,162,39,0.65)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Pentagon patch centers
-    const patchRadius = r * 0.52;
-    const pentSize = r * 0.2;
-
-    const patchCenters = [
-      [0, -patchRadius],
-      [patchRadius * Math.cos(-Math.PI / 10), patchRadius * Math.sin(-Math.PI / 10)],
-      [patchRadius * Math.cos(Math.PI * 0.3 - Math.PI / 10), patchRadius * Math.sin(Math.PI * 0.3 - Math.PI / 10)],
-      [-patchRadius * Math.cos(Math.PI * 0.3 - Math.PI / 10), patchRadius * Math.sin(Math.PI * 0.3 - Math.PI / 10)],
-      [-patchRadius * Math.cos(-Math.PI / 10), patchRadius * Math.sin(-Math.PI / 10)]
-    ];
-
-    // Lines from center patch to outer patches
-    ctx.strokeStyle = 'rgba(201,162,39,0.2)';
-    ctx.lineWidth = 0.7;
-    for (let i = 1; i < patchCenters.length; i++) {
-      ctx.beginPath();
-      ctx.moveTo(patchCenters[0][0], patchCenters[0][1]);
-      ctx.lineTo(patchCenters[i][0], patchCenters[i][1]);
-      ctx.stroke();
-    }
+    ctx.arc(0, 0, b.r, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
 
     // Pentagon patches
-    ctx.strokeStyle = 'rgba(201,162,39,0.4)';
-    ctx.lineWidth = 1.0;
-    for (const [px, py] of patchCenters) {
-      pentagon(ctx, px, py, pentSize);
+    ctx.strokeStyle = 'rgba(0,0,0,.5)';
+    ctx.lineWidth   = 1;
+    const patches = [
+      [0, 0],
+      [b.r * .55,  b.r * .2],
+      [b.r * .2,  -b.r * .55],
+      [-b.r * .5,  b.r * .35],
+      [-b.r * .5, -b.r * .25],
+    ];
+    patches.forEach(([px, py]) => {
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const a = (Math.PI * 2 * i / 5) - Math.PI / 2;
+        const side = b.r * .28;
+        const x = px + Math.cos(a) * side;
+        const y = py + Math.sin(a) * side;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fillStyle   = 'rgba(10,10,10,.65)';
+      ctx.fill();
       ctx.stroke();
-    }
+    });
 
     ctx.restore();
   }
 
-  let rafId = null;
-
-  function tick() {
+  function animate () {
     ctx.clearRect(0, 0, W, H);
-    for (const ball of balls) {
-      ball.x += ball.vx;
-      ball.y += ball.vy;
-      ball.rot += ball.rotSpeed;
-      // Edge wrap
-      if (ball.x < -ball.r)  ball.x = W + ball.r;
-      if (ball.x > W + ball.r) ball.x = -ball.r;
-      if (ball.y < -ball.r)  ball.y = H + ball.r;
-      if (ball.y > H + ball.r) ball.y = -ball.r;
-      drawBall(ctx, ball);
-    }
-    rafId = requestAnimationFrame(tick);
-  }
 
-  if (!reducedMotion) {
-    tick();
-  }
+    balls.forEach(b => {
+      b.x   += b.vx;
+      b.y   += b.vy;
+      b.rot += b.rotV;
 
-  window.addEventListener('resize', () => {
-    W = window.innerWidth;
-    H = window.innerHeight;
-    canvas.width = W;
-    canvas.height = H;
-  });
+      if (b.x + b.r < 0)  b.x = W + b.r;
+      if (b.x - b.r > W)  b.x = -b.r;
+      if (b.y + b.r < 0)  b.y = H + b.r;
+      if (b.y - b.r > H)  b.y = -b.r;
 
-  document.addEventListener('visibilitychange', () => {
-    if (reducedMotion) return;
-    if (document.hidden) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
-    } else {
-      if (!rafId) tick();
-    }
-  });
-
-  /* =====================================================
-     NAVIGATION — SCROLL + HAMBURGER
-     ===================================================== */
-  const nav = document.getElementById('main-nav');
-  const hamburger = document.getElementById('hamburger-btn');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const mobileMenuWrap = document.getElementById('mobile-menu-wrap');
-  let menuOpen = false;
-
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      nav.classList.add('scrolled');
-    } else {
-      nav.classList.remove('scrolled');
-    }
-  });
-
-  hamburger.addEventListener('click', () => {
-    menuOpen = !menuOpen;
-    mobileMenu.classList.toggle('open', menuOpen);
-    hamburger.setAttribute('aria-expanded', String(menuOpen));
-    mobileMenuWrap.setAttribute('aria-hidden', String(!menuOpen));
-    hamburger.textContent = menuOpen ? '✕' : '☰';
-  });
-
-  // Close menu when a mobile link is tapped
-  mobileMenu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      menuOpen = false;
-      mobileMenu.classList.remove('open');
-      hamburger.setAttribute('aria-expanded', 'false');
-      mobileMenuWrap.setAttribute('aria-hidden', 'true');
-      hamburger.textContent = '☰';
-    });
-  });
-
-  /* =====================================================
-     COUNTDOWN
-     ===================================================== */
-  const TARGET_DATE = new Date('2026-06-11T20:00:00Z').getTime();
-
-  function updateCountdown() {
-    const now = Date.now();
-    const diff = TARGET_DATE - now;
-
-    if (diff <= 0) {
-      document.getElementById('cd-days').textContent = '000';
-      document.getElementById('cd-hours').textContent = '00';
-      document.getElementById('cd-mins').textContent = '00';
-      document.getElementById('cd-secs').textContent = '00';
-      return;
-    }
-
-    const days    = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    document.getElementById('cd-days').textContent = String(days).padStart(3, '0');
-    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
-    document.getElementById('cd-mins').textContent = String(minutes).padStart(2, '0');
-    document.getElementById('cd-secs').textContent = String(seconds).padStart(2, '0');
-  }
-
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
-  /* =====================================================
-     LIVE SCORES TICKER
-     ===================================================== */
-  const tickerItems = [
-    { teams: 'Argentina vs France',    score: '2–1', status: 'LIVE', minute: "74'" },
-    { teams: 'Brazil vs Spain',        score: '1–1', status: 'LIVE', minute: "58'" },
-    { teams: 'Germany vs Japan',       score: '3–2', status: 'FT',   minute: null  },
-    { teams: 'Portugal vs Morocco',    score: '2–0', status: 'FT',   minute: null  },
-    { teams: 'England vs Netherlands', score: '1–0', status: 'LIVE', minute: "88'" },
-    { teams: 'USA vs Canada',          score: '0–0', status: 'LIVE', minute: "22'" },
-  ];
-
-  function buildTickerItem(item) {
-    const badgeHtml = item.status === 'LIVE'
-      ? `<span class="ticker-live live-badge-pulse" aria-hidden="true">${item.minute} LIVE</span>`
-      : `<span class="ticker-ft" aria-hidden="true">FT</span>`;
-    return `<div class="ticker-item">${item.teams} <span class="ticker-score">${item.score}</span>${badgeHtml}</div>`;
-  }
-
-  const track = document.getElementById('ticker-track');
-  const allItems = [...tickerItems, ...tickerItems]; // duplicate for seamless loop
-  track.innerHTML = allItems.map(buildTickerItem).join('');
-
-  /* =====================================================
-     STATS COUNT-UP
-     ===================================================== */
-  function easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
-  }
-
-  function animateCountUp(el, target, duration) {
-    const start = performance.now();
-    function step(now) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = easeOutCubic(progress);
-      el.textContent = Math.floor(eased * target);
-      if (progress < 1) requestAnimationFrame(step);
-      else el.textContent = target;
-    }
-    requestAnimationFrame(step);
-  }
-
-  const statsStrip = document.querySelector('.stats-strip');
-  let statsAnimated = false;
-
-  const statsObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !statsAnimated) {
-        statsAnimated = true;
-        statsObserver.unobserve(statsStrip);
-        document.querySelectorAll('[data-target]').forEach(el => {
-          const target = parseInt(el.dataset.target, 10);
-          animateCountUp(el, target, 1600);
-        });
-      }
-    });
-  }, { threshold: 0.2 });
-
-  if (statsStrip) statsObserver.observe(statsStrip);
-
-  /* =====================================================
-     GROUPS TOGGLE
-     ===================================================== */
-  const groupsToggle = document.getElementById('groups-toggle');
-  let groupsExpanded = false;
-
-  groupsToggle.addEventListener('click', () => {
-    groupsExpanded = !groupsExpanded;
-    document.querySelectorAll('.hidden-group').forEach(card => {
-      card.style.display = groupsExpanded ? 'block' : 'none';
-    });
-    groupsToggle.textContent = groupsExpanded ? 'SHOW LESS ↑' : 'VIEW ALL 12 GROUPS ↓';
-
-    // Re-observe newly visible cards
-    if (groupsExpanded) {
-      document.querySelectorAll('.hidden-group').forEach(card => {
-        scrollObserver.observe(card);
-      });
-    }
-  });
-
-  /* =====================================================
-     SCROLL ANIMATIONS
-     ===================================================== */
-  const scrollObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in-view');
-        scrollObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12 });
-
-  function initScrollObserver() {
-    // Stagger siblings within same parent
-    const fadeUpGroups = {};
-    document.querySelectorAll('.fade-up, .fade-left').forEach(el => {
-      const parent = el.parentElement;
-      if (!fadeUpGroups[parent]) fadeUpGroups[parent] = [];
-      fadeUpGroups[parent].push(el);
+      drawBall(b);
     });
 
-    Object.values(fadeUpGroups).forEach(siblings => {
-      siblings.forEach((el, i) => {
-        if (!reducedMotion) {
-          el.style.transitionDelay = `${i * 0.08}s`;
-        }
-        scrollObserver.observe(el);
-      });
-    });
+    if (!prefersReducedMotion) requestAnimationFrame(animate);
   }
 
-  initScrollObserver();
+  resize();
+  initBalls();
+  if (!prefersReducedMotion) {
+    animate();
+  } else {
+    // Draw static frame for reduced-motion users
+    balls.forEach(drawBall);
+  }
 
-  /* =====================================================
-     MATCH PREDICTOR
-     ===================================================== */
-  let selectedScore = null;
-
-  window.pickScore = function(btn, score) {
-    // Deactivate all
-    document.querySelectorAll('.score-btn').forEach(b => {
-      b.setAttribute('aria-pressed', 'false');
-    });
-    // Activate clicked
-    btn.setAttribute('aria-pressed', 'true');
-    selectedScore = score;
-
-    // Reset result if re-picking
-    const result = document.getElementById('predict-result');
-    result.classList.remove('visible');
-    const submitBtn = document.getElementById('predict-submit');
-    submitBtn.classList.remove('locked');
-    submitBtn.textContent = 'LOCK IN PREDICTION';
-  };
-
-  window.submitPrediction = function() {
-    const result = document.getElementById('predict-result');
-    const submitBtn = document.getElementById('predict-submit');
-
-    if (!selectedScore) {
-      result.textContent = 'Please pick a score first ⚽';
-      result.classList.add('visible');
-      return;
-    }
-
-    const [a, b] = selectedScore.split('-').map(Number);
-    let message = '';
-
-    if (a > b) {
-      message = '🇦🇷 Argentina win! The Albiceleste faithful will love you for that prediction.';
-    } else if (b > a) {
-      message = '🇫🇷 France take it! Vive la France — Les Bleus march on to glory.';
-    } else {
-      message = '⚖️ All square! You\'re predicting extra-time drama and possibly penalties.';
-    }
-
-    result.textContent = message;
-    result.classList.add('visible');
-    submitBtn.classList.add('locked');
-    submitBtn.textContent = '✓ Prediction Locked!';
-  };
-
+  const ro = new ResizeObserver(() => { resize(); initBalls(); });
+  ro.observe(canvas);
 })();
+
+/* ── INTERSECTION OBSERVER — scroll reveal + count-up ─────────── */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: .15, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* Count-up numbers */
+function countUp (el, target, duration = 1800) {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) { el.textContent = target; return; }
+
+  const start = performance.now();
+  function step (now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(ease * target);
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+const countObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      countUp(el, Number(el.dataset.target));
+      countObserver.unobserve(el);
+    }
+  });
+}, { threshold: .5 });
+
+document.querySelectorAll('.count-up').forEach(el => countObserver.observe(el));
+
+/* ── PLAYER FILTER ─────────────────────────────────────────────── */
+const filterBtns = document.querySelectorAll('.filter-btn');
+const playerGrid = document.getElementById('players-grid');
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed','true');
+
+    const filter = btn.dataset.filter;
+    playerGrid.querySelectorAll('.player-card').forEach(card => {
+      const show = filter === 'all' || card.dataset.pos === filter;
+      card.style.display = show ? '' : 'none';
+    });
+  });
+});
+
+/* ── SCORE PREDICTOR ───────────────────────────────────────────── */
+const predictorForm   = document.getElementById('predictor-form');
+const predictorResult = document.getElementById('predictor-result');
+const resultScore     = document.getElementById('result-score');
+const resultTeams     = document.getElementById('result-teams');
+
+// Simple weighted random with FIFA ranking bias
+const STRENGTH = {
+  Argentina: 10, France: 9, Brazil: 9, Spain: 8, England: 7,
+  Germany: 7, Portugal: 7, Netherlands: 7, Belgium: 8, Croatia: 7,
+  USA: 5, Mexico: 5, Canada: 4, Morocco: 6, Senegal: 5, Japan: 5
+};
+
+function simGoals (strengthA, strengthB) {
+  const λA = (strengthA / (strengthA + strengthB)) * 2.8;
+  const λB = (strengthB / (strengthA + strengthB)) * 2.8;
+  const poisson = λ => {
+    let L = Math.exp(-λ), k = 0, p = 1;
+    do { k++; p *= Math.random(); } while (p > L);
+    return k - 1;
+  };
+  return [poisson(λA), poisson(λB)];
+}
+
+predictorForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const teamA = document.getElementById('team-a').value;
+  const teamB = document.getElementById('team-b').value;
+  const stage = document.getElementById('match-stage').value;
+
+  if (!teamA || !teamB) {
+    alert('Please select both teams before predicting.');
+    return;
+  }
+  if (teamA === teamB) {
+    alert('Please select two different teams.');
+    return;
+  }
+
+  const sA = STRENGTH[teamA] || 5;
+  const sB = STRENGTH[teamB] || 5;
+  const [gA, gB] = simGoals(sA, sB);
+
+  resultScore.textContent    = `${gA} – ${gB}`;
+  resultScore.setAttribute('aria-label', `Predicted score: ${teamA} ${gA}, ${teamB} ${gB}`);
+  resultTeams.textContent    = `${teamA} vs ${teamB}${stage !== 'group' ? ' · ' + stage.toUpperCase() : ''}`;
+  predictorResult.classList.add('show');
+  predictorResult.focus();
+});
+
 </script>
 </body>
 </html>

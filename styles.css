@@ -1,212 +1,133 @@
-:root {
-  --ball-size:            64px;
-  --kick-duration:        2s;
-  --idle-bounce-duration: 0.6s;
-  --idle-sway-duration:   1.0s;
-  --impact-duration:      0.15s;
-  --shadow-color:         rgba(0, 0, 0, 0.35);
+/* ═══════════════════════════════════════════════════════════════════
+   FIFA World Cup 2026 — styles.css
+   Supplementary stylesheet (index.html is self-contained;
+   this file provides additional overrides and component styles
+   for any external stylesheet consumers)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── LOGO SIZE CLASSES ────────────────────────────────────────── */
+.logo-hero {
+  width: 260px;
+  height: 260px;
+  display: block;
+  filter: drop-shadow(0 0 32px rgba(201, 162, 39, 0.55));
+  transition: filter 0.35s ease, transform 0.35s ease;
+}
+.logo-hero:hover {
+  filter: drop-shadow(0 0 48px rgba(245, 214, 117, 0.75));
 }
 
-/* ─── Layout ──────────────────────────────────────────────────── */
-body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: #1a5c2a;
-  overflow: hidden;
+.logo-nav {
+  width: 48px;
+  height: 48px;
+  display: block;
+  flex-shrink: 0;
+  transition: opacity 0.25s ease;
+}
+.logo-nav:hover {
+  opacity: 0.85;
 }
 
-#football-container {
-  position: relative;
-  width: 100vw;
+.logo-section {
+  width: 80px;
+  height: 80px;
+  display: block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 10px rgba(201, 162, 39, 0.3));
+}
+
+.logo-footer {
+  width: 120px;
   height: 120px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
+  display: block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 14px rgba(201, 162, 39, 0.35));
 }
 
-/* ─── Ball shadow ─────────────────────────────────────────────── */
-#ball-shadow {
+.logo-canvas {
+  width: 180px;
+  height: 180px;
   position: absolute;
-  bottom: 0;
-  left: 32px;
-  width: var(--ball-size);
-  height: 12px;
-  background: var(--shadow-color);
-  border-radius: 50%;
-  transform: translateX(-50%) scaleX(1);
-  transform-origin: center center;
-  filter: blur(4px);
-  transition: opacity 0.2s ease;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   pointer-events: none;
+  z-index: 10;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 24px rgba(201, 162, 39, 0.6));
 }
 
-/* ─── Ball base ───────────────────────────────────────────────── */
-.football {
-  position: absolute;
-  bottom: 8px;
-  left: 32px;
-  width: var(--ball-size);
-  height: var(--ball-size);
-  font-size: var(--ball-size);
-  line-height: 1;
-  cursor: pointer;
-  user-select: none;
-  transform-origin: center center;
-  will-change: transform, opacity;
+/* ─── RESPONSIVE LOGO SCALING ──────────────────────────────────── */
+@media (max-width: 1024px) {
+  .logo-hero    { width: 220px; height: 220px; }
+  .logo-section { width: 70px;  height: 70px; }
 }
 
-/* ─── IDLE state ──────────────────────────────────────────────── */
-.football.idle {
-  opacity: 1;
-  pointer-events: auto;
-  animation:
-    idleBounce var(--idle-bounce-duration) ease-in-out infinite alternate,
-    idleSway   var(--idle-sway-duration)   ease-in-out infinite alternate;
+@media (max-width: 768px) {
+  .logo-hero    { width: 180px; height: 180px; }
+  .logo-section { width: 60px;  height: 60px; }
+  .logo-footer  { width: 90px;  height: 90px; }
+  .logo-canvas  { width: 130px; height: 130px; }
 }
 
-.football.idle ~ #ball-shadow {
-  animation: idleShadow var(--idle-bounce-duration) ease-in-out infinite alternate;
+@media (max-width: 480px) {
+  .logo-hero    { width: 140px; height: 140px; }
+  .logo-nav     { width: 38px;  height: 38px; }
+  .logo-section { width: 50px;  height: 50px; }
+  .logo-footer  { width: 72px;  height: 72px; }
+  .logo-canvas  { width: 110px; height: 110px; }
 }
 
-@keyframes idleBounce {
-  0%   { transform: translateY(0)    rotate(-4deg) scaleY(1.00); }
-  30%  { transform: translateY(-18px) rotate(0deg)  scaleY(1.05); }
-  70%  { transform: translateY(-22px) rotate(2deg)  scaleY(1.05); }
-  100% { transform: translateY(0)    rotate(4deg)  scaleY(0.92); }
+@media (max-width: 375px) {
+  .logo-hero    { width: 120px; height: 120px; }
+  .logo-nav     { width: 34px;  height: 34px; }
+  .logo-section { width: 44px;  height: 44px; }
+  .logo-footer  { width: 60px;  height: 60px; }
 }
 
-@keyframes idleSway {
-  0%   { left: 28px; }
-  100% { left: 40px; }
-}
-
-@keyframes idleShadow {
-  0%   { transform: translateX(-50%) scaleX(1.0);  opacity: 0.8; }
-  30%  { transform: translateX(-50%) scaleX(0.6);  opacity: 0.45; }
-  70%  { transform: translateX(-50%) scaleX(0.5);  opacity: 0.35; }
-  100% { transform: translateX(-50%) scaleX(1.05); opacity: 0.85; }
-}
-
-/* ─── KICK IMPACT flash (foot strikes ball) ───────────────────── */
-.football.kicked {
-  opacity: 1;
-  pointer-events: none;
-  animation:
-    kickImpact      var(--impact-duration)  ease-out forwards,
-    footballKickAcross var(--kick-duration) ease-in  forwards var(--impact-duration),
-    footballSpin       var(--kick-duration) linear   forwards var(--impact-duration);
-}
-
-.football.kicked ~ #ball-shadow {
-  animation: kickShadow var(--kick-duration) ease-in forwards var(--impact-duration);
-}
-
-@keyframes kickImpact {
-  0%   { transform: scale(0.80) rotate(0deg); }
-  50%  { transform: scale(1.35) rotate(-8deg); }
-  100% { transform: scale(1.00) rotate(0deg); }
-}
-
-/* Arc trajectory: rises to peak at 40%, falls back to ground */
-@keyframes footballKickAcross {
-  0%   {
-    left: 32px;
-    bottom: 8px;
-    transform: scaleX(0.9) scaleY(1.1);   /* squash on takeoff */
-  }
-  8%   {
-    transform: scaleX(1.15) scaleY(0.85); /* stretch as it launches */
-  }
-  15%  {
-    bottom: 55px;
-    transform: scaleX(1) scaleY(1);
-  }
-  40%  {
-    bottom: 105px;                         /* peak of arc */
-    transform: scaleX(1) scaleY(1);
-  }
-  65%  {
-    bottom: 55px;
-    transform: scaleX(1) scaleY(1);
-  }
-  85%  {
-    bottom: 14px;
-    transform: scaleX(1.1) scaleY(0.9);   /* start squash on descent */
-  }
-  92%  {
-    bottom: 2px;
-    left: calc(100vw - 80px);
-    transform: scaleX(1.25) scaleY(0.72); /* heavy squash on landing */
-  }
-  96%  {
-    bottom: 18px;                          /* small bounce */
-    left: calc(100vw - 74px);
-    transform: scaleX(0.95) scaleY(1.08);
-  }
-  100% {
-    bottom: 8px;
-    left: calc(100vw - 80px);
-    transform: scaleX(1) scaleY(1);
+/* ─── PREFERS REDUCED MOTION ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .logo-hero,
+  .logo-nav,
+  .logo-section,
+  .logo-footer,
+  .logo-canvas {
+    transition: none;
+    animation: none;
   }
 }
 
-/* Continuous 720° spin layered on top of translation */
-@keyframes footballSpin {
-  0%   { rotate: 0deg;   }
-  100% { rotate: 720deg; }
+/* ─── GOLD GRADIENT TEXT UTILITY ───────────────────────────────── */
+.text-gold {
+  background: linear-gradient(135deg, #f5d675 0%, #c9a227 50%, #a07a10 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Shadow grows as ball is near ground, shrinks at arc peak */
-@keyframes kickShadow {
-  0%   { left: 32px;              transform: translateX(-50%) scaleX(1.0);  opacity: 0.75; }
-  15%  { transform: translateX(-50%) scaleX(0.55); opacity: 0.40; }
-  40%  { left: 50vw;              transform: translateX(-50%) scaleX(0.25); opacity: 0.15; }
-  65%  { transform: translateX(-50%) scaleX(0.55); opacity: 0.40; }
-  85%  { transform: translateX(-50%) scaleX(0.9);  opacity: 0.70; }
-  92%  { left: calc(100vw - 80px); transform: translateX(-50%) scaleX(1.3);  opacity: 0.90; }
-  96%  { transform: translateX(-50%) scaleX(0.85); opacity: 0.65; }
-  100% { left: calc(100vw - 80px); transform: translateX(-50%) scaleX(1.0);  opacity: 0.75; }
+/* ─── SECTION DIVIDER ──────────────────────────────────────────── */
+.section-divider {
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #f5d675, #c9a227);
+  border-radius: 2px;
+  margin: 1rem 0 2rem;
 }
 
-/* ─── RESETTING state ─────────────────────────────────────────── */
-.football.resetting {
-  opacity: 0;
-  pointer-events: none;
-  left: 32px;
-  bottom: 8px;
-  animation: none;
-  transition: none;
+/* ─── CARD GOLD ACCENT ─────────────────────────────────────────── */
+.card-accent {
+  border-top: 3px solid #c9a227;
 }
 
-.football.resetting ~ #ball-shadow {
-  opacity: 0;
+/* ─── FOCUS RING OVERRIDE ──────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #c9a227;
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
-/* ─── FADE-IN DROP when returning to idle ─────────────────────── */
-.football.dropping {
-  opacity: 0;
-  pointer-events: none;
-  left: 32px;
-  animation: fadeInDrop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.football.dropping ~ #ball-shadow {
-  animation: shadowFadeIn 0.45s ease forwards;
-}
-
-@keyframes fadeInDrop {
-  0%   { opacity: 0; transform: translateY(-28px) scale(0.80); }
-  55%  { opacity: 1; transform: translateY(6px)   scale(1.08) scaleX(1.12) scaleY(0.88); }
-  75%  { transform: translateY(-6px) scale(0.97); }
-  90%  { transform: translateY(2px)  scale(1.02) scaleX(1.03) scaleY(0.98); }
-  100% { opacity: 1; transform: translateY(0)     scale(1.00); }
-}
-
-@keyframes shadowFadeIn {
-  0%   { opacity: 0;    transform: translateX(-50%) scaleX(0.4); }
-  55%  { opacity: 0.85; transform: translateX(-50%) scaleX(1.2); }
-  100% { opacity: 0.8;  transform: translateX(-50%) scaleX(1.0); }
+/* ─── SELECTION COLOR ──────────────────────────────────────────── */
+::selection {
+  background: rgba(201, 162, 39, 0.3);
+  color: #ffffff;
 }
