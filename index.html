@@ -1,23 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sample Football App</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Football App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Animated background layers -->
+    <div class="bg-gradient" aria-hidden="true"></div>
+    <div class="field-pattern" aria-hidden="true"></div>
 
-  <div id="football-container">
-    <!-- Ball -->
-    <div id="football" class="football idle" role="button" aria-label="Kick the football" tabindex="0">
-      ⚽
-    </div>
+    <!-- ===== HEADER ===== -->
+    <header class="site-header" role="banner">
+      <div class="header-inner">
+        <div class="logo-area">
+          <span class="logo-icon" aria-hidden="true">⚽</span>
+          <span class="logo-text">FootballApp</span>
+        </div>
+        <nav class="header-nav" aria-label="Primary navigation">
+          <button class="nav-btn active" data-view="game" aria-current="page">
+            Game
+          </button>
+          <button class="nav-btn" data-view="stats">Stats</button>
+        </nav>
+        <div class="header-badge">
+          <span class="badge-label">Season</span>
+          <span class="badge-value">2025</span>
+        </div>
+      </div>
+    </header>
 
-    <!-- Shadow — sized and animated by CSS to follow the ball's arc -->
-    <div id="ball-shadow"></div>
-  </div>
+    <!-- ===== MAIN ===== -->
+    <main class="main-content" id="main" role="main">
 
-  <script src="app.js"></script>
-</body>
+      <!-- Scoreboard / Stats Panel -->
+      <section class="scoreboard" aria-label="Scoreboard">
+        <div class="score-card" id="score-card-kicks">
+          <span class="score-value" id="kick-count" aria-live="polite" aria-atomic="true">0</span>
+          <span class="score-label">Kicks</span>
+        </div>
+        <div class="score-divider" aria-hidden="true">VS</div>
+        <div class="score-card" id="score-card-record">
+          <span class="score-value" id="record-count" aria-live="polite" aria-atomic="true">0</span>
+          <span class="score-label">Record</span>
+        </div>
+        <div class="score-divider score-divider--thin" aria-hidden="true"></div>
+        <div class="score-card" id="score-card-streak">
+          <span class="score-value" id="streak-count" aria-live="polite" aria-atomic="true">0</span>
+          <span class="score-label">Streak 🔥</span>
+        </div>
+      </section>
+
+      <!-- Status message -->
+      <p class="status-message" id="status-message" role="status" aria-live="polite">
+        Click the ball to kick!
+      </p>
+
+      <!-- Game Arena -->
+      <section class="arena" aria-label="Game arena">
+        <div class="arena-inner">
+          <!-- Ball + shadow -->
+          <div
+            class="football-wrapper"
+            id="football-wrapper"
+            role="button"
+            tabindex="0"
+            aria-label="Football — click to kick"
+          >
+            <div class="football" id="football" aria-hidden="true">⚽</div>
+            <div class="shadow" id="shadow" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <!-- Kick feedback burst -->
+        <div class="burst-container" id="burst-container" aria-hidden="true"></div>
+      </section>
+
+      <!-- Action bar -->
+      <div class="action-bar">
+        <button class="btn btn--primary" id="kick-btn" aria-label="Kick the football">
+          <span class="btn-icon">👟</span>
+          <span class="btn-text">Kick!</span>
+        </button>
+        <button class="btn btn--ghost" id="reset-btn" aria-label="Reset the game">
+          <span class="btn-icon">🔄</span>
+          <span class="btn-text">Reset</span>
+        </button>
+      </div>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer" role="contentinfo">
+      <p class="footer-text">
+        Built with <span aria-label="love">❤️</span> · FootballApp &copy; 2025
+      </p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+  </body>
 </html>

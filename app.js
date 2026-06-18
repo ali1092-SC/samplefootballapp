@@ -1,113 +1,274 @@
 /**
- * app.js — Football kick animation controller
+ * app.js — Football App UI logic
  *
- * State machine:  idle → kicked → resetting → dropping → idle
- *
- * Timing constants must stay in sync with CSS:
- *   KICK_DURATION_MS   ↔  --kick-duration       (2 s)
- *   IMPACT_DURATION_MS ↔  --impact-duration      (0.15 s)
- *   RESET_DELAY_MS     — pause while ball is invisible before drop-in
- *   DROP_DURATION_MS   ↔  fadeInDrop duration    (0.45 s)
+ * State managed here:
+ *  - kickCount   : total kicks this session
+ *  - record      : highest kick streak achieved
+ *  - streak      : consecutive kicks without reset
+ *  - isFlying    : ball currently in animation
  */
 
-const KICK_DURATION_MS   = 2000;   // total kick-across travel time
-const IMPACT_DURATION_MS = 150;    // kickImpact flash at start of kick
-const RESET_DELAY_MS     = 300;    // invisible pause before reappearing
-const DROP_DURATION_MS   = 450;    // fadeInDrop animation length
+// ─── DOM References ─────────────────────────────────────────────────────────
+const football        = document.getElementById('football');
+const footballWrapper = document.getElementById('football-wrapper');
+const shadow          = document.getElementById('shadow');
+const kickCountEl     = document.getElementById('kick-count');
+const recordCountEl   = document.getElementById('record-count');
+const streakCountEl   = document.getElementById('streak-count');
+const statusMessage   = document.getElementById('status-message');
+const kickBtn         = document.getElementById('kick-btn');
+const resetBtn        = document.getElementById('reset-btn');
+const burstContainer  = document.getElementById('burst-container');
 
-// ─── Element references ────────────────────────────────────────────────────
-const ball       = document.getElementById('football');
-const shadow     = document.getElementById('ball-shadow');
+// ─── State ───────────────────────────────────────────────────────────────────
+export let state = {
+  kickCount: 0,
+  record:    0,
+  streak:    0,
+  isFlying:  false,
+};
 
-if (!ball) {
-  console.error('[app.js] #football element not found — check index.html');
-}
+// ─── Constants ───────────────────────────────────────────────────────────────
+const PARTICLE_POOL   = ['⭐', '✨', '💫', '🌟', '🔥', '💥', '🎉'];
+const PARTICLE_COUNT  = 8;
+const STATUS_MESSAGES = [
+  'Nice kick! 🎯',
+  'Booom! 💥',
+  'What a strike! ⚡',
+  'Unstoppable! 🔥',
+  'In the net! 🥅',
+  'Thunderbolt! ⛈️',
+  'Legendary! 🌟',
+];
 
-// ─── State helpers ─────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Remove every state class and apply only the supplied ones.
- * @param {...string} classes
+ * Temporarily add a CSS class to an element, removing it after the
+ * animation completes (via animationend) or after a fallback timeout.
  */
-function applyState(...classes) {
-  ball.classList.remove('idle', 'kicked', 'resetting', 'dropping');
-  ball.classList.add(...classes);
+function addAnimClass(el, cls, fallbackMs = 1000) {
+  el.classList.remove(cls);
+  // Force reflow so removing + re-adding actually restarts the animation
+  void el.offsetWidth; // eslint-disable-line no-void
+  el.classList.add(cls);
+
+  return new Promise((resolve) => {
+    const cleanup = () => {
+      el.classList.remove(cls);
+      resolve();
+    };
+    const onEnd = (e) => {
+      if (e.target !== el) return;
+      el.removeEventListener('animationend', onEnd);
+      clearTimeout(timer);
+      cleanup();
+    };
+    const timer = setTimeout(() => {
+      el.removeEventListener('animationend', onEnd);
+      cleanup();
+    }, fallbackMs);
+    el.addEventListener('animationend', onEnd);
+  });
 }
 
-// ─── Public API ────────────────────────────────────────────────────────────
+/** Bump a score counter with a visual pop. */
+function bumpCounter(el, newValue) {
+  el.textContent = String(newValue);
+  el.classList.remove('bump');
+  void el.offsetWidth;
+  el.classList.add('bump');
+  setTimeout(() => el.classList.remove('bump'), 300);
+}
+
+/** Pick a random item from an array. */
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
 /**
- * Trigger a kick from the idle position.
- * Safe to call programmatically — guards against double-firing.
+ * Compute parabolic arc height for a normalised time t ∈ [0,1].
+ * Returns value in range [0, 1] — peaks at t = 0.5.
  */
-function kickFootball() {
-  if (!ball.classList.contains('idle')) return;
+export function parabolicHeight(t) {
+  return 4 * t * (1 - t);
+}
 
-  applyState('kicked');
+/**
+ * Compute spin angle (degrees) for a 720° rotation over t ∈ [0,1].
+ */
+export function spinAngle(t) {
+  return t * 720;
+}
 
-  // Total animation time = impact flash + kick-across travel
-  const totalKickMs = IMPACT_DURATION_MS + KICK_DURATION_MS;
+/**
+ * Squash value at landing (t = 1): scaleX grows, scaleY shrinks.
+ * Returns { scaleX, scaleY }.
+ */
+export function squashValues(t) {
+  const squash = 1 - Math.max(0, t);
+  return {
+    scaleX: 1 + 0.3 * (1 - squash),
+    scaleY: 1 - 0.3 * (1 - squash),
+  };
+}
 
-  // Listen for the main kick animation to end, then reset
-  // We use a one-shot listener keyed to the 'footballKickAcross' animation
-  function onKickEnd(e) {
-    if (e.animationName !== 'footballKickAcross') return;
-    ball.removeEventListener('animationend', onKickEnd);
-    resetFootball();
+/**
+ * Shadow scale — inversely proportional to ball height.
+ * At peak (height=1) shadow is tiny; at ground (height=0) shadow is full.
+ */
+export function shadowScale(height) {
+  return 1 - height * 0.75;
+}
+
+/** Spawn emoji particles around the arena centre. */
+function spawnParticles() {
+  burstContainer.innerHTML = '';
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const p = document.createElement('span');
+    p.className = 'particle';
+    p.textContent = pick(PARTICLE_POOL);
+    // Random angle spread
+    const angle  = (i / PARTICLE_COUNT) * 360 + (Math.random() * 30 - 15);
+    const dist   = 60 + Math.random() * 80;
+    const rad    = (angle * Math.PI) / 180;
+    const dx     = Math.round(Math.cos(rad) * dist);
+    const dy     = Math.round(Math.sin(rad) * dist);
+    p.style.setProperty('--p-end', `translate(${dx}px, ${dy}px)`);
+    // Place near centre of burst container
+    p.style.left = '50%';
+    p.style.top  = '50%';
+    p.style.transform = 'translate(-50%, -50%)';
+    burstContainer.appendChild(p);
+  }
+  // Clean up after animation
+  setTimeout(() => { burstContainer.innerHTML = ''; }, 900);
+}
+
+/** Update the status message text. */
+export function setStatus(msg, highlight = false) {
+  if (!statusMessage) return;
+  statusMessage.textContent = msg;
+  statusMessage.classList.toggle('highlight', highlight);
+}
+
+// ─── Core Kick Logic ─────────────────────────────────────────────────────────
+
+export async function kickBall() {
+  if (state.isFlying) return;
+
+  state.isFlying = true;
+  state.kickCount += 1;
+  state.streak   += 1;
+  if (state.streak > state.record) {
+    state.record = state.streak;
   }
 
-  ball.addEventListener('animationend', onKickEnd);
+  // Update counters
+  bumpCounter(kickCountEl, state.kickCount);
+  bumpCounter(streakCountEl, state.streak);
+  if (state.streak >= state.record) {
+    bumpCounter(recordCountEl, state.record);
+  }
 
-  // Safety fallback in case animationend misfires (e.g. tab hidden)
-  setTimeout(() => {
-    if (ball.classList.contains('kicked')) {
-      ball.removeEventListener('animationend', onKickEnd);
-      resetFootball();
-    }
-  }, totalKickMs + 200);
+  // Status feedback
+  const msg = state.streak >= 5
+    ? '🔥 On fire! ' + state.streak + ' in a row!'
+    : pick(STATUS_MESSAGES);
+  setStatus(msg, true);
+
+  // Disable kick button during flight
+  kickBtn.disabled = true;
+  kickBtn.setAttribute('aria-disabled', 'true');
+
+  // Remove idle animation
+  football.classList.remove('idle-bounce');
+
+  // Ripple on wrapper
+  footballWrapper.classList.add('ripple');
+  setTimeout(() => footballWrapper.classList.remove('ripple'), 600);
+
+  // Shadow shrinks as ball goes up
+  shadow.classList.add('shadow-small');
+
+  // Particles
+  spawnParticles();
+
+  // Fly!
+  await addAnimClass(football, 'flying', 1100);
+
+  // Landing squash
+  shadow.classList.remove('shadow-small');
+  shadow.classList.add('shadow-large');
+  await addAnimClass(football, 'squash', 300);
+  shadow.classList.remove('shadow-large');
+
+  // Re-enable
+  state.isFlying = false;
+  kickBtn.disabled = false;
+  kickBtn.removeAttribute('aria-disabled');
+
+  setStatus('Click the ball to kick!', false);
+
+  // Resume idle
+  football.classList.add('idle-bounce');
 }
 
-/**
- * Snap the ball back to its origin (invisible) then call setIdleState.
- * Can be called from any state to force a clean reset.
- */
-function resetFootball() {
-  applyState('resetting');
+export function resetGame() {
+  // Stop any flight
+  state.isFlying  = false;
+  state.kickCount = 0;
+  state.streak    = 0;
+  // Record persists as high score
 
-  setTimeout(() => {
-    dropInFootball();
-  }, RESET_DELAY_MS);
+  kickCountEl.textContent  = '0';
+  streakCountEl.textContent = '0';
+
+  kickBtn.disabled = false;
+  kickBtn.removeAttribute('aria-disabled');
+
+  setStatus('Click the ball to kick!', false);
+  football.classList.remove('flying', 'squash', 'stretch', 'idle-bounce');
+  shadow.classList.remove('shadow-small', 'shadow-large');
+
+  // Drop ball back in
+  addAnimClass(football, 'drop-in', 800).then(() => {
+    football.classList.add('idle-bounce');
+  });
 }
 
-/**
- * Play the drop-in animation then hand off to setIdleState.
- * Intermediate step between resetting and idle.
- */
-function dropInFootball() {
-  applyState('dropping');
+// ─── Event Listeners ─────────────────────────────────────────────────────────
 
-  setTimeout(() => {
-    setIdleState();
-  }, DROP_DURATION_MS);
-}
-
-/**
- * Put the ball directly into idle (bouncing/swaying) state.
- * Skips the drop-in — useful for programmatic resets.
- */
-function setIdleState() {
-  applyState('idle');
-}
-
-// ─── Event binding ─────────────────────────────────────────────────────────
-
-if (ball) {
-  ball.addEventListener('click', kickFootball);
-}
-
-// ─── Boot ──────────────────────────────────────────────────────────────────
-
-// Ensure the ball starts in idle on page load regardless of HTML class attr
-window.addEventListener('DOMContentLoaded', () => {
-  setIdleState();
+footballWrapper.addEventListener('click', kickBall);
+footballWrapper.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    kickBall();
+  }
 });
+
+kickBtn.addEventListener('click', kickBall);
+resetBtn.addEventListener('click', resetGame);
+
+// Nav buttons (view toggle placeholder)
+document.querySelectorAll('.nav-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach((b) => {
+      b.classList.remove('active');
+      b.removeAttribute('aria-current');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-current', 'page');
+  });
+});
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+function init() {
+  // Kick counter starts at 0 — display already set in HTML
+  // Drop the ball in on load
+  addAnimClass(football, 'drop-in', 800).then(() => {
+    football.classList.add('idle-bounce');
+  });
+}
+
+init();
