@@ -1,133 +1,1157 @@
-/* ═══════════════════════════════════════════════════════════════════
-   FIFA World Cup 2026 — styles.css
-   Supplementary stylesheet (index.html is self-contained;
-   this file provides additional overrides and component styles
-   for any external stylesheet consumers)
-   ═══════════════════════════════════════════════════════════════════ */
+/* ============================================================
+   FOOTBALL APP — MAIN STYLESHEET
+   Conventions: BEM-ish classes, CSS custom properties, mobile-first
+   ============================================================ */
 
-/* ─── LOGO SIZE CLASSES ────────────────────────────────────────── */
-.logo-hero {
-  width: 260px;
-  height: 260px;
-  display: block;
-  filter: drop-shadow(0 0 32px rgba(201, 162, 39, 0.55));
-  transition: filter 0.35s ease, transform 0.35s ease;
-}
-.logo-hero:hover {
-  filter: drop-shadow(0 0 48px rgba(245, 214, 117, 0.75));
+/* ----------------------------------------------------------
+   1. CUSTOM PROPERTIES
+   ---------------------------------------------------------- */
+:root {
+  --color-primary:       #1a472a;   /* deep green */
+  --color-primary-light: #2d6a4f;
+  --color-accent:        #f4a61d;   /* gold */
+  --color-accent-dark:   #c97f00;
+  --color-bg:            #0d1b0f;
+  --color-surface:       #162318;
+  --color-surface-2:     #1e2f21;
+  --color-text:          #e8f5e9;
+  --color-text-muted:    #8faa92;
+  --color-border:        #2a3d2c;
+
+  --nav-height:          64px;
+  --banner-height:       40px;
+  --countdown-height:    56px;
+  --header-total:        calc(var(--nav-height) + var(--banner-height) + var(--countdown-height));
+
+  --radius-sm:  6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --shadow-img:  0 2px 12px rgba(0, 0, 0, 0.6);
+
+  --transition-fast:   0.18s ease;
+  --transition-normal: 0.28s ease;
+
+  --font-base:    'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Georgia', 'Times New Roman', serif;
 }
 
-.logo-nav {
-  width: 48px;
-  height: 48px;
+/* ----------------------------------------------------------
+   2. RESET & BASE
+   ---------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-base);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+img {
   display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+}
+
+/* ----------------------------------------------------------
+   3. NAVIGATION BAR
+   ---------------------------------------------------------- */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--nav-height);
+  background-color: var(--color-primary);
+  border-bottom: 2px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+}
+
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.nav__brand-icon {
+  font-size: 1.5rem;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav__link:hover,
+.nav__link:focus-visible {
+  background-color: var(--color-primary-light);
+  color: var(--color-accent);
+  outline: none;
+}
+
+.nav__link--active,
+.nav__link[aria-current="page"] {
+  background-color: var(--color-accent);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* Player-specific nav links */
+.nav__link--player {
+  border: 1px solid transparent;
+}
+
+.nav__link--player:hover,
+.nav__link--player:focus-visible {
+  border-color: var(--color-accent);
+}
+
+/* ----------------------------------------------------------
+   4. ROTATION BANNER (TICKER / MARQUEE)
+   Sits immediately below the nav bar
+   ---------------------------------------------------------- */
+.banner {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  z-index: 990;
+  height: var(--banner-height);
+  background-color: var(--color-accent);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-accent-dark);
+}
+
+.banner__label {
   flex-shrink: 0;
-  transition: opacity 0.25s ease;
-}
-.logo-nav:hover {
-  opacity: 0.85;
-}
-
-.logo-section {
-  width: 80px;
-  height: 80px;
-  display: block;
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 10px rgba(201, 162, 39, 0.3));
-}
-
-.logo-footer {
-  width: 120px;
-  height: 120px;
-  display: block;
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 14px rgba(201, 162, 39, 0.35));
+  padding: 0 1rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background-color: var(--color-accent-dark);
+  color: #fff;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
-.logo-canvas {
-  width: 180px;
-  height: 180px;
+.banner__track {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.banner__items {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  white-space: nowrap;
+  animation: ticker-scroll 30s linear infinite;
+  will-change: transform;
+}
+
+.banner__items:hover {
+  animation-play-state: paused;
+}
+
+.banner__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.banner__item::after {
+  content: '•';
+  margin-left: 2rem;
+  opacity: 0.5;
+}
+
+.banner__item:last-child::after {
+  content: '';
+}
+
+.banner__separator {
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  margin: 0 0.5rem;
+}
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Duplicate items for seamless loop */
+.banner__items--duplicate {
   position: absolute;
+  left: 100%;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateY(-50%);
+}
+
+/* ----------------------------------------------------------
+   5. KICKOFF COUNTDOWN TIMER
+   Sits immediately below the rotation banner
+   ---------------------------------------------------------- */
+.countdown {
+  position: fixed;
+  top: calc(var(--nav-height) + var(--banner-height));
+  left: 0;
+  right: 0;
+  z-index: 980;
+  height: var(--countdown-height);
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-2) 100%);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0 1rem;
+}
+
+.countdown__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.countdown__match {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.countdown__match-name {
+  white-space: nowrap;
+}
+
+.countdown__divider {
+  color: var(--color-text-muted);
+}
+
+.countdown__timer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.countdown__unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 2.8rem;
+}
+
+.countdown__value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+  line-height: 1;
+  background-color: rgba(244, 166, 29, 0.1);
+  border: 1px solid rgba(244, 166, 29, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.4rem;
+  min-width: 2.4rem;
+  text-align: center;
+}
+
+.countdown__unit-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+  margin-top: 0.2rem;
+}
+
+.countdown__colon {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  line-height: 1;
+  margin-top: -0.4rem;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.countdown--live .countdown__value {
+  color: #ff4444;
+  border-color: rgba(255, 68, 68, 0.4);
+  background-color: rgba(255, 68, 68, 0.08);
+  animation: pulse-live 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-live {
+  from { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.3); }
+  to   { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); }
+}
+
+/* ----------------------------------------------------------
+   6. PAGE OFFSET — push page content below all fixed headers
+   ---------------------------------------------------------- */
+.page-content,
+main,
+.main {
+  padding-top: var(--header-total);
+}
+
+/* Offset for smooth-scroll anchor targets */
+section[id],
+div[id].section {
+  scroll-margin-top: var(--header-total);
+}
+
+/* ----------------------------------------------------------
+   7. HERO / MATCH HIGHLIGHT SECTION
+   ---------------------------------------------------------- */
+.hero {
+  position: relative;
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-bg) 70%);
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(244, 166, 29, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 30%, rgba(45, 106, 79, 0.15) 0%, transparent 55%);
   pointer-events: none;
-  z-index: 10;
-  opacity: 0.92;
-  filter: drop-shadow(0 0 24px rgba(201, 162, 39, 0.6));
 }
 
-/* ─── RESPONSIVE LOGO SCALING ──────────────────────────────────── */
-@media (max-width: 1024px) {
-  .logo-hero    { width: 220px; height: 220px; }
-  .logo-section { width: 70px;  height: 70px; }
+.hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-weight: 700;
+  color: var(--color-accent);
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-@media (max-width: 768px) {
-  .logo-hero    { width: 180px; height: 180px; }
-  .logo-section { width: 60px;  height: 60px; }
-  .logo-footer  { width: 90px;  height: 90px; }
-  .logo-canvas  { width: 130px; height: 130px; }
+.hero__subtitle {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  max-width: 540px;
+  margin: 0 auto 1.5rem;
 }
 
-@media (max-width: 480px) {
-  .logo-hero    { width: 140px; height: 140px; }
-  .logo-nav     { width: 38px;  height: 38px; }
-  .logo-section { width: 50px;  height: 50px; }
-  .logo-footer  { width: 72px;  height: 72px; }
-  .logo-canvas  { width: 110px; height: 110px; }
+/* ----------------------------------------------------------
+   8. SECTION GENERIC
+   ---------------------------------------------------------- */
+.section {
+  padding: 3rem 1.5rem;
 }
 
+.section__header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 0.75rem;
+}
+
+.section__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.section__subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* ----------------------------------------------------------
+   9. PLAYERS SECTION  (#players)
+   ---------------------------------------------------------- */
+#players {
+  scroll-margin-top: var(--header-total);
+  background-color: var(--color-surface);
+  padding: 3rem 1.5rem;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ------ Player Card ------ */
+.player-card {
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal),
+    border-color var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+}
+
+.player-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  border-color: var(--color-accent);
+}
+
+/* --- Player Card Image Container --- */
+.player-card__img-wrap {
+  position: relative;
+  width: 100%;
+  /* 4:5 portrait aspect ratio for jersey shots */
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-bg) 100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.player-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform var(--transition-normal);
+  display: block;
+}
+
+.player-card:hover .player-card__img {
+  transform: scale(1.06);
+}
+
+/* Placeholder shown while image loads or on error */
+.player-card__img-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-surface) 100%);
+  color: var(--color-text-muted);
+  font-size: 2.5rem;
+}
+
+.player-card__img-placeholder span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+/* Country flag badge */
+.player-card__flag {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 32px;
+  height: 22px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.player-card__flag-emoji {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.6rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+}
+
+/* Jersey number badge */
+.player-card__number {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 0.6rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+}
+
+/* --- Player Card Body --- */
+.player-card__body {
+  padding: 0.85rem 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.player-card__name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-card__country {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.player-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.player-card__position {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.player-card__caps {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+/* ------ Circular / Headshot variant (optional modifier) ------ */
+.player-card--headshot .player-card__img-wrap {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  width: 90px;
+  height: 90px;
+  margin: 1.2rem auto 0;
+  box-shadow: var(--shadow-img);
+  border: 3px solid var(--color-accent);
+}
+
+.player-card--headshot {
+  text-align: center;
+}
+
+/* ----------------------------------------------------------
+   10. MATCHES / FIXTURES SECTION
+   ---------------------------------------------------------- */
+#matches {
+  scroll-margin-top: var(--header-total);
+}
+
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.match-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-card);
+  transition: border-color var(--transition-fast);
+}
+
+.match-card:hover {
+  border-color: var(--color-accent);
+}
+
+.match-card__team {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.match-card__team--away {
+  text-align: right;
+}
+
+.match-card__team-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.match-card__team-flag {
+  font-size: 1.5rem;
+}
+
+.match-card__centre {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.match-card__score {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.match-card__time {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.match-card__status {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 100px;
+}
+
+.match-card__status--live {
+  background-color: rgba(255, 68, 68, 0.15);
+  color: #ff4444;
+  border: 1px solid rgba(255, 68, 68, 0.4);
+}
+
+.match-card__status--upcoming {
+  background-color: rgba(244, 166, 29, 0.1);
+  color: var(--color-accent);
+  border: 1px solid rgba(244, 166, 29, 0.3);
+}
+
+.match-card__status--finished {
+  background-color: rgba(143, 170, 146, 0.1);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+/* ----------------------------------------------------------
+   11. NEWS SECTION
+   ---------------------------------------------------------- */
+#news {
+  scroll-margin-top: var(--header-total);
+  background-color: var(--color-surface);
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.news-card {
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-normal), border-color var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+}
+
+.news-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-accent);
+}
+
+.news-card__img-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--color-primary);
+}
+
+.news-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-normal);
+}
+
+.news-card:hover .news-card__img {
+  transform: scale(1.05);
+}
+
+.news-card__body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.news-card__tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+}
+
+.news-card__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text);
+}
+
+.news-card__excerpt {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.news-card__date {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+/* ----------------------------------------------------------
+   12. STANDINGS / TABLE SECTION
+   ---------------------------------------------------------- */
+#standings {
+  scroll-margin-top: var(--header-total);
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.standings-table th,
+.standings-table td {
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.standings-table th {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+}
+
+.standings-table td:not(:first-child),
+.standings-table th:not(:first-child) {
+  text-align: center;
+}
+
+.standings-table tr:nth-child(even) td {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.standings-table tr:hover td {
+  background-color: rgba(244, 166, 29, 0.04);
+}
+
+.standings-table__pts {
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.standings-table__pos {
+  font-weight: 700;
+  color: var(--color-text-muted);
+  width: 2.5rem;
+}
+
+.standings-table__form {
+  display: flex;
+  gap: 0.2rem;
+  justify-content: center;
+}
+
+.form-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.form-dot--w { background-color: #4caf50; }
+.form-dot--d { background-color: var(--color-accent); }
+.form-dot--l { background-color: #f44336; }
+
+/* ----------------------------------------------------------
+   13. FOOTER
+   ---------------------------------------------------------- */
+.footer {
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.footer__brand {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.footer__links {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer__link {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  transition: color var(--transition-fast);
+}
+
+.footer__link:hover {
+  color: var(--color-accent);
+}
+
+/* ----------------------------------------------------------
+   14. UTILITY CLASSES
+   ---------------------------------------------------------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-accent  { color: var(--color-accent); }
+.text-muted   { color: var(--color-text-muted); }
+.text-center  { text-align: center; }
+.flex-center  { display: flex; align-items: center; justify-content: center; }
+.gap-sm       { gap: 0.5rem; }
+.gap-md       { gap: 1rem; }
+.mt-sm        { margin-top: 0.5rem; }
+.mt-md        { margin-top: 1rem; }
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 25%,
+    var(--color-border) 50%,
+    var(--color-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ----------------------------------------------------------
+   15. RESPONSIVE — TABLET  (≥ 600px)
+   ---------------------------------------------------------- */
+@media (min-width: 600px) {
+  :root {
+    --nav-height:    64px;
+    --banner-height: 40px;
+    --countdown-height: 52px;
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.75rem;
+  }
+
+  .news-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .match-card {
+    padding: 1.5rem 2rem;
+  }
+
+  .countdown {
+    gap: 2rem;
+  }
+
+  .countdown__value {
+    font-size: 1.4rem;
+    min-width: 2.8rem;
+  }
+}
+
+/* ----------------------------------------------------------
+   16. RESPONSIVE — DESKTOP  (≥ 900px)
+   ---------------------------------------------------------- */
+@media (min-width: 900px) {
+  :root {
+    --nav-height: 64px;
+    --banner-height: 40px;
+    --countdown-height: 52px;
+  }
+
+  .nav__links {
+    gap: 0.5rem;
+  }
+
+  .nav__link {
+    font-size: 0.9rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 2rem;
+  }
+
+  .hero {
+    padding: 4rem 3rem 3rem;
+  }
+
+  .section {
+    padding: 4rem 3rem;
+  }
+
+  #players {
+    padding: 4rem 3rem;
+  }
+}
+
+/* ----------------------------------------------------------
+   17. RESPONSIVE — WIDE  (≥ 1280px)
+   ---------------------------------------------------------- */
+@media (min-width: 1280px) {
+  .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .news-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ----------------------------------------------------------
+   18. MOBILE SMALL  (≤ 375px)
+   ---------------------------------------------------------- */
 @media (max-width: 375px) {
-  .logo-hero    { width: 120px; height: 120px; }
-  .logo-nav     { width: 34px;  height: 34px; }
-  .logo-section { width: 44px;  height: 44px; }
-  .logo-footer  { width: 60px;  height: 60px; }
+  :root {
+    --nav-height:      56px;
+    --banner-height:   36px;
+    --countdown-height: 60px; /* taller to allow wrapping */
+  }
+
+  .nav {
+    padding: 0 0.75rem;
+  }
+
+  .nav__brand {
+    font-size: 1rem;
+  }
+
+  .nav__link {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .countdown {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: var(--countdown-height);
+    padding: 0.4rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .countdown__match-name {
+    font-size: 0.75rem;
+  }
+
+  .countdown__value {
+    font-size: 1rem;
+    min-width: 2rem;
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.875rem;
+  }
+
+  .player-card__body {
+    padding: 0.65rem 0.7rem 0.8rem;
+  }
+
+  .player-card__name {
+    font-size: 0.82rem;
+  }
+
+  .banner__item {
+    font-size: 0.72rem;
+    padding: 0 1.25rem;
+  }
 }
 
-/* ─── PREFERS REDUCED MOTION ───────────────────────────────────── */
+/* ----------------------------------------------------------
+   19. REDUCED MOTION
+   ---------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  .logo-hero,
-  .logo-nav,
-  .logo-section,
-  .logo-footer,
-  .logo-canvas {
-    transition: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .banner__items {
     animation: none;
   }
 }
 
-/* ─── GOLD GRADIENT TEXT UTILITY ───────────────────────────────── */
-.text-gold {
-  background: linear-gradient(135deg, #f5d675 0%, #c9a227 50%, #a07a10 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* ----------------------------------------------------------
+   20. PRINT
+   ---------------------------------------------------------- */
+@media print {
+  .nav,
+  .banner,
+  .countdown {
+    position: static;
+    box-shadow: none;
+  }
 
-/* ─── SECTION DIVIDER ──────────────────────────────────────────── */
-.section-divider {
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #f5d675, #c9a227);
-  border-radius: 2px;
-  margin: 1rem 0 2rem;
-}
+  .page-content,
+  main,
+  .main {
+    padding-top: 0;
+  }
 
-/* ─── CARD GOLD ACCENT ─────────────────────────────────────────── */
-.card-accent {
-  border-top: 3px solid #c9a227;
-}
-
-/* ─── FOCUS RING OVERRIDE ──────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid #c9a227;
-  outline-offset: 3px;
-  border-radius: 4px;
-}
-
-/* ─── SELECTION COLOR ──────────────────────────────────────────── */
-::selection {
-  background: rgba(201, 162, 39, 0.3);
-  color: #ffffff;
+  body {
+    background: #fff;
+    color: #000;
+  }
 }
