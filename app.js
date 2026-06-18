@@ -1,622 +1,631 @@
-/* =========================================
-   FIFA WORLD CUP 2026 - FAN HUB
-   Main Application Script
-   ========================================= */
+/* =============================================
+   FIFA WORLD CUP 2026 — Fan Hub Application
+   ============================================= */
 
-// ─── DATA ───────────────────────────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────────────────────
 
-const MATCHES = [
-    {
-        id: 1, stage: 'Group A', type: 'group',
-        date: 'Jun 11, 2026', time: '5:00 PM EST',
-        team1: { name: 'USA', flag: '🇺🇸' },
-        team2: { name: 'Mexico', flag: '🇲🇽' },
-        venue: 'MetLife Stadium, New York',
-        status: 'upcoming',
-        watchPlayers: ['Christian Pulisic', 'Hirving Lozano']
-    },
-    {
-        id: 2, stage: 'Group B', type: 'group',
-        date: 'Jun 12, 2026', time: '8:00 PM EST',
-        team1: { name: 'Brazil', flag: '🇧🇷' },
-        team2: { name: 'Germany', flag: '🇩🇪' },
-        venue: 'Rose Bowl, Los Angeles',
-        status: 'upcoming',
-        watchPlayers: ['Vinícius Jr.', 'Jamal Musiala']
-    },
-    {
-        id: 3, stage: 'Group C', type: 'group',
-        date: 'Jun 12, 2026', time: '11:00 AM EST',
-        team1: { name: 'France', flag: '🇫🇷' },
-        team2: { name: 'Argentina', flag: '🇦🇷' },
-        venue: 'AT&T Stadium, Dallas',
-        status: 'live',
-        watchPlayers: ['Kylian Mbappé', 'Lionel Messi']
-    },
-    {
-        id: 4, stage: 'Group D', type: 'group',
-        date: 'Jun 13, 2026', time: '2:00 PM EST',
-        team1: { name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-        team2: { name: 'Spain', flag: '🇪🇸' },
-        venue: 'Levi\'s Stadium, San Francisco',
-        status: 'upcoming',
-        watchPlayers: ['Jude Bellingham', 'Pedri']
-    },
-    {
-        id: 5, stage: 'Group E', type: 'group',
-        date: 'Jun 14, 2026', time: '6:00 PM EST',
-        team1: { name: 'Portugal', flag: '🇵🇹' },
-        team2: { name: 'Netherlands', flag: '🇳🇱' },
-        venue: 'SoFi Stadium, Los Angeles',
-        status: 'upcoming',
-        watchPlayers: ['Cristiano Ronaldo', 'Cody Gakpo']
-    },
-    {
-        id: 6, stage: 'Group F', type: 'group',
-        date: 'Jun 15, 2026', time: '9:00 PM EST',
-        team1: { name: 'Morocco', flag: '🇲🇦' },
-        team2: { name: 'Japan', flag: '🇯🇵' },
-        venue: 'Estadio Azteca, Mexico City',
-        status: 'upcoming',
-        watchPlayers: ['Achraf Hakimi', 'Takefusa Kubo']
-    },
-    {
-        id: 7, stage: 'Quarter-Final', type: 'knockout',
-        date: 'Jul 4, 2026', time: '3:00 PM EST',
-        team1: { name: 'Brazil', flag: '🇧🇷' },
-        team2: { name: 'France', flag: '🇫🇷' },
-        venue: 'MetLife Stadium, New York',
-        status: 'upcoming',
-        watchPlayers: ['Rodrygo', 'Ousmane Dembélé']
-    },
-    {
-        id: 8, stage: 'Semi-Final', type: 'knockout',
-        date: 'Jul 10, 2026', time: '7:00 PM EST',
-        team1: { name: 'Argentina', flag: '🇦🇷' },
-        team2: { name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-        venue: 'Rose Bowl, Los Angeles',
-        status: 'upcoming',
-        watchPlayers: ['Lionel Messi', 'Harry Kane']
-    },
-    {
-        id: 9, stage: 'FINAL', type: 'final',
-        date: 'Jul 19, 2026', time: '6:00 PM EST',
-        team1: { name: 'TBD', flag: '🏆' },
-        team2: { name: 'TBD', flag: '🏆' },
-        venue: 'MetLife Stadium, New York',
-        status: 'upcoming',
-        watchPlayers: ['TBD', 'TBD']
-    }
-];
-
-const PLAYERS_TO_WATCH = [
-    {
-        name: 'Kylian Mbappé', country: 'France', flag: '🇫🇷',
-        position: 'Forward', avatar: '⚡', goals: 6, assists: 3,
-        match: 'France vs Argentina', isGoldenBoot: true,
-        reason: 'Lightning quick and lethal in front of goal. Mbappé is the tournament\'s standout performer and on course for the Golden Boot.'
-    },
-    {
-        name: 'Lionel Messi', country: 'Argentina', flag: '🇦🇷',
-        position: 'Forward', avatar: '🐐', goals: 5, assists: 6,
-        match: 'Argentina vs France', isGoldenBoot: false,
-        reason: 'The GOAT\'s final World Cup campaign. Messi continues to dazzle with his vision, dribbling, and clutch performances.'
-    },
-    {
-        name: 'Vinícius Jr.', country: 'Brazil', flag: '🇧🇷',
-        position: 'Winger', avatar: '🌟', goals: 4, assists: 4,
-        match: 'Brazil vs Germany', isGoldenBoot: false,
-        reason: 'Brazil\'s explosive winger causes nightmares for defenders with his pace, creativity and incredible footwork.'
-    },
-    {
-        name: 'Jude Bellingham', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-        position: 'Midfielder', avatar: '👑', goals: 3, assists: 5,
-        match: 'England vs Spain', isGoldenBoot: false,
-        reason: 'England\'s heartbeat and creative engine. Bellingham\'s box-to-box dynamism and leadership are world class.'
-    },
-    {
-        name: 'Cristiano Ronaldo', country: 'Portugal', flag: '🇵🇹',
-        position: 'Forward', avatar: '🏅', goals: 5, assists: 2,
-        match: 'Portugal vs Netherlands', isGoldenBoot: true,
-        reason: 'CR7 chasing history at his final World Cup. His experience and goal-scoring instinct remain unmatched at 41.'
-    },
-    {
-        name: 'Jamal Musiala', country: 'Germany', flag: '🇩🇪',
-        position: 'Attacking Mid', avatar: '✨', goals: 3, assists: 4,
-        match: 'Germany vs Brazil', isGoldenBoot: false,
-        reason: 'Germany\'s 22-year-old phenom lights up every match with his technique, dribbling and uncanny ability to read space.'
-    },
-    {
-        name: 'Pedri', country: 'Spain', flag: '🇪🇸',
-        position: 'Midfielder', avatar: '🎯', goals: 2, assists: 5,
-        match: 'Spain vs England', isGoldenBoot: false,
-        reason: 'The heir to Spain\'s great midfield tradition. Pedri\'s passing range, composure and press resistance are elite.'
-    },
-    {
-        name: 'Achraf Hakimi', country: 'Morocco', flag: '🇲🇦',
-        position: 'Right Back', avatar: '🚀', goals: 2, assists: 3,
-        match: 'Morocco vs Japan', isGoldenBoot: false,
-        reason: 'Africa\'s best defender and one of the world\'s most dynamic full-backs. Hakimi can single-handedly turn a match.'
-    }
-];
-
-const LEADERBOARD_DATA = {
-    goals: [
-        { name: 'Kylian Mbappé', country: 'France', flag: '🇫🇷', avatar: '⚡', value: 6, badge: 'boot', badgeText: '🥇 Golden Boot' },
-        { name: 'Cristiano Ronaldo', country: 'Portugal', flag: '🇵🇹', avatar: '🏅', value: 5, badge: 'boot', badgeText: '🥈 Contender' },
-        { name: 'Lionel Messi', country: 'Argentina', flag: '🇦🇷', avatar: '🐐', value: 5, badge: 'contender', badgeText: '🥈 Contender' },
-        { name: 'Vinícius Jr.', country: 'Brazil', flag: '🇧🇷', avatar: '🌟', value: 4, badge: 'contender', badgeText: '🥉 Contender' },
-        { name: 'Harry Kane', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', avatar: '🎯', value: 4, badge: 'contender', badgeText: '🥉 Contender' },
-        { name: 'Takumi Minamino', country: 'Japan', flag: '🇯🇵', avatar: '⚡', value: 3, badge: '', badgeText: '' },
-        { name: 'Jamal Musiala', country: 'Germany', flag: '🇩🇪', avatar: '✨', value: 3, badge: '', badgeText: '' }
-    ],
-    assists: [
-        { name: 'Lionel Messi', country: 'Argentina', flag: '🇦🇷', avatar: '🐐', value: 6, badge: 'boot', badgeText: '🥇 Top Creator' },
-        { name: 'Jude Bellingham', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', avatar: '👑', value: 5, badge: 'contender', badgeText: '🥈 2nd' },
-        { name: 'Pedri', country: 'Spain', flag: '🇪🇸', avatar: '🎯', value: 5, badge: 'contender', badgeText: '🥈 2nd' },
-        { name: 'Vinícius Jr.', country: 'Brazil', flag: '🇧🇷', avatar: '🌟', value: 4, badge: 'contender', badgeText: '🥉 3rd' },
-        { name: 'Kylian Mbappé', country: 'France', flag: '🇫🇷', avatar: '⚡', value: 3, badge: '', badgeText: '' },
-        { name: 'Jamal Musiala', country: 'Germany', flag: '🇩🇪', avatar: '✨', value: 4, badge: 'contender', badgeText: '🥉 3rd' },
-        { name: 'Achraf Hakimi', country: 'Morocco', flag: '🇲🇦', avatar: '🚀', value: 3, badge: '', badgeText: '' }
-    ],
-    ratings: [
-        { name: 'Kylian Mbappé', country: 'France', flag: '🇫🇷', avatar: '⚡', value: '9.4', badge: 'boot', badgeText: '🌟 Best Player' },
-        { name: 'Lionel Messi', country: 'Argentina', flag: '🇦🇷', avatar: '🐐', value: '9.2', badge: 'boot', badgeText: '🌟 Elite' },
-        { name: 'Jude Bellingham', country: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', avatar: '👑', value: '8.9', badge: 'contender', badgeText: '⭐ Top Rated' },
-        { name: 'Vinícius Jr.', country: 'Brazil', flag: '🇧🇷', avatar: '🌟', value: '8.8', badge: 'contender', badgeText: '⭐ Top Rated' },
-        { name: 'Jamal Musiala', country: 'Germany', flag: '🇩🇪', avatar: '✨', value: '8.6', badge: 'contender', badgeText: '⭐ Top Rated' },
-        { name: 'Pedri', country: 'Spain', flag: '🇪🇸', avatar: '🎯', value: '8.5', badge: '', badgeText: '' },
-        { name: 'Achraf Hakimi', country: 'Morocco', flag: '🇲🇦', avatar: '🚀', value: '8.4', badge: '', badgeText: '' }
+const matchesData = [
+  {
+    id: 1, group: 'group-a',
+    teamA: { name: 'Argentina', flag: '🇦🇷' },
+    teamB: { name: 'France', flag: '🇫🇷' },
+    date: 'June 20, 2026', time: '3:00 PM EST',
+    venue: 'MetLife Stadium, New York',
+    stadium: 'MetLife Stadium', capacity: '82,500',
+    players: [
+      { name: 'L. Messi', role: 'Forward', emoji: '🌟' },
+      { name: 'K. Mbappé', role: 'Forward', emoji: '⚡' },
+      { name: 'J. Álvarez', role: 'Striker', emoji: '🔥' },
+      { name: 'A. Griezmann', role: 'Midfielder', emoji: '🎯' }
     ]
-};
-
-const RESULTS = [
-    {
-        stage: 'Group A – Matchday 1',
-        date: 'Jun 11, 2026',
-        team1: { name: 'Brazil', flag: '🇧🇷', score: 3, scorers: ['Vinícius Jr. 12\'', 'Rodrygo 45\'', 'Endrick 78\''] },
-        team2: { name: 'Serbia', flag: '🇷🇸', score: 1, scorers: ['Vlahović 67\''] },
-        venue: 'SoFi Stadium, LA',
-        rating: '8.5 / 10',
-        summary: 'Brazil announced themselves in style as Vinícius Jr. opened the scoring with a stunning solo effort in the 12th minute. Rodrygo doubled the lead before the break, and teenage sensation Endrick sealed all three points with a composed finish. Serbia pulled one back through Vlahović but couldn\'t find a second.'
-    },
-    {
-        stage: 'Group B – Matchday 1',
-        date: 'Jun 12, 2026',
-        team1: { name: 'France', flag: '🇫🇷', score: 4, scorers: ['Mbappé 8\'', 'Mbappé 34\'', 'Griezmann 56\'', 'Dembélé 89\''] },
-        team2: { name: 'Poland', flag: '🇵🇱', score: 1, scorers: ['Lewandowski 71\' (pen)'] },
-        venue: 'AT&T Stadium, Dallas',
-        rating: '9.1 / 10',
-        summary: 'Mbappé was unstoppable as France demolished Poland in a masterclass display. The PSG star netted twice in the first half before Griezmann added a third. Lewandowski pulled one back from the spot but Dembélé\'s late goal put the icing on the cake for Deschamps\' side.'
-    },
-    {
-        stage: 'Group C – Matchday 1',
-        date: 'Jun 13, 2026',
-        team1: { name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', score: 2, scorers: ['Kane 33\'', 'Bellingham 77\''] },
-        team2: { name: 'Italy', flag: '🇮🇹', score: 2, scorers: ['Barella 45\'', 'Raspadori 88\''] },
-        venue: 'Levi\'s Stadium, San Francisco',
-        rating: '8.8 / 10',
-        summary: 'A thrilling contest between two heavyweights ended level. England looked set for all three points after Bellingham\'s superb 77th-minute volley, only for Raspadori to break English hearts with a last-gasp equaliser. Both sides showed tremendous quality throughout.'
-    },
-    {
-        stage: 'Group D – Matchday 1',
-        date: 'Jun 14, 2026',
-        team1: { name: 'Portugal', flag: '🇵🇹', score: 5, scorers: ['Ronaldo 22\' (pen)', 'Ronaldo 44\'', 'Bruno 60\'', 'Leão 72\'', 'Neves 85\''] },
-        team2: { name: 'Nigeria', flag: '🇳🇬', score: 1, scorers: ['Osimhen 55\''] },
-        venue: 'MetLife Stadium, New York',
-        rating: '8.7 / 10',
-        summary: 'Cristiano Ronaldo stole the show with a brace as Portugal put on a spectacular attacking show. The legendary forward opened from the penalty spot before adding a second before half-time. Bruno Fernandes, Leão and Neves compounded Nigeria\'s misery in the second half in what was a statement win.'
-    }
+  },
+  {
+    id: 2, group: 'group-b',
+    teamA: { name: 'Brazil', flag: '🇧🇷' },
+    teamB: { name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+    date: 'June 20, 2026', time: '6:00 PM EST',
+    venue: 'Rose Bowl, Los Angeles',
+    stadium: 'Rose Bowl', capacity: '90,888',
+    players: [
+      { name: 'Vinicius Jr', role: 'Forward', emoji: '💫' },
+      { name: 'H. Kane', role: 'Striker', emoji: '⚽' },
+      { name: 'Rodrygo', role: 'Winger', emoji: '🚀' },
+      { name: 'J. Bellingham', role: 'Midfielder', emoji: '🌠' }
+    ]
+  },
+  {
+    id: 3, group: 'group-c',
+    teamA: { name: 'Spain', flag: '🇪🇸' },
+    teamB: { name: 'Germany', flag: '🇩🇪' },
+    date: 'June 21, 2026', time: '3:00 PM EST',
+    venue: 'AT&T Stadium, Dallas',
+    stadium: 'AT&T Stadium', capacity: '80,000',
+    players: [
+      { name: 'Pedri', role: 'Midfielder', emoji: '🎪' },
+      { name: 'K. Havertz', role: 'Forward', emoji: '💥' },
+      { name: 'Y. Yamal', role: 'Winger', emoji: '🌟' },
+      { name: 'J. Kimmich', role: 'Midfielder', emoji: '🧠' }
+    ]
+  },
+  {
+    id: 4, group: 'group-d',
+    teamA: { name: 'Portugal', flag: '🇵🇹' },
+    teamB: { name: 'Morocco', flag: '🇲🇦' },
+    date: 'June 21, 2026', time: '6:00 PM EST',
+    venue: 'SoFi Stadium, Los Angeles',
+    stadium: 'SoFi Stadium', capacity: '70,240',
+    players: [
+      { name: 'C. Ronaldo', role: 'Forward', emoji: '👑' },
+      { name: 'H. Ziyech', role: 'Winger', emoji: '✨' },
+      { name: 'B. Fernandes', role: 'Midfielder', emoji: '🎯' },
+      { name: 'A. Hakimi', role: 'Defender', emoji: '🛡️' }
+    ]
+  },
+  {
+    id: 5, group: 'group-a',
+    teamA: { name: 'Mexico', flag: '🇲🇽' },
+    teamB: { name: 'Canada', flag: '🇨🇦' },
+    date: 'June 22, 2026', time: '1:00 PM EST',
+    venue: 'Estadio Azteca, Mexico City',
+    stadium: 'Estadio Azteca', capacity: '87,523',
+    players: [
+      { name: 'H. Lozano', role: 'Winger', emoji: '🌶️' },
+      { name: 'A. Davies', role: 'Defender', emoji: '⚡' },
+      { name: 'R. Jiménez', role: 'Striker', emoji: '🦅' },
+      { name: 'J. David', role: 'Forward', emoji: '🎯' }
+    ]
+  },
+  {
+    id: 6, group: 'group-b',
+    teamA: { name: 'Netherlands', flag: '🇳🇱' },
+    teamB: { name: 'USA', flag: '🇺🇸' },
+    date: 'June 22, 2026', time: '4:00 PM EST',
+    venue: 'Levi\'s Stadium, San Francisco',
+    stadium: "Levi's Stadium", capacity: '68,500',
+    players: [
+      { name: 'V. van Dijk', role: 'Defender', emoji: '🏰' },
+      { name: 'C. Pulisic', role: 'Winger', emoji: '🦅' },
+      { name: 'C. Gakpo', role: 'Forward', emoji: '💫' },
+      { name: 'F. Adams', role: 'Midfielder', emoji: '⭐' }
+    ]
+  },
+  {
+    id: 7, group: 'knockout',
+    teamA: { name: 'TBD', flag: '🏳️' },
+    teamB: { name: 'TBD', flag: '🏳️' },
+    date: 'July 10, 2026', time: '5:00 PM EST',
+    venue: 'MetLife Stadium, New York',
+    stadium: 'MetLife Stadium', capacity: '82,500',
+    players: [
+      { name: 'TBD', role: 'TBD', emoji: '❓' },
+      { name: 'TBD', role: 'TBD', emoji: '❓' },
+      { name: 'TBD', role: 'TBD', emoji: '❓' },
+      { name: 'TBD', role: 'TBD', emoji: '❓' }
+    ]
+  },
+  {
+    id: 8, group: 'knockout',
+    teamA: { name: 'TBD', flag: '🏳️' },
+    teamB: { name: 'TBD', flag: '🏳️' },
+    date: 'July 14, 2026', time: '8:00 PM EST',
+    venue: 'SoFi Stadium, Los Angeles',
+    stadium: 'SoFi Stadium', capacity: '70,240',
+    players: [
+      { name: 'TBD', role: 'TBD', emoji: '❓' },
+      { name: 'TBD', role: 'TBD', emoji: '❓' },
+      { name: 'TBD', role: 'TBD', emoji: '❓' },
+      { name: 'TBD', role: 'TBD', emoji: '❓' }
+    ]
+  }
 ];
 
-const NEWS = [
-    {
-        tag: 'breaking', tagText: 'BREAKING',
-        source: 'FIFA Official', time: '2 hours ago',
-        emoji: '🔴',
-        title: 'Mbappé Breaks World Cup Scoring Record with Hat-Trick Against Poland',
-        excerpt: 'Kylian Mbappé etched his name into World Cup history by becoming the fastest player to 6 goals in a single tournament, surpassing the previous record set by Just Fontaine in 1958. France captain was unstoppable and led his team to a commanding 4-1 victory.',
-        featured: true
-    },
-    {
-        tag: 'analysis', tagText: 'ANALYSIS',
-        source: 'ESPN FC', time: '4 hours ago',
-        emoji: '📊',
-        title: 'How Brazil\'s New Generation Is Redefining South American Football',
-        excerpt: 'Endrick, Rodrygo and Vinícius Jr. are spearheading a Brazilian revolution. Our analysts break down the tactical genius behind Dorival Jr.\'s 4-3-3 system.',
-        featured: false
-    },
-    {
-        tag: 'news', tagText: 'NEWS',
-        source: 'Goal.com', time: '5 hours ago',
-        emoji: '🌟',
-        title: 'Messi: "This is My Last World Cup & I Want to Win it For Argentina"',
-        excerpt: 'In an emotional pre-match interview, Lionel Messi opened up about his final World Cup campaign and the burning desire to deliver glory for his nation one more time.',
-        featured: false
-    },
-    {
-        tag: 'feature', tagText: 'FEATURE',
-        source: 'The Athletic', time: '8 hours ago',
-        emoji: '🏟️',
-        title: 'MetLife Stadium Set to Host Biggest Match in World Cup History with 92,000 Fans',
-        excerpt: 'The iconic New Jersey venue has been transformed into a festival of football. We take an exclusive behind-the-scenes look at preparations for the World Cup Final.',
-        featured: false
-    },
-    {
-        tag: 'analysis', tagText: 'ANALYSIS',
-        source: 'BBC Sport', time: '12 hours ago',
-        emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-        title: 'Bellingham\'s World Class Display Gives England Hope of Ending 60-Year Wait',
-        excerpt: 'Jude Bellingham was imperious against Italy, capping a man-of-the-match performance with a stunning volley. England\'s talisman is playing the best football of his career.',
-        featured: false
-    },
-    {
-        tag: 'news', tagText: 'NEWS',
-        source: 'AS USA', time: '1 day ago',
-        emoji: '🇺🇸',
-        title: 'USMNT Draw Capacity Crowd as Host Nation Fever Grips the United States',
-        excerpt: 'Over 82,000 fans packed MetLife Stadium for the USA\'s opening match. Christian Pulisic inspired the host nation with a stunning brace as America dreams of glory on home soil.',
-        featured: false
-    }
+const playersData = [
+  { name: 'Lionel Messi', country: '🇦🇷 Argentina', position: 'Forward',   emoji: '🌟', number: '10', goals: 4, assists: 3 },
+  { name: 'Kylian Mbappé', country: '🇫🇷 France',   position: 'Forward',   emoji: '⚡', number: '7',  goals: 5, assists: 2 },
+  { name: 'Vinicius Jr',   country: '🇧🇷 Brazil',    position: 'Winger',    emoji: '💫', number: '7',  goals: 3, assists: 4 },
+  { name: 'Erling Haaland',country: '🇳🇴 Norway',    position: 'Striker',   emoji: '🔨', number: '9',  goals: 4, assists: 1 },
+  { name: 'Pedri',         country: '🇪🇸 Spain',     position: 'Midfielder',emoji: '🎪', number: '8',  goals: 2, assists: 5 },
+  { name: 'Lamine Yamal',  country: '🇪🇸 Spain',     position: 'Winger',    emoji: '👶', number: '11', goals: 3, assists: 3 },
+  { name: 'Jude Bellingham',country:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',  position: 'Midfielder',emoji: '🌠', number: '10', goals: 3, assists: 2 },
+  { name: 'Cristiano Ronaldo',country:'🇵🇹 Portugal',position: 'Forward',   emoji: '👑', number: '7',  goals: 2, assists: 1 }
 ];
 
-// ─── PRELOADER ───────────────────────────────────────────────────────────────
+const scorersData = [
+  { rank: 1, name: 'Kylian Mbappé',   country: '🇫🇷 France',    emoji: '⚡', goals: 5, matches: 4 },
+  { rank: 2, name: 'Erling Haaland',  country: '🇳🇴 Norway',    emoji: '🔨', goals: 4, matches: 4 },
+  { rank: 3, name: 'Lionel Messi',    country: '🇦🇷 Argentina', emoji: '🌟', goals: 4, matches: 3 },
+  { rank: 4, name: 'Lamine Yamal',    country: '🇪🇸 Spain',     emoji: '👶', goals: 3, matches: 4 },
+  { rank: 5, name: 'Vinicius Jr',     country: '🇧🇷 Brazil',    emoji: '💫', goals: 3, matches: 4 },
+  { rank: 6, name: 'Jude Bellingham', country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',  emoji: '🌠', goals: 3, matches: 3 },
+  { rank: 7, name: 'Harry Kane',      country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',  emoji: '⚽', goals: 2, matches: 4 },
+  { rank: 8, name: 'Pedri',           country: '🇪🇸 Spain',     emoji: '🎪', goals: 2, matches: 4 }
+];
+
+const assistsData = [
+  { rank: 1, name: 'Pedri',           country: '🇪🇸 Spain',     emoji: '🎪', assists: 5, matches: 4 },
+  { rank: 2, name: 'Vinicius Jr',     country: '🇧🇷 Brazil',    emoji: '💫', assists: 4, matches: 4 },
+  { rank: 3, name: 'Lionel Messi',    country: '🇦🇷 Argentina', emoji: '🌟', assists: 3, matches: 3 },
+  { rank: 4, name: 'Lamine Yamal',    country: '🇪🇸 Spain',     emoji: '👶', assists: 3, matches: 4 },
+  { rank: 5, name: 'Kevin De Bruyne', country: '🇧🇪 Belgium',   emoji: '🧠', assists: 3, matches: 3 },
+  { rank: 6, name: 'Kylian Mbappé',   country: '🇫🇷 France',    emoji: '⚡', assists: 2, matches: 4 },
+  { rank: 7, name: 'Achraf Hakimi',   country: '🇲🇦 Morocco',   emoji: '🛡️', assists: 2, matches: 4 },
+  { rank: 8, name: 'Jude Bellingham', country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',  emoji: '🌠', assists: 2, matches: 3 }
+];
+
+const groupStandingsData = [
+  { group: 'A', team: '🇦🇷 Argentina', p: 3, w: 2, d: 1, l: 0, gf: 7, ga: 3, pts: 7 },
+  { group: 'A', team: '🇫🇷 France',    p: 3, w: 2, d: 0, l: 1, gf: 6, ga: 4, pts: 6 },
+  { group: 'A', team: '🇲🇽 Mexico',    p: 3, w: 1, d: 1, l: 1, gf: 4, ga: 5, pts: 4 },
+  { group: 'A', team: '🇨🇦 Canada',    p: 3, w: 0, d: 0, l: 3, gf: 2, ga: 7, pts: 0 },
+  { group: 'B', team: '🇧🇷 Brazil',    p: 3, w: 3, d: 0, l: 0, gf: 9, ga: 2, pts: 9 },
+  { group: 'B', team: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',  p: 3, w: 2, d: 0, l: 1, gf: 5, ga: 4, pts: 6 },
+  { group: 'B', team: '🇳🇱 Netherlands',p: 3,w: 1, d: 0, l: 2, gf: 3, ga: 5, pts: 3 },
+  { group: 'B', team: '🇺🇸 USA',        p: 3, w: 0, d: 0, l: 3, gf: 1, ga: 7, pts: 0 }
+];
+
+const resultsData = [
+  {
+    group: 'Group B — Matchday 1', date: 'June 15, 2026',
+    teamA: { name: 'Brazil', flag: '🇧🇷' }, scoreA: 3,
+    teamB: { name: 'Mexico', flag: '🇲🇽' }, scoreB: 0,
+    scorers: [
+      { team: 'Brazil', player: 'Vinicius Jr', time: "23'" },
+      { team: 'Brazil', player: 'Rodrygo',     time: "58'" },
+      { team: 'Brazil', player: 'Endrick',     time: "79'" }
+    ]
+  },
+  {
+    group: 'Group A — Matchday 1', date: 'June 15, 2026',
+    teamA: { name: 'France', flag: '🇫🇷' }, scoreA: 4,
+    teamB: { name: 'Canada', flag: '🇨🇦' }, scoreB: 1,
+    scorers: [
+      { team: 'France', player: 'Mbappé',     time: "12'" },
+      { team: 'France', player: 'Mbappé',     time: "34'" },
+      { team: 'France', player: 'Griezmann',  time: "67'" },
+      { team: 'France', player: 'Mbappé',     time: "88'" },
+      { team: 'Canada', player: 'J. David',   time: "45+2'" }
+    ]
+  },
+  {
+    group: 'Group C — Matchday 1', date: 'June 16, 2026',
+    teamA: { name: 'Morocco', flag: '🇲🇦' }, scoreA: 2,
+    teamB: { name: 'Italy',   flag: '🇮🇹' }, scoreB: 1,
+    scorers: [
+      { team: 'Morocco', player: 'Ziyech',    time: "29'" },
+      { team: 'Morocco', player: 'En-Nesyri', time: "71'" },
+      { team: 'Italy',   player: 'Retegui',   time: "55'" }
+    ]
+  },
+  {
+    group: 'Group D — Matchday 1', date: 'June 16, 2026',
+    teamA: { name: 'Argentina', flag: '🇦🇷' }, scoreA: 2,
+    teamB: { name: 'Australia', flag: '🇦🇺' }, scoreB: 0,
+    scorers: [
+      { team: 'Argentina', player: 'Messi',    time: "10'" },
+      { team: 'Argentina', player: 'Álvarez',  time: "62'" }
+    ]
+  },
+  {
+    group: 'Group B — Matchday 2', date: 'June 19, 2026',
+    teamA: { name: 'England', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' }, scoreA: 2,
+    teamB: { name: 'USA',     flag: '🇺🇸' },    scoreB: 1,
+    scorers: [
+      { team: 'England', player: 'Kane',       time: "33'" },
+      { team: 'England', player: 'Bellingham', time: "74'" },
+      { team: 'USA',     player: 'Pulisic',    time: "56'" }
+    ]
+  },
+  {
+    group: 'Group A — Matchday 2', date: 'June 19, 2026',
+    teamA: { name: 'Argentina', flag: '🇦🇷' }, scoreA: 1,
+    teamB: { name: 'Mexico',    flag: '🇲🇽' }, scoreB: 1,
+    scorers: [
+      { team: 'Argentina', player: 'Messi',   time: "45'" },
+      { team: 'Mexico',    player: 'Lozano',  time: "78'" }
+    ]
+  }
+];
+
+const newsData = [
+  {
+    featured: true, category: 'BREAKING',
+    image: '🏆', date: 'June 18, 2026', source: 'FIFA Official',
+    title: 'BRAZIL EYES RECORD SEVENTH WORLD CUP TITLE AS SELEÇÃO DOMINATE',
+    excerpt: 'With three wins from three, Brazil look unstoppable in Group B. Vinicius Jr has been in scintillating form, racking up three goals and four assists as the five-time champions march towards a historic seventh trophy.'
+  },
+  {
+    featured: false, category: 'MATCH REPORT',
+    image: '⚡', date: 'June 17, 2026', source: 'FIFA News',
+    title: 'MBAPPÉ HAT-TRICK SINKS CANADA IN OPENING ROUT',
+    excerpt: 'Kylian Mbappé became the fastest player to score three goals at this World Cup, netting a stunning hat-trick inside 88 minutes as France cruised to a 4-1 victory over Canada in New York.'
+  },
+  {
+    featured: false, category: 'FEATURE',
+    image: '🌟', date: 'June 17, 2026', source: 'Fan Hub',
+    title: 'THE MESSI FACTOR: HOW ARGENTINA\'S LEGEND DEFIES TIME',
+    excerpt: 'At 38, Lionel Messi continues to bewitch defenders and inspire teammates. We look at how the greatest of all time is still making the difference when it matters most on the biggest stage.'
+  },
+  {
+    featured: false, category: 'UPSET',
+    image: '🇲🇦', date: 'June 16, 2026', source: 'FIFA News',
+    title: 'MOROCCO STUN ITALY IN STUNNING GROUP C UPSET',
+    excerpt: "The Atlas Lions produced a tactical masterclass to beat Italy 2-1, with Hakim Ziyech's thunderbolt opener and Youssef En-Nesyri's clinical finish sending shockwaves through the tournament."
+  },
+  {
+    featured: false, category: 'RISING STAR',
+    image: '👶', date: 'June 15, 2026', source: 'Fan Hub',
+    title: 'LAMINE YAMAL: THE TEENAGE SENSATION TAKING THE WORLD BY STORM',
+    excerpt: "Spain's 18-year-old prodigy has been unplayable in Group C. With three goals and three assists already, Yamal is the talk of the tournament and a strong contender for the Golden Boot."
+  },
+  {
+    featured: false, category: 'STADIUM',
+    image: '🏟️', date: 'June 14, 2026', source: 'Fan Hub',
+    title: 'INSIDE THE VENUES: THE MOST SPECTACULAR WORLD CUP STADIUMS EVER',
+    excerpt: "From the iconic Rose Bowl to the futuristic SoFi Stadium, the 2026 World Cup boasts 16 world-class venues across three nations. We take you inside the arenas that will define football history."
+  }
+];
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+
+function groupLabel(key) {
+  const map = { 'group-a': 'Group A', 'group-b': 'Group B', 'group-c': 'Group C', 'group-d': 'Group D', 'knockout': 'Knockout Stage' };
+  return map[key] || key.toUpperCase();
+}
+
+// ── Preloader ─────────────────────────────────────────────────────────────────
+
 window.addEventListener('load', () => {
-    setTimeout(() => {
-        document.getElementById('preloader').classList.add('hidden');
-        initParticles();
-        initRevealObserver();
-    }, 2000);
+  setTimeout(() => {
+    document.getElementById('preloader').classList.add('hidden');
+  }, 2200);
 });
 
-// ─── PARTICLES ───────────────────────────────────────────────────────────────
-function initParticles() {
-    const container = document.getElementById('particles');
-    const colors = ['rgba(201,168,76,0.6)', 'rgba(255,215,0,0.4)', 'rgba(255,255,255,0.3)', 'rgba(192,57,43,0.4)'];
-    for (let i = 0; i < 30; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 4 + 1;
-        p.style.cssText = `
-            width: ${size}px; height: ${size}px;
-            left: ${Math.random() * 100}%;
-            background: ${colors[Math.floor(Math.random() * colors.length)]};
-            animation-duration: ${Math.random() * 15 + 10}s;
-            animation-delay: ${Math.random() * 10}s;
-        `;
-        container.appendChild(p);
-    }
-}
+// ── Navbar ────────────────────────────────────────────────────────────────────
 
-// ─── NAVBAR SCROLL ───────────────────────────────────────────────────────────
+const navbar    = document.getElementById('navbar');
+const navToggle = document.getElementById('navToggle');
+const navLinks  = document.getElementById('navLinks');
+
 window.addEventListener('scroll', () => {
-    const nav = document.getElementById('navbar');
-    nav.classList.toggle('scrolled', window.scrollY > 80);
-    updateActiveNavLink();
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
 });
 
-function updateActiveNavLink() {
-    const sections = ['schedule', 'players-watch', 'leaderboard', 'results', 'news'];
-    const scrollPos = window.scrollY + 100;
-    sections.forEach(id => {
-        const section = document.getElementById(id);
-        const link = document.querySelector(`.nav-links a[href="#${id}"]`);
-        if (section && link) {
-            const top = section.offsetTop;
-            const bottom = top + section.offsetHeight;
-            link.style.color = scrollPos >= top && scrollPos < bottom ? 'var(--gold)' : '';
-        }
-    });
-}
-
-// ─── HAMBURGER MENU ──────────────────────────────────────────────────────────
-document.getElementById('hamburger').addEventListener('click', () => {
-    document.getElementById('mobileMenu').classList.toggle('open');
+navToggle.addEventListener('click', () => {
+  navLinks.classList.toggle('open');
 });
-function closeMobile() {
-    document.getElementById('mobileMenu').classList.remove('open');
-}
 
-// ─── RENDER SCHEDULE ─────────────────────────────────────────────────────────
-function renderSchedule(filter = 'all') {
-    const grid = document.getElementById('scheduleGrid');
-    const filtered = filter === 'all' ? MATCHES : MATCHES.filter(m => m.type === filter);
-    grid.innerHTML = filtered.map(match => `
-        <div class="match-card reveal" onclick="openMatchModal(${match.id})" data-type="${match.type}">
-            ${match.status === 'live' ? '<span class="match-status-badge status-live">🔴 LIVE</span>' :
-              match.status === 'finished' ? '<span class="match-status-badge status-finished">FT</span>' :
-              '<span class="match-status-badge status-upcoming">UPCOMING</span>'}
-            <div class="match-card-header">
-                <span class="match-stage">${match.stage}</span>
-                <span class="match-date">${match.date}</span>
-            </div>
-            <div class="match-card-body">
-                <div class="teams-row">
-                    <div class="team-info">
-                        <div class="team-flag">${match.team1.flag}</div>
-                        <div class="team-name">${match.team1.name}</div>
-                    </div>
-                    <div class="match-vs">VS</div>
-                    <div class="team-info">
-                        <div class="team-flag">${match.team2.flag}</div>
-                        <div class="team-name">${match.team2.name}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="match-card-footer">
-                <div class="match-time">
-                    <i class="fas fa-clock"></i>
-                    ${match.time}
-                </div>
-                <div class="match-venue">${match.venue}</div>
-            </div>
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => navLinks.classList.remove('open'));
+});
+
+// ── Scroll Reveal ─────────────────────────────────────────────────────────────
+
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── Match Schedule ────────────────────────────────────────────────────────────
+
+function renderMatches(filter = 'all') {
+  const grid = document.getElementById('matchesGrid');
+  const data = filter === 'all' ? matchesData : matchesData.filter(m => m.group === filter);
+  grid.innerHTML = data.map((m, i) => `
+    <div class="match-card reveal" style="animation-delay:${i * 0.08}s" data-id="${m.id}">
+      <div class="match-card-header">
+        <span class="match-group">${groupLabel(m.group)}</span>
+        <span class="match-date">${m.date}</span>
+      </div>
+      <div class="match-card-body">
+        <div class="match-teams">
+          <div class="team">
+            <div class="team-flag">${m.teamA.flag}</div>
+            <div class="team-name">${m.teamA.name}</div>
+          </div>
+          <div class="match-vs">VS</div>
+          <div class="team">
+            <div class="team-flag">${m.teamB.flag}</div>
+            <div class="team-name">${m.teamB.name}</div>
+          </div>
         </div>
-    `).join('');
-    reobserveReveal();
-}
-
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderSchedule(btn.dataset.filter);
-    });
-});
-
-// ─── MATCH MODAL ─────────────────────────────────────────────────────────────
-function openMatchModal(id) {
-    const match = MATCHES.find(m => m.id === id);
-    if (!match) return;
-    const playersData = match.watchPlayers.map(name => {
-        return PLAYERS_TO_WATCH.find(p => p.name === name) || { name, avatar: '⚽', position: 'Player', goals: '-', assists: '-', country: '', flag: '' };
-    });
-    document.getElementById('modalContent').innerHTML = `
-        <div class="modal-match-header">
-            <div class="modal-stage">${match.stage} &nbsp;·&nbsp; ${match.date} &nbsp;·&nbsp; ${match.time}</div>
-            <div class="modal-teams">
-                <div class="modal-team">
-                    <div class="modal-flag">${match.team1.flag}</div>
-                    <div class="modal-team-name">${match.team1.name}</div>
-                </div>
-                <div class="modal-vs">VS</div>
-                <div class="modal-team">
-                    <div class="modal-flag">${match.team2.flag}</div>
-                    <div class="modal-team-name">${match.team2.name}</div>
-                </div>
-            </div>
+      </div>
+      <div class="match-card-footer">
+        <div>
+          <div class="match-time">⏰ ${m.time}</div>
+          <div class="match-venue">📍 ${m.venue}</div>
         </div>
-        <div class="modal-body">
-            <div class="modal-info-grid">
-                <div class="modal-info-item"><label>Kickoff (EST)</label><span>⏰ ${match.time}</span></div>
-                <div class="modal-info-item"><label>Status</label><span>${match.status === 'live' ? '🔴 LIVE NOW' : match.status === 'upcoming' ? '📅 Upcoming' : '✅ Full Time'}</span></div>
-                <div class="modal-info-item"><label>Venue</label><span>🏟️ ${match.venue}</span></div>
-                <div class="modal-info-item"><label>Stage</label><span>🏆 ${match.stage}</span></div>
-            </div>
-            <div class="modal-players-title">⭐ Players to Watch</div>
-            <div class="modal-player-list">
-                ${playersData.map(p => `
-                    <div class="modal-player-item">
-                        <div class="modal-player-avatar">${p.avatar}</div>
-                        <div class="modal-player-details">
-                            <div class="modal-player-name">${p.name} ${p.flag}</div>
-                            <div class="modal-player-meta">${p.country} · ${p.position}</div>
-                        </div>
-                        <div class="modal-player-stat">${p.goals !== '-' ? p.goals + ' ⚽' : '⭐'}</div>
-                    </div>
-                `).join('')}
-            </div>
+        <div class="match-cta">Details</div>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.match-card').forEach(card => {
+    revealObserver.observe(card);
+    card.addEventListener('click', () => openModal(parseInt(card.dataset.id)));
+  });
+}
+
+document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMatches(btn.dataset.filter);
+  });
+});
+
+renderMatches();
+
+// ── Match Modal ───────────────────────────────────────────────────────────────
+
+function openModal(id) {
+  const match   = matchesData.find(m => m.id === id);
+  if (!match) return;
+  const overlay = document.getElementById('matchModal');
+  const body    = document.getElementById('modalBody');
+
+  body.innerHTML = `
+    <div class="modal-header">
+      <div class="modal-group">${groupLabel(match.group)} · ${match.date}</div>
+      <div class="modal-teams">
+        <div class="modal-team">
+          <span class="modal-team-flag">${match.teamA.flag}</span>
+          <div class="modal-team-name">${match.teamA.name}</div>
         </div>
-    `;
-    document.getElementById('matchModal').classList.add('open');
-}
-
-document.getElementById('modalClose').addEventListener('click', () => {
-    document.getElementById('matchModal').classList.remove('open');
-});
-document.getElementById('matchModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('matchModal')) {
-        document.getElementById('matchModal').classList.remove('open');
-    }
-});
-
-// ─── RENDER PLAYERS TO WATCH ─────────────────────────────────────────────────
-function renderPlayersToWatch() {
-    const grid = document.getElementById('playersWatchGrid');
-    grid.innerHTML = PLAYERS_TO_WATCH.map((player, i) => `
-        <div class="player-watch-card reveal reveal-delay-${(i % 3) + 1}">
-            ${player.isGoldenBoot ? '<div class="golden-boot-badge">🥇 Golden Boot</div>' : ''}
-            <div class="player-watch-header">
-                <div class="player-country-flag">${player.flag}</div>
-                <div class="player-avatar">${player.avatar}</div>
-                <div class="player-watch-name">${player.name}</div>
-                <div class="player-watch-country">${player.country}</div>
-                <span class="player-watch-pos">${player.position}</span>
-            </div>
-            <div class="player-watch-body">
-                <div class="player-stats-row">
-                    <div class="player-stat-item">
-                        <span class="pstat-num">${player.goals}</span>
-                        <span class="pstat-label">Goals</span>
-                    </div>
-                    <div class="player-stat-item">
-                        <span class="pstat-num">${player.assists}</span>
-                        <span class="pstat-label">Assists</span>
-                    </div>
-                    <div class="player-stat-item">
-                        <span class="pstat-num">${player.goals + player.assists}</span>
-                        <span class="pstat-label">G+A</span>
-                    </div>
-                </div>
-                <div class="player-match-preview">
-                    <span>Next Match</span>
-                    <span>${player.match}</span>
-                </div>
-            </div>
-            <div class="player-watch-footer">
-                <div class="watch-reason">${player.reason}</div>
-            </div>
+        <div class="modal-vs">VS</div>
+        <div class="modal-team">
+          <span class="modal-team-flag">${match.teamB.flag}</span>
+          <div class="modal-team-name">${match.teamB.name}</div>
         </div>
-    `).join('');
-}
-
-// ─── RENDER LEADERBOARD ──────────────────────────────────────────────────────
-function renderLeaderboard(tab = 'goals') {
-    const data = LEADERBOARD_DATA[tab];
-    const rankClasses = ['gold-rank', 'silver-rank', 'bronze-rank'];
-    const label = tab === 'goals' ? 'Goals' : tab === 'assists' ? 'Assists' : 'Rating';
-    document.getElementById('leaderboardContainer').innerHTML = `
-        <table class="lb-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Player</th>
-                    <th>Nation</th>
-                    <th>${label}</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.map((player, i) => `
-                    <tr class="lb-row">
-                        <td class="lb-rank ${rankClasses[i] || ''}">${i + 1}</td>
-                        <td>
-                            <div class="lb-player-info">
-                                <div class="lb-avatar">${player.avatar}</div>
-                                <div>
-                                    <div class="lb-player-name">${player.name}</div>
-                                    <div class="lb-player-country">${player.country}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="lb-nation-flag">${player.flag}</td>
-                        <td class="lb-stat-value">${player.value}</td>
-                        <td>${player.badge ? `<span class="lb-badge badge-${player.badge}">${player.badgeText}</span>` : '—'}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-    `;
-}
-
-document.querySelectorAll('.lb-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        renderLeaderboard(tab.dataset.tab);
-    });
-});
-
-// ─── RENDER RESULTS ──────────────────────────────────────────────────────────
-function renderResults() {
-    const grid = document.getElementById('resultsGrid');
-    grid.innerHTML = RESULTS.map((result, i) => `
-        <div class="result-card reveal reveal-delay-${(i % 2) + 1}">
-            <div class="result-card-header">
-                <span class="result-stage">${result.stage}</span>
-                <span class="result-date">${result.date}</span>
-            </div>
-            <div class="result-scoreline">
-                <div class="result-team">
-                    <div class="result-flag">${result.team1.flag}</div>
-                    <div class="result-team-name">${result.team1.name}</div>
-                </div>
-                <div class="result-score-box">
-                    <div class="score-display">${result.team1.score} – ${result.team2.score}</div>
-                    <span class="score-label">FULL TIME</span>
-                </div>
-                <div class="result-team">
-                    <div class="result-flag">${result.team2.flag}</div>
-                    <div class="result-team-name">${result.team2.name}</div>
-                </div>
-            </div>
-            <div class="result-details">
-                <div class="result-scorers">
-                    <div class="scorer-list">
-                        ${result.team1.scorers.map(s => `<p>${s}</p>`).join('')}
-                    </div>
-                    <div class="scorer-list" style="text-align:right;">
-                        ${result.team2.scorers.map(s => `<p style="flex-direction:row-reverse;">${s}</p>`).join('')}
-                    </div>
-                </div>
-                <div class="result-summary">${result.summary}</div>
-                <div class="result-footer">
-                    <div class="result-rating"><i class="fas fa-star"></i> Match Rating: ${result.rating}</div>
-                    <div class="result-venue"><i class="fas fa-map-marker-alt"></i> ${result.venue}</div>
-                </div>
-            </div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info-grid">
+        <div class="modal-info-item">
+          <div class="modal-info-label">Kick-off Time</div>
+          <div class="modal-info-value">⏰ ${match.time}</div>
         </div>
-    `).join('');
-}
-
-// ─── RENDER NEWS ─────────────────────────────────────────────────────────────
-function renderNews() {
-    const grid = document.getElementById('newsGrid');
-    grid.innerHTML = NEWS.map((article, i) => `
-        <div class="news-card ${article.featured ? 'featured' : ''} reveal">
-            <div class="news-thumbnail">
-                <div class="news-thumb-emoji">${article.emoji}</div>
-                <div class="news-thumb-overlay"></div>
-                <span class="news-tag tag-${article.tag}">${article.tagText}</span>
-            </div>
-            <div class="news-body">
-                <div class="news-meta">
-                    <span class="news-source">${article.source}</span>
-                    <span class="news-time"><i class="fas fa-clock"></i> ${article.time}</span>
-                </div>
-                <h3 class="news-title">${article.title}</h3>
-                <p class="news-excerpt">${article.excerpt}</p>
-                <a href="#" class="news-read-more">Read More <i class="fas fa-arrow-right"></i></a>
-            </div>
+        <div class="modal-info-item">
+          <div class="modal-info-label">Venue</div>
+          <div class="modal-info-value">🏟️ ${match.stadium}</div>
         </div>
-    `).join('');
-    reobserveReveal();
+        <div class="modal-info-item">
+          <div class="modal-info-label">Location</div>
+          <div class="modal-info-value">📍 ${match.venue}</div>
+        </div>
+        <div class="modal-info-item">
+          <div class="modal-info-label">Capacity</div>
+          <div class="modal-info-value">👥 ${match.capacity}</div>
+        </div>
+      </div>
+      <div class="modal-players-title">⭐ Players to Watch</div>
+      <div class="modal-players-grid">
+        ${match.players.map(p => `
+          <div class="modal-player">
+            <div class="modal-player-avatar">${p.emoji}</div>
+            <div>
+              <div class="modal-player-name">${p.name}</div>
+              <div class="modal-player-role">${p.role}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
 }
 
-// ─── SCROLL REVEAL ───────────────────────────────────────────────────────────
-let revealObserver;
-function initRevealObserver() {
-    revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-}
-function reobserveReveal() {
-    if (!revealObserver) return;
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('matchModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function closeModal() {
+  document.getElementById('matchModal').classList.remove('active');
+  document.body.style.overflow = '';
 }
 
-// ─── KEYBOARD ESC MODAL ──────────────────────────────────────────────────────
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.getElementById('matchModal').classList.remove('open');
+// ── Players to Watch ──────────────────────────────────────────────────────────
+
+(function renderPlayers() {
+  document.getElementById('playersGrid').innerHTML = playersData.map((p, i) => `
+    <div class="player-card reveal" style="animation-delay:${i * 0.07}s">
+      <div class="player-card-banner">
+        <div class="player-number">${p.number}</div>
+      </div>
+      <div class="player-avatar-wrap">
+        <div class="player-avatar">${p.emoji}</div>
+      </div>
+      <div class="player-info">
+        <div class="player-name">${p.name}</div>
+        <div class="player-country">${p.country}</div>
+        <div class="player-position">${p.position}</div>
+        <div class="player-stats">
+          <div class="player-stat-item">
+            <div class="player-stat-val">${p.goals}</div>
+            <div class="player-stat-lbl">Goals</div>
+          </div>
+          <div class="player-stat-item">
+            <div class="player-stat-val">${p.assists}</div>
+            <div class="player-stat-lbl">Assists</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.player-card').forEach(el => revealObserver.observe(el));
+})();
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+
+function renderScorers() {
+  return `<table class="lb-table">
+    <thead><tr>
+      <th>#</th><th>Player</th><th>Matches</th><th>Goals</th>
+    </tr></thead>
+    <tbody>
+      ${scorersData.map(p => `
+        <tr>
+          <td><span class="lb-rank ${p.rank===1?'gold':p.rank===2?'silver':p.rank===3?'bronze':''}">${p.rank}</span></td>
+          <td><div class="lb-player-cell">
+            <div class="lb-avatar">${p.emoji}</div>
+            <div><div class="lb-name">${p.name}</div><div class="lb-country">${p.country}</div></div>
+          </div></td>
+          <td>${p.matches}</td>
+          <td><span class="lb-goals">${p.goals}</span></td>
+        </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function renderAssists() {
+  return `<table class="lb-table">
+    <thead><tr>
+      <th>#</th><th>Player</th><th>Matches</th><th>Assists</th>
+    </tr></thead>
+    <tbody>
+      ${assistsData.map(p => `
+        <tr>
+          <td><span class="lb-rank ${p.rank===1?'gold':p.rank===2?'silver':p.rank===3?'bronze':''}">${p.rank}</span></td>
+          <td><div class="lb-player-cell">
+            <div class="lb-avatar">${p.emoji}</div>
+            <div><div class="lb-name">${p.name}</div><div class="lb-country">${p.country}</div></div>
+          </div></td>
+          <td>${p.matches}</td>
+          <td><span class="lb-goals">${p.assists}</span></td>
+        </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function renderGroupStandings() {
+  const groups = ['A', 'B'];
+  return groups.map(g => {
+    const rows = groupStandingsData.filter(t => t.group === g);
+    return `
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--navy);letter-spacing:2px;margin:28px 0 12px">Group ${g}</h3>
+      <table class="lb-table" style="margin-bottom:0">
+        <thead><tr>
+          <th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(t => `
+            <tr>
+              <td><strong>${t.team}</strong></td>
+              <td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+              <td>${t.gf}</td><td>${t.ga}</td>
+              <td><strong style="color:var(--navy)">${t.pts}</strong></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }).join('');
+}
+
+function renderLeaderboard(type) {
+  const el = document.getElementById('leaderboardContent');
+  if (type === 'scorers')  el.innerHTML = renderScorers();
+  if (type === 'assists')  el.innerHTML = renderAssists();
+  if (type === 'groups')   el.innerHTML = renderGroupStandings();
+}
+
+document.querySelectorAll('[data-board]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-board]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderLeaderboard(btn.dataset.board);
+  });
 });
 
-// ─── SMOOTH SCROLL FOR NAV LINKS ─────────────────────────────────────────────
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', (e) => {
-        const target = document.querySelector(link.getAttribute('href'));
-        if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    });
-});
+renderLeaderboard('scorers');
 
-// ─── ACTIVE LEADERBOARD TAB HIGHLIGHT ────────────────────────────────────────
-function setActiveTab(tabEl) {
-    document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
-    tabEl.classList.add('active');
-}
+// ── Match Results ─────────────────────────────────────────────────────────────
 
-// ─── INITIALIZE ALL SECTIONS ─────────────────────────────────────────────────
-function init() {
-    renderSchedule();
-    renderPlayersToWatch();
-    renderLeaderboard('goals');
-    renderResults();
-    renderNews();
-}
-init();
+(function renderResults() {
+  document.getElementById('resultsGrid').innerHTML = resultsData.map((r, i) => {
+    const scorerLines = r.scorers.map(s =>
+      `<strong>${s.team}:</strong> ${s.player} ${s.time}`
+    ).join(' &nbsp;|&nbsp; ');
+    return `
+      <div class="result-card reveal" style="animation-delay:${i * 0.08}s">
+        <div class="result-header">
+          <span class="result-group">${r.group}</span>
+          <span class="result-date">${r.date}</span>
+        </div>
+        <div class="result-body">
+          <div class="result-scoreline">
+            <div class="result-team">
+              <div class="result-flag">${r.teamA.flag}</div>
+              <div class="result-team-name">${r.teamA.name}</div>
+            </div>
+            <div class="result-score">${r.scoreA} – ${r.scoreB}</div>
+            <div class="result-team">
+              <div class="result-flag">${r.teamB.flag}</div>
+              <div class="result-team-name">${r.teamB.name}</div>
+            </div>
+          </div>
+        </div>
+        <div class="result-footer">
+          <div class="result-scorers">⚽ ${scorerLines}</div>
+        </div>
+      </div>`;
+  }).join('');
+  document.querySelectorAll('.result-card').forEach(el => revealObserver.observe(el));
+})();
+
+// ── News Feed ─────────────────────────────────────────────────────────────────
+
+(function renderNews() {
+  document.getElementById('newsGrid').innerHTML = newsData.map((n, i) => `
+    <div class="news-card${n.featured ? ' featured' : ''} reveal" style="animation-delay:${i * 0.07}s">
+      <div class="news-image">
+        <span class="news-image-emoji">${n.image}</span>
+        <span class="news-category">${n.category}</span>
+      </div>
+      <div class="news-body">
+        <div class="news-meta">
+          <span class="news-date">${n.date}</span>
+          <span class="news-source">${n.source}</span>
+        </div>
+        <h3 class="news-title">${n.title}</h3>
+        <p class="news-excerpt">${n.excerpt}</p>
+        <a href="#" class="news-read-more">Read More</a>
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.news-card').forEach(el => revealObserver.observe(el));
+})();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ⚽  FOOTBALL ANIMATION — Click to Kick Interaction
+// ══════════════════════════════════════════════════════════════════════════════
+
+(function initFootballAnimation() {
+  const football = document.getElementById('footballAnimation');
+  if (!football) return;
+
+  let kickCooldown = false;
+
+  football.addEventListener('click', () => {
+    if (kickCooldown) return;
+    kickCooldown = true;
+
+    // Add kicked class to trigger burst animation on the SVG
+    football.classList.add('kicked');
+
+    // Remove after animation completes (450ms) then restore normal spin
+    setTimeout(() => {
+      football.classList.remove('kicked');
+      // Brief cooldown so clicks don't stack
+      setTimeout(() => { kickCooldown = false; }, 200);
+    }, 450);
+  });
+
+  // Optional: pause spin when page is hidden to save resources
+  document.addEventListener('visibilitychange', () => {
+    const svg = football.querySelector('.football-svg');
+    if (!svg) return;
+    svg.style.animationPlayState = document.hidden ? 'paused' : 'running';
+  });
+})();

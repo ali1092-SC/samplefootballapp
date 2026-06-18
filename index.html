@@ -1,281 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIFA World Cup 2026™ | Official Fan Hub</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIFA World Cup 2026 | Official Fan Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-    <!-- PRELOADER -->
-    <div id="preloader">
-        <div class="preloader-content">
-            <div class="trophy-icon">🏆</div>
-            <div class="preloader-text">FIFA WORLD CUP 2026™</div>
-            <div class="preloader-bar"><div class="preloader-fill"></div></div>
-        </div>
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo">
+        <svg viewBox="0 0 120 120" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="55" fill="#001B5E" stroke="#C9A84C" stroke-width="4"/>
+          <polygon points="60,20 68,45 95,45 73,61 81,86 60,70 39,86 47,61 25,45 52,45" fill="#C9A84C"/>
+        </svg>
+      </div>
+      <div class="preloader-text">FIFA WORLD CUP 2026</div>
+      <div class="preloader-bar"><div class="preloader-fill"></div></div>
     </div>
+  </div>
 
-    <!-- STICKY NAV -->
-    <nav id="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <span class="logo-trophy">🏆</span>
-                <div class="logo-text">
-                    <span class="logo-fifa">FIFA</span>
-                    <span class="logo-wc">WORLD CUP 2026™</span>
-                </div>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#schedule">Schedule</a></li>
-                <li><a href="#players-watch">Players to Watch</a></li>
-                <li><a href="#leaderboard">Top Players</a></li>
-                <li><a href="#results">Results</a></li>
-                <li><a href="#news">News</a></li>
-            </ul>
-            <div class="nav-cta">
-                <span class="live-badge"><span class="live-dot"></span>LIVE</span>
-            </div>
-            <button class="hamburger" id="hamburger">
-                <span></span><span></span><span></span>
-            </button>
-        </div>
-        <div class="mobile-menu" id="mobileMenu">
-            <ul>
-                <li><a href="#schedule" onclick="closeMobile()">Schedule</a></li>
-                <li><a href="#players-watch" onclick="closeMobile()">Players to Watch</a></li>
-                <li><a href="#leaderboard" onclick="closeMobile()">Top Players</a></li>
-                <li><a href="#results" onclick="closeMobile()">Results</a></li>
-                <li><a href="#news" onclick="closeMobile()">News</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- HERO SECTION -->
-    <section id="hero">
-        <div class="hero-bg-overlay"></div>
-        <div class="hero-particles" id="particles"></div>
-        <div class="hero-content">
-            <div class="hero-badge">JUNE 11 – JULY 19, 2026</div>
-            <h1 class="hero-title">
-                <span class="title-fifa">FIFA</span>
-                <span class="title-world">WORLD CUP</span>
-                <span class="title-year">2026™</span>
-            </h1>
-            <p class="hero-subtitle">USA · CANADA · MEXICO · 48 TEAMS · 104 MATCHES</p>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <span class="stat-num">48</span>
-                    <span class="stat-label">Teams</span>
-                </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="stat-num">16</span>
-                    <span class="stat-label">Venues</span>
-                </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="stat-num">104</span>
-                    <span class="stat-label">Matches</span>
-                </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="stat-num">3</span>
-                    <span class="stat-label">Countries</span>
-                </div>
-            </div>
-            <div class="hero-cta">
-                <a href="#schedule" class="btn-primary">View Schedule</a>
-                <a href="#results" class="btn-secondary">Match Results</a>
-            </div>
-        </div>
-        <div class="hero-scroll-hint">
-            <span>Scroll to explore</span>
-            <i class="fas fa-chevron-down"></i>
-        </div>
-    </section>
-
-    <!-- TICKER TAPE -->
-    <div class="ticker-wrap">
-        <div class="ticker-label">LATEST</div>
-        <div class="ticker-content">
-            <div class="ticker-inner" id="ticker">
-                <span>🔴 LIVE: Argentina vs France – 2:1 (67') &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>⚽ Mbappe scores in the 54th minute for France &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>🏆 Brazil leads Group E with 6 points &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>📊 Ronaldo ties World Cup scoring record with 9 goals &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>🌟 Bellingham named Player of the Match vs Spain &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>📅 Quarter-Final fixtures confirmed for July 4-5 &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>🔴 LIVE: Argentina vs France – 2:1 (67') &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>⚽ Mbappe scores in the 54th minute for France &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>🏆 Brazil leads Group E with 6 points &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>📊 Ronaldo ties World Cup scoring record with 9 goals &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>🌟 Bellingham named Player of the Match vs Spain &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <span>📅 Quarter-Final fixtures confirmed for July 4-5 &nbsp;&nbsp;|&nbsp;&nbsp;</span>
-            </div>
-        </div>
+  <!-- Sticky Navigation -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <svg viewBox="0 0 50 50" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="25" cy="25" r="23" fill="#001B5E" stroke="#C9A84C" stroke-width="2"/>
+          <polygon points="25,8 29,18 40,18 31,25 34,36 25,29 16,36 19,25 10,18 21,18" fill="#C9A84C"/>
+        </svg>
+        <span>FIFA WC 2026</span>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#schedule">Schedule</a></li>
+        <li><a href="#players">Players</a></li>
+        <li><a href="#leaderboard">Standings</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#news">News</a></li>
+      </ul>
     </div>
+  </nav>
 
-    <!-- SCHEDULE SECTION -->
-    <section id="schedule" class="section-dark">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-tag">MATCH SCHEDULE</div>
-                <h2 class="section-title">Upcoming <span class="gold-text">Fixtures</span></h2>
-                <p class="section-subtitle">All times shown in Eastern Standard Time (EST)</p>
-            </div>
-
-            <div class="schedule-filters">
-                <button class="filter-btn active" data-filter="all">All Matches</button>
-                <button class="filter-btn" data-filter="group">Group Stage</button>
-                <button class="filter-btn" data-filter="knockout">Knockout</button>
-                <button class="filter-btn" data-filter="final">Finals</button>
-            </div>
-
-            <div class="schedule-grid" id="scheduleGrid">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- PLAYERS TO WATCH SECTION -->
-    <section id="players-watch" class="section-light">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-tag">SPOTLIGHT</div>
-                <h2 class="section-title">Players to <span class="gold-text">Watch</span></h2>
-                <p class="section-subtitle">Star players set to light up the 2026 World Cup</p>
-            </div>
-            <div class="players-watch-grid" id="playersWatchGrid">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- LEADERBOARD SECTION -->
-    <section id="leaderboard" class="section-dark">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-tag">STATISTICS</div>
-                <h2 class="section-title">Top Players <span class="gold-text">So Far</span></h2>
-                <p class="section-subtitle">Golden Boot contenders and tournament leaders</p>
-            </div>
-
-            <div class="leaderboard-tabs">
-                <button class="lb-tab active" data-tab="goals">⚽ Top Scorers</button>
-                <button class="lb-tab" data-tab="assists">🎯 Top Assists</button>
-                <button class="lb-tab" data-tab="ratings">⭐ Best Rated</button>
-            </div>
-
-            <div class="leaderboard-container" id="leaderboardContainer">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- MATCH RESULTS SECTION -->
-    <section id="results" class="section-light">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-tag">RESULTS</div>
-                <h2 class="section-title">Match <span class="gold-text">Summaries</span></h2>
-                <p class="section-subtitle">Latest completed matches and scorelines</p>
-            </div>
-            <div class="results-grid" id="resultsGrid">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- NEWS SECTION -->
-    <section id="news" class="section-dark">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-tag">LATEST NEWS</div>
-                <h2 class="section-title">World Cup <span class="gold-text">Headlines</span></h2>
-                <p class="section-subtitle">Breaking news and exclusive stories from FIFA 2026</p>
-            </div>
-            <div class="news-grid" id="newsGrid">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer id="footer">
-        <div class="footer-top">
-            <div class="container">
-                <div class="footer-grid">
-                    <div class="footer-brand">
-                        <div class="footer-logo">
-                            <span>🏆</span>
-                            <div>
-                                <div class="footer-logo-fifa">FIFA</div>
-                                <div class="footer-logo-wc">WORLD CUP 2026™</div>
-                            </div>
-                        </div>
-                        <p>The biggest sporting event on Earth. USA · Canada · Mexico hosting the most expanded World Cup in history with 48 nations.</p>
-                        <div class="footer-social">
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
-                            <a href="#"><i class="fab fa-facebook"></i></a>
-                            <a href="#"><i class="fab fa-youtube"></i></a>
-                            <a href="#"><i class="fab fa-tiktok"></i></a>
-                        </div>
-                    </div>
-                    <div class="footer-links-col">
-                        <h4>Tournament</h4>
-                        <ul>
-                            <li><a href="#schedule">Match Schedule</a></li>
-                            <li><a href="#results">Results</a></li>
-                            <li><a href="#leaderboard">Statistics</a></li>
-                            <li><a href="#">Standings</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-links-col">
-                        <h4>Explore</h4>
-                        <ul>
-                            <li><a href="#">Host Cities</a></li>
-                            <li><a href="#">Venues</a></li>
-                            <li><a href="#">Teams</a></li>
-                            <li><a href="#players-watch">Players</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-links-col">
-                        <h4>FIFA</h4>
-                        <ul>
-                            <li><a href="#">About FIFA</a></li>
-                            <li><a href="#">Tickets</a></li>
-                            <li><a href="#">Merchandise</a></li>
-                            <li><a href="#news">Media</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="container">
-                <p>© 2026 FIFA World Cup™ Fan Hub. This is a fan-made application. All trademarks belong to FIFA.</p>
-                <div class="footer-host-logos">
-                    <span class="host-badge">🇺🇸 USA</span>
-                    <span class="host-badge">🇨🇦 CANADA</span>
-                    <span class="host-badge">🇲🇽 MEXICO</span>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- MATCH DETAIL MODAL -->
-    <div id="matchModal" class="modal-overlay">
-        <div class="modal-box">
-            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
-            <div id="modalContent"></div>
-        </div>
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">OFFICIAL FAN HUB</div>
+      <h1 class="hero-title">FIFA WORLD CUP<br/><span class="hero-year">2026</span></h1>
+      <p class="hero-subtitle">USA · CANADA · MEXICO</p>
+      <p class="hero-tagline">Where Legends Are Born</p>
+      <a href="#schedule" class="hero-cta">View Schedule</a>
     </div>
+    <div class="hero-scroll-indicator">
+      <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+    </div>
+  </section>
 
-    <script src="app.js"></script>
+  <!-- Ticker Tape -->
+  <div class="ticker-wrap">
+    <div class="ticker-content">
+      <span>⚽ Argentina vs France — Group A — June 20, 3PM EST</span>
+      <span>🏆 Brazil leads Group B with 6 points</span>
+      <span>⭐ Mbappe scores hat-trick in opening match</span>
+      <span>📍 MetLife Stadium, New York — 82,500 capacity</span>
+      <span>⚽ Spain vs Germany — Group C — June 21, 6PM EST</span>
+      <span>🔥 Portugal's Ronaldo becomes oldest WC scorer</span>
+      <span>📊 England top of Group D after two wins</span>
+      <span>⚽ Morocco stuns Italy 2-1 in historic upset</span>
+      <span>🎯 Vinicius Jr named Player of the Week</span>
+      <span>🏟️ SoFi Stadium hosts first semifinal July 14</span>
+    </div>
+  </div>
+
+  <!-- Schedule Section -->
+  <section id="schedule" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">MATCH SCHEDULE</span>
+        <h2 class="section-title">Upcoming Fixtures</h2>
+      </div>
+      <div class="filter-tabs reveal">
+        <button class="tab-btn active" data-filter="all">All Matches</button>
+        <button class="tab-btn" data-filter="group-a">Group A</button>
+        <button class="tab-btn" data-filter="group-b">Group B</button>
+        <button class="tab-btn" data-filter="group-c">Group C</button>
+        <button class="tab-btn" data-filter="group-d">Group D</button>
+        <button class="tab-btn" data-filter="knockout">Knockout</button>
+      </div>
+      <div class="matches-grid" id="matchesGrid"></div>
+    </div>
+  </section>
+
+  <!-- Match Detail Modal -->
+  <div id="matchModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Players to Watch -->
+  <section id="players" class="section section-dark">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">SPOTLIGHT</span>
+        <h2 class="section-title">Players to Watch</h2>
+      </div>
+      <div class="players-grid" id="playersGrid"></div>
+    </div>
+  </section>
+
+  <!-- Leaderboard -->
+  <section id="leaderboard" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">STANDINGS</span>
+        <h2 class="section-title">Tournament Leaderboard</h2>
+      </div>
+      <div class="leaderboard-tabs reveal">
+        <button class="tab-btn active" data-board="scorers">Top Scorers</button>
+        <button class="tab-btn" data-board="assists">Top Assists</button>
+        <button class="tab-btn" data-board="groups">Group Standings</button>
+      </div>
+      <div id="leaderboardContent"></div>
+    </div>
+  </section>
+
+  <!-- Match Results -->
+  <section id="results" class="section section-dark">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">MATCH SUMMARY</span>
+        <h2 class="section-title">Recent Results</h2>
+      </div>
+      <div class="results-grid" id="resultsGrid"></div>
+    </div>
+  </section>
+
+  <!-- News Section -->
+  <section id="news" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">LATEST NEWS</span>
+        <h2 class="section-title">World Cup Dispatch</h2>
+      </div>
+      <div class="news-grid" id="newsGrid"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <svg viewBox="0 0 50 50" width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="25" cy="25" r="23" fill="#001B5E" stroke="#C9A84C" stroke-width="2"/>
+          <polygon points="25,8 29,18 40,18 31,25 34,36 25,29 16,36 19,25 10,18 21,18" fill="#C9A84C"/>
+        </svg>
+        <span>FIFA WORLD CUP 2026</span>
+      </div>
+      <p class="footer-copy">&copy; 2026 FIFA World Cup Fan Hub. All rights reserved.</p>
+      <p class="footer-disclaimer">This is a fan-created application. Not affiliated with FIFA.</p>
+    </div>
+  </footer>
+
+  <!-- ⚽ Floating Football Animation -->
+  <div class="football-animation" id="footballAnimation" title="Click to kick!">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="football-svg">
+      <!-- Main ball -->
+      <circle cx="50" cy="50" r="46" fill="white" stroke="#222" stroke-width="2"/>
+      <!-- Shadow -->
+      <ellipse cx="50" cy="96" rx="22" ry="5" fill="rgba(0,0,0,0.18)"/>
+      <!-- Pentagon patches -->
+      <polygon points="50,18 60,26 56,38 44,38 40,26" fill="#111"/>
+      <polygon points="78,36 84,47 76,56 65,52 65,40" fill="#111"/>
+      <polygon points="70,72 60,78 50,72 50,60 62,56" fill="#111"/>
+      <polygon points="30,72 22,64 26,53 38,53 42,62" fill="#111"/>
+      <polygon points="22,40 32,36 40,44 36,55 24,55" fill="#111"/>
+      <!-- Highlight -->
+      <ellipse cx="38" cy="34" rx="8" ry="5" fill="rgba(255,255,255,0.45)" transform="rotate(-20,38,34)"/>
+    </svg>
+    <div class="football-tooltip">Click to kick!</div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
