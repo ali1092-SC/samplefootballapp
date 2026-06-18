@@ -4,11 +4,15 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    include: ['**/*.test.js'],
-    setupFiles: [],
     coverage: {
-      reporter: ['text', 'html'],
-      include: ['app.js'],
+      provider: 'v8',
+      reporter: ['text', 'lcov', 'html'],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80,
+      },
     },
   },
 });

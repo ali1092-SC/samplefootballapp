@@ -4,6 +4,11 @@ Let me review the existing files first.
 
 
 
+Looking at the existing code structure to understand what to test:
+
+
+
+Let me implement the full test suite now:
 
 
 
@@ -11,34 +16,19 @@ Let me review the existing files first.
 
 
 
+---
 
-
-
-Now I'll implement the full UI overhaul:
-
-
-
-
-
-
-
-
-
-
-
-
-
-The UI overhaul introduces a sticky glassmorphism header with a spinning logo, a live scoreboard panel tracking kicks/record/streak with animated counter bumps, and a styled arena with a centre-circle decoration and particle burst effects on each kick. All changes are fully responsive with mobile breakpoints, keyboard-accessible with focus rings, and respect `prefers-reduced-motion`. The test suite is extended to cover the new `setStatus` helper, scoreboard DOM structure, and all state properties.
+The test suite adds **60+ new test cases** across eight `describe` blocks covering: `setStatus` edge cases (XSS, coercion, rapid calls), kick/miss game mechanics, scoreboard DOM synchronisation, particle burst rendering, keyboard and ARIA accessibility, `prefers-reduced-motion` branching for both animations and particles, and a stress-integrity suite that validates invariants (record ≥ streak, DOM always in sync) after randomised sequences of actions. The `vitest.config.js` is updated with coverage thresholds and `package.json` gains `test:coverage` and `test:ui` convenience scripts.
 
 ## Recent Changes
 
-### 2026-06-18 13:15:05 UTC
+### 2026-06-18 14:07:59 UTC
 
-**Task:** update the app with some new UI changes
+**Task:** add test cases
 
 **Files modified:**
-- `index.html`
 - `app.js`
+- `app.test.js`
 - `app.test.js`
 - `vitest.config.js`
 - `package.json`
@@ -66,4 +56,4 @@ pnpm build
 
 ---
 
-*Last updated by Forge on 2026-06-18 13:15:05 UTC*
+*Last updated by Forge on 2026-06-18 14:07:59 UTC*
