@@ -1,109 +1,2242 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Football App</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <!-- Animated background layers -->
-    <div class="bg-gradient" aria-hidden="true"></div>
-    <div class="field-pattern" aria-hidden="true"></div>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIFA World Cup 2026 — Official Fan Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   CSS CUSTOM PROPERTIES
+   ===================================================== */
+:root {
+  --fifa-navy:       #0a1628;
+  --fifa-blue:       #1a3a6e;
+  --fifa-gold:       #c9a227;
+  --fifa-gold-light: #f5d675;
+  --fifa-red:        #c1272d;
+  --fifa-white:      #f5f5f0;
+  --fifa-silver:     #b0b8c8;
+  --glow-gold: 0 0 40px rgba(201,162,39,0.4);
+}
 
-    <!-- ===== HEADER ===== -->
-    <header class="site-header" role="banner">
-      <div class="header-inner">
-        <div class="logo-area">
-          <span class="logo-icon" aria-hidden="true">⚽</span>
-          <span class="logo-text">FootballApp</span>
-        </div>
-        <nav class="header-nav" aria-label="Primary navigation">
-          <button class="nav-btn active" data-view="game" aria-current="page">
-            Game
-          </button>
-          <button class="nav-btn" data-view="stats">Stats</button>
-        </nav>
-        <div class="header-badge">
-          <span class="badge-label">Season</span>
-          <span class="badge-value">2025</span>
+/* =====================================================
+   RESET & BASE
+   ===================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--fifa-navy);
+  color: var(--fifa-white);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+img, svg { display: block; }
+
+a { text-decoration: none; color: inherit; }
+
+button { cursor: pointer; font-family: inherit; }
+
+ul { list-style: none; }
+
+:focus-visible {
+  outline: 2px solid var(--fifa-gold);
+  outline-offset: 3px;
+}
+
+/* =====================================================
+   TYPOGRAPHY HELPERS
+   ===================================================== */
+.bebas { font-family: 'Bebas Neue', sans-serif; }
+.oswald { font-family: 'Oswald', sans-serif; }
+.inter { font-family: 'Inter', sans-serif; }
+
+/* =====================================================
+   SECTION SHARED STYLES
+   ===================================================== */
+.section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section {
+  padding: 90px 0;
+}
+
+.section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--fifa-gold);
+  border-bottom: 1px solid var(--fifa-gold);
+  display: inline-block;
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+}
+
+.section-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 6vw, 64px);
+  letter-spacing: 1px;
+  color: var(--fifa-white);
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.section-heading em {
+  font-style: normal;
+  color: var(--fifa-gold);
+}
+
+.section-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: var(--fifa-silver);
+  max-width: 560px;
+  margin-bottom: 40px;
+}
+
+/* =====================================================
+   FADE ANIMATIONS (prefers-reduced-motion guarded)
+   ===================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .fade-up.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .fade-left {
+    opacity: 0;
+    transform: translateX(-24px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .fade-left.in-view {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Hero logo float */
+  @keyframes logoFloat {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-6px); }
+  }
+  .logo-float {
+    animation: logoFloat 4s ease-in-out infinite;
+  }
+
+  /* Live dot pulse */
+  @keyframes livePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.4); opacity: 0.7; }
+  }
+  .live-dot {
+    animation: livePulse 1.2s ease-in-out infinite;
+  }
+
+  /* Scroll indicator */
+  @keyframes scrollBob {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(6px); }
+  }
+  .scroll-indicator-line {
+    animation: scrollBob 2s ease-in-out infinite;
+  }
+
+  /* Ticker */
+  @keyframes tickerMove {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .ticker-track {
+    animation: tickerMove 26s linear infinite;
+  }
+
+  /* LIVE badge pulse */
+  @keyframes badgePulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+  .live-badge-pulse {
+    animation: badgePulse 1.1s ease-in-out infinite;
+  }
+
+  /* Player card top border */
+  .player-card::before {
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+  }
+  .player-card:hover::before {
+    transform: scaleX(1);
+  }
+}
+
+/* =====================================================
+   CANVAS (animated footballs)
+   ===================================================== */
+#ball-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.16;
+}
+
+/* =====================================================
+   NAVIGATION
+   ===================================================== */
+#main-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 64px;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(10,22,40,0.93);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(201,162,39,0.18);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#main-nav.scrolled {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+
+.nav-logo-wrap { display: flex; align-items: center; }
+
+.nav-links {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.nav-links a {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--fifa-silver);
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--fifa-gold); }
+
+.nav-ticket-btn {
+  background: var(--fifa-gold);
+  color: var(--fifa-navy);
+  padding: 8px 20px;
+  border-radius: 3px;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  transition: opacity 0.2s;
+}
+.nav-ticket-btn:hover { opacity: 0.85; }
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--fifa-white);
+  cursor: pointer;
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: var(--fifa-navy);
+  border-top: 1px solid rgba(201,162,39,0.18);
+  padding: 12px 0;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu-wrap {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+.mobile-menu a {
+  padding: 12px 24px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--fifa-silver);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.mobile-menu a:hover { color: var(--fifa-gold); }
+
+@media (max-width: 768px) {
+  .nav-links, .nav-ticket-btn { display: none; }
+  .hamburger { display: block; }
+  #main-nav { padding: 0 20px; }
+}
+
+/* =====================================================
+   HERO SECTION
+   ===================================================== */
+#hero {
+  min-height: 100vh;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 100px 20px 60px;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to bottom, transparent 65%, var(--fifa-navy) 100%),
+    radial-gradient(ellipse 75% 55% at 50% 62%, rgba(26,58,110,0.5) 0%, transparent 100%),
+    var(--fifa-navy);
+}
+
+/* Pitch lines SVG overlay */
+.hero-pitch {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(193,39,45,0.12);
+  border: 1px solid rgba(193,39,45,0.35);
+  border-radius: 100px;
+  padding: 7px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ff6b6b;
+  margin-bottom: 28px;
+  letter-spacing: 0.3px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff6b6b;
+  flex-shrink: 0;
+}
+
+.hero-logo-wrap {
+  margin-bottom: 24px;
+  filter: drop-shadow(var(--glow-gold));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-logo-wrap { animation: logoFloat 4s ease-in-out infinite; }
+}
+
+.hero-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 14vw, 190px);
+  line-height: 0.86;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #ffffff 0%, var(--fifa-gold) 55%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+}
+
+.hero-subheading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(18px, 3.5vw, 48px);
+  color: var(--fifa-silver);
+  letter-spacing: 5px;
+  margin-bottom: 28px;
+}
+
+.hero-flags {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 44px;
+  color: var(--fifa-white);
+}
+
+.hero-flags span[aria-hidden] { margin: 0 6px; opacity: 0.5; }
+
+/* Countdown */
+.countdown {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+
+.cd-block {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,162,39,0.2);
+  border-radius: 6px;
+  padding: 16px 22px;
+  min-width: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.cd-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 54px;
+  line-height: 1;
+  color: var(--fifa-gold);
+}
+
+.cd-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--fifa-silver);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* CTA Buttons */
+.hero-ctas {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 60px;
+}
+
+.btn-primary {
+  background: var(--fifa-gold);
+  color: var(--fifa-navy);
+  padding: 13px 34px;
+  border-radius: 3px;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-gold);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--fifa-white);
+  padding: 13px 34px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.3);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-secondary:hover {
+  border-color: var(--fifa-gold);
+  color: var(--fifa-gold);
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--fifa-silver);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.scroll-indicator-line {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(to bottom, var(--fifa-silver), transparent);
+}
+
+/* =====================================================
+   LIVE SCORES TICKER
+   ===================================================== */
+#ticker {
+  position: relative;
+  width: 100%;
+  background: var(--fifa-red);
+  border-top: 2px solid rgba(255,255,255,0.12);
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+  overflow: hidden;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  z-index: 3;
+}
+
+.ticker-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.ticker-scroll {
+  overflow: hidden;
+  margin-left: 90px;
+  width: 100%;
+}
+
+.ticker-track {
+  display: flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 36px;
+  border-right: 1px solid rgba(255,255,255,0.18);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.ticker-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  background: rgba(0,0,0,0.25);
+  padding: 2px 10px;
+  border-radius: 3px;
+}
+
+.ticker-live {
+  font-size: 9px;
+  font-weight: 700;
+  background: #fff;
+  color: var(--fifa-red);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.ticker-ft {
+  font-size: 9px;
+  font-weight: 700;
+  background: #fff;
+  color: var(--fifa-navy);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* =====================================================
+   STATS STRIP
+   ===================================================== */
+#stats {
+  background: var(--fifa-blue);
+  border-top: 3px solid var(--fifa-gold);
+  border-bottom: 3px solid var(--fifa-gold);
+  padding: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.stat-item {
+  padding: 30px 16px;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+.stat-item:last-child { border-right: none; }
+
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px;
+  color: var(--fifa-gold);
+  line-height: 1;
+  display: block;
+}
+
+.stat-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--fifa-silver);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* =====================================================
+   VENUES
+   ===================================================== */
+#venues {
+  background: var(--fifa-navy);
+}
+
+.venues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 0;
+}
+
+.venue-card {
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+  background: var(--fifa-navy);
+}
+.venue-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(201,162,39,0.5);
+}
+
+.venue-img {
+  height: 155px;
+  background: linear-gradient(160deg, var(--fifa-blue), #0d2140);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  position: relative;
+}
+.venue-img::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, rgba(10,22,40,0), rgba(10,22,40,0.8));
+}
+
+.venue-info {
+  padding: 18px 20px;
+}
+
+.venue-city {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--fifa-white);
+  line-height: 1;
+}
+
+.venue-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--fifa-silver);
+  margin: 4px 0 10px;
+}
+
+.venue-cap {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fifa-gold);
+}
+
+/* =====================================================
+   GROUP STAGE
+   ===================================================== */
+#groups {
+  background: linear-gradient(160deg, var(--fifa-navy) 0%, var(--fifa-blue) 50%, var(--fifa-navy) 100%);
+}
+
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.group-card {
+  background: rgba(10,22,40,0.65);
+  border: 1px solid rgba(201,162,39,0.18);
+  border-radius: 8px;
+  padding: 20px;
+  transition: border-color 0.25s ease;
+}
+.group-card:hover { border-color: rgba(201,162,39,0.45); }
+
+.group-card.hidden-group { display: none; }
+
+.group-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.group-letter {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  color: var(--fifa-gold);
+  line-height: 1;
+}
+
+.group-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--fifa-silver);
+  background: rgba(255,255,255,0.07);
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.team-row:last-child { border-bottom: none; }
+
+.team-flag { font-size: 20px; }
+
+.team-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--fifa-white);
+  flex: 1;
+}
+
+.team-pts {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: var(--fifa-gold);
+}
+
+.groups-toggle {
+  display: block;
+  margin: 24px auto 0;
+  background: none;
+  border: 1px solid rgba(201,162,39,0.35);
+  color: var(--fifa-gold);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 28px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.groups-toggle:hover {
+  background: rgba(201,162,39,0.1);
+}
+
+/* =====================================================
+   PLAYER SPOTLIGHT
+   ===================================================== */
+#players {
+  background: var(--fifa-navy);
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 20px;
+  margin-top: 0;
+}
+
+.player-card {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 24px 18px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+.player-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201,162,39,0.38);
+}
+
+.player-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--fifa-gold);
+}
+
+.player-jersey {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 66px;
+  color: rgba(255,255,255,0.05);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.player-emoji {
+  font-size: 50px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.player-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fifa-white);
+  margin-bottom: 3px;
+}
+
+.player-nation {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--fifa-silver);
+  margin-bottom: 12px;
+}
+
+.player-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  color: var(--fifa-gold);
+  display: block;
+  line-height: 1;
+}
+
+.player-stat-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--fifa-silver);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* =====================================================
+   TIMELINE
+   ===================================================== */
+#schedule {
+  background: linear-gradient(160deg, var(--fifa-navy), var(--fifa-blue));
+}
+
+.timeline-wrap {
+  max-width: 800px;
+  margin: 40px auto 0;
+  padding-left: 44px;
+  position: relative;
+}
+
+.timeline-wrap::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 4px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--fifa-gold), rgba(201,162,39,0.1));
+}
+
+.t-event {
+  position: relative;
+  margin-bottom: 36px;
+}
+
+.t-event:last-child { margin-bottom: 0; }
+
+.t-dot {
+  position: absolute;
+  left: -36px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--fifa-gold);
+  box-shadow: 0 0 0 5px rgba(201,162,39,0.18);
+  flex-shrink: 0;
+}
+
+.t-date {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--fifa-gold);
+  text-transform: uppercase;
+}
+
+.t-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--fifa-white);
+  margin: 3px 0;
+}
+
+.t-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--fifa-silver);
+}
+
+/* =====================================================
+   PREDICTOR
+   ===================================================== */
+#predictor {
+  background: var(--fifa-navy);
+}
+
+.predictor-card {
+  max-width: 580px;
+  margin: 40px auto 0;
+  background: rgba(26,58,110,0.38);
+  border: 1px solid rgba(201,162,39,0.22);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+}
+
+.predictor-match {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.predictor-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.predictor-team-flag { font-size: 48px; }
+
+.predictor-team-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--fifa-white);
+}
+
+.predictor-vs {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px;
+  color: var(--fifa-gold);
+  opacity: 0.55;
+}
+
+.predictor-instruction {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--fifa-silver);
+  margin-bottom: 16px;
+}
+
+.score-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  /* role="radiogroup" applied in HTML */
+}
+
+.score-btn {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--fifa-white);
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.score-btn:hover { background: rgba(201,162,39,0.15); border-color: var(--fifa-gold); }
+.score-btn[aria-pressed="true"] {
+  background: var(--fifa-gold);
+  color: var(--fifa-navy);
+  border-color: transparent;
+}
+
+.predict-submit {
+  width: 100%;
+  background: var(--fifa-gold);
+  color: var(--fifa-navy);
+  padding: 14px;
+  border-radius: 4px;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: opacity 0.2s, background 0.3s;
+}
+.predict-submit:hover { opacity: 0.87; }
+.predict-submit.locked { background: #1D9E75; }
+
+#predict-result {
+  margin-top: 16px;
+  min-height: 28px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--fifa-silver);
+  transition: opacity 0.3s, transform 0.3s;
+  opacity: 0;
+  transform: translateY(6px);
+}
+#predict-result.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+#footer {
+  background: rgba(0,0,0,0.42);
+  border-top: 1px solid rgba(201,162,39,0.18);
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.footer-logo-wrap { margin-bottom: 16px; display: flex; justify-content: center; }
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.footer-links a {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--fifa-silver);
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--fifa-gold); }
+
+.footer-flags {
+  font-size: 18px;
+  margin-bottom: 16px;
+  letter-spacing: 4px;
+}
+
+.footer-legal {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.22);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .venues-grid { grid-template-columns: repeat(2, 1fr); }
+  .players-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  section { padding: 60px 0; }
+  .section-inner { padding: 0 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .venues-grid { grid-template-columns: 1fr; }
+  .players-grid { grid-template-columns: repeat(2, 1fr); }
+  .groups-grid { grid-template-columns: repeat(2, 1fr); }
+  .predictor-card { padding: 24px 16px; }
+  .hero-ctas { flex-direction: column; align-items: center; }
+  .countdown { gap: 6px; }
+  .cd-block { padding: 12px 14px; min-width: 70px; }
+  .cd-num { font-size: 40px; }
+}
+
+@media (max-width: 375px) {
+  .section-heading { font-size: 32px; }
+  .groups-grid { grid-template-columns: 1fr; }
+  .players-grid { grid-template-columns: 1fr; }
+  .hero-headline { font-size: 64px; }
+  .timeline-wrap { padding-left: 32px; }
+  .t-dot { left: -24px; }
+  .timeline-wrap::before { left: 6px; }
+}
+
+/* =====================================================
+   REDUCE MOTION FALLBACKS
+   ===================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up, .fade-left {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .ticker-track { animation: none !important; }
+  .live-dot { animation: none !important; }
+  .live-badge-pulse { animation: none !important; }
+  .scroll-indicator-line { animation: none !important; }
+  .hero-logo-wrap { animation: none !important; }
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- =====================================================
+     CANVAS — Animated Footballs
+     ===================================================== -->
+<canvas id="ball-canvas" aria-hidden="true"></canvas>
+
+<!-- =====================================================
+     NAVIGATION
+     ===================================================== -->
+<nav id="main-nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-logo-wrap">
+    <!-- FIFA 2026 Logo — .logo-nav -->
+    <svg class="logo-nav" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg" aria-label="FIFA World Cup 2026" role="img" style="height:36px;width:auto;">
+      <defs>
+        <linearGradient id="goldGrad-nav" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#f5d675"/>
+          <stop offset="50%" stop-color="#c9a227"/>
+          <stop offset="100%" stop-color="#a07a10"/>
+        </linearGradient>
+        <radialGradient id="trophyGrad-nav" cx="50%" cy="35%" r="55%">
+          <stop offset="0%" stop-color="#f5e88a"/>
+          <stop offset="100%" stop-color="#c9a227"/>
+        </radialGradient>
+        <filter id="trophyShadow-nav">
+          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#c9a227" flood-opacity="0.7"/>
+        </filter>
+      </defs>
+      <rect width="280" height="380" rx="4" fill="#0a1628"/>
+      <rect x="1" y="1" width="278" height="378" rx="4" fill="none" stroke="#c9a227" stroke-width="2"/>
+      <!-- Numeral 2 -->
+      <g fill="url(#goldGrad-nav)">
+        <rect x="60" y="28" width="160" height="22" rx="3"/>
+        <rect x="172" y="28" width="48" height="80" rx="3"/>
+        <rect x="60" y="88" width="160" height="22" rx="3"/>
+        <rect x="60" y="88" width="48" height="80" rx="3"/>
+        <rect x="60" y="148" width="160" height="22" rx="3"/>
+      </g>
+      <!-- Numeral 6 -->
+      <g fill="url(#goldGrad-nav)">
+        <rect x="60" y="192" width="160" height="22" rx="3"/>
+        <rect x="60" y="192" width="48" height="80" rx="3"/>
+        <rect x="60" y="252" width="160" height="22" rx="3"/>
+        <rect x="172" y="252" width="48" height="80" rx="3"/>
+        <rect x="60" y="312" width="160" height="22" rx="3"/>
+      </g>
+      <!-- Trophy Silhouette -->
+      <g filter="url(#trophyShadow-nav)" fill="url(#trophyGrad-nav)">
+        <rect x="116" y="316" width="48" height="18" rx="2"/>
+        <rect x="108" y="306" width="64" height="14" rx="2"/>
+        <rect x="124" y="210" width="32" height="96" rx="3"/>
+        <ellipse cx="140" cy="205" rx="52" ry="36"/>
+        <ellipse cx="140" cy="185" rx="40" ry="28"/>
+        <path d="M106 185 Q88 175 84 155 Q80 135 106 130 L106 185Z"/>
+        <path d="M174 185 Q192 175 196 155 Q200 135 174 130 L174 185Z"/>
+        <circle cx="118" cy="118" r="10"/>
+        <circle cx="162" cy="118" r="10"/>
+        <path d="M118 108 Q140 90 162 108"/>
+        <circle cx="140" cy="88" r="14"/>
+      </g>
+      <!-- FIFA wordmark -->
+      <text x="140" y="354" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="38" fill="#ffffff" letter-spacing="4">FIFA</text>
+      <!-- Host nations -->
+      <text x="140" y="372" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" fill="#b0b8c8" letter-spacing="1.5">CANADA · MEXICO · USA</text>
+    </svg>
+  </div>
+
+  <ul class="nav-links" role="list">
+    <li><a href="#venues">Venues</a></li>
+    <li><a href="#groups">Groups</a></li>
+    <li><a href="#players">Stars</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#predictor">Predictor</a></li>
+  </ul>
+
+  <button class="nav-ticket-btn" type="button">Get Tickets</button>
+  <button class="hamburger" type="button" aria-label="Open navigation menu" aria-expanded="false" id="hamburger-btn">☰</button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu-wrap" id="mobile-menu-wrap" aria-hidden="true">
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation">
+    <a href="#venues">Venues</a>
+    <a href="#groups">Groups</a>
+    <a href="#players">Stars</a>
+    <a href="#schedule">Schedule</a>
+    <a href="#predictor">Predictor</a>
+  </nav>
+</div>
+
+<!-- =====================================================
+     SECTION 2 — HERO
+     ===================================================== -->
+<section id="hero" aria-labelledby="hero-heading">
+  <div class="hero-bg" aria-hidden="true">
+    <!-- Pitch lines SVG overlay -->
+    <svg class="hero-pitch" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="1440" height="900" fill="none" stroke="#ffffff" stroke-width="1"/>
+      <line x1="720" y1="0" x2="720" y2="900" stroke="#ffffff" stroke-width="1"/>
+      <circle cx="720" cy="450" r="120" fill="none" stroke="#ffffff" stroke-width="1"/>
+      <rect x="0" y="270" width="200" height="360" fill="none" stroke="#ffffff" stroke-width="1"/>
+      <rect x="1240" y="270" width="200" height="360" fill="none" stroke="#ffffff" stroke-width="1"/>
+      <rect x="0" y="360" width="80" height="180" fill="none" stroke="#ffffff" stroke-width="1"/>
+      <rect x="1360" y="360" width="80" height="180" fill="none" stroke="#ffffff" stroke-width="1"/>
+      <circle cx="0" cy="450" r="100" fill="none" stroke="#ffffff" stroke-width="1"/>
+      <circle cx="1440" cy="450" r="100" fill="none" stroke="#ffffff" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <!-- Live badge -->
+  <div class="live-badge" role="status" aria-label="Live event in progress">
+    <span class="live-dot" aria-hidden="true"></span>
+    <span>LIVE NOW · 2026 TOURNAMENT IN PROGRESS</span>
+  </div>
+
+  <!-- Hero Logo -->
+  <div class="hero-logo-wrap" aria-hidden="true">
+    <svg class="logo-hero" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg" style="width:220px;" aria-hidden="true">
+      <defs>
+        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#f5d675"/>
+          <stop offset="50%" stop-color="#c9a227"/>
+          <stop offset="100%" stop-color="#a07a10"/>
+        </linearGradient>
+        <radialGradient id="trophyGrad" cx="50%" cy="35%" r="55%">
+          <stop offset="0%" stop-color="#f5e88a"/>
+          <stop offset="100%" stop-color="#c9a227"/>
+        </radialGradient>
+        <filter id="trophyShadow">
+          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#c9a227" flood-opacity="0.7"/>
+        </filter>
+      </defs>
+      <rect width="280" height="380" rx="4" fill="#0a1628"/>
+      <rect x="1" y="1" width="278" height="378" rx="4" fill="none" stroke="#c9a227" stroke-width="2"/>
+      <!-- Numeral 2 -->
+      <g fill="url(#goldGrad)">
+        <rect x="60" y="28" width="160" height="22" rx="3"/>
+        <rect x="172" y="28" width="48" height="80" rx="3"/>
+        <rect x="60" y="88" width="160" height="22" rx="3"/>
+        <rect x="60" y="88" width="48" height="80" rx="3"/>
+        <rect x="60" y="148" width="160" height="22" rx="3"/>
+      </g>
+      <!-- Numeral 6 -->
+      <g fill="url(#goldGrad)">
+        <rect x="60" y="192" width="160" height="22" rx="3"/>
+        <rect x="60" y="192" width="48" height="80" rx="3"/>
+        <rect x="60" y="252" width="160" height="22" rx="3"/>
+        <rect x="172" y="252" width="48" height="80" rx="3"/>
+        <rect x="60" y="312" width="160" height="22" rx="3"/>
+      </g>
+      <!-- Trophy -->
+      <g filter="url(#trophyShadow)" fill="url(#trophyGrad)">
+        <rect x="116" y="316" width="48" height="18" rx="2"/>
+        <rect x="108" y="306" width="64" height="14" rx="2"/>
+        <rect x="124" y="210" width="32" height="96" rx="3"/>
+        <ellipse cx="140" cy="205" rx="52" ry="36"/>
+        <ellipse cx="140" cy="185" rx="40" ry="28"/>
+        <path d="M106 185 Q88 175 84 155 Q80 135 106 130 L106 185Z"/>
+        <path d="M174 185 Q192 175 196 155 Q200 135 174 130 L174 185Z"/>
+        <circle cx="118" cy="118" r="10"/>
+        <circle cx="162" cy="118" r="10"/>
+        <path d="M118 108 Q140 90 162 108" fill="none" stroke="url(#trophyGrad)" stroke-width="4"/>
+        <circle cx="140" cy="88" r="14"/>
+      </g>
+      <!-- FIFA -->
+      <text x="140" y="354" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="38" fill="#ffffff" letter-spacing="4">FIFA</text>
+      <text x="140" y="372" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" fill="#b0b8c8" letter-spacing="1.5">CANADA · MEXICO · USA</text>
+    </svg>
+  </div>
+
+  <h1 class="hero-headline" id="hero-heading">WE ARE 26</h1>
+  <p class="hero-subheading">USA · CANADA · MEXICO · 2026</p>
+
+  <p class="hero-flags">
+    <span aria-hidden="true">🇺🇸</span> United States
+    <span aria-hidden="true"> ✦ </span>
+    <span aria-hidden="true">🇨🇦</span> Canada
+    <span aria-hidden="true"> ✦ </span>
+    <span aria-hidden="true">🇲🇽</span> Mexico
+  </p>
+
+  <!-- Countdown -->
+  <div class="countdown" id="countdown" role="timer" aria-live="polite" aria-atomic="true" aria-label="Countdown to FIFA World Cup 2026 opening match">
+    <div class="cd-block">
+      <span class="cd-num" id="cd-days">000</span>
+      <span class="cd-label">Days</span>
+    </div>
+    <div class="cd-block">
+      <span class="cd-num" id="cd-hours">00</span>
+      <span class="cd-label">Hours</span>
+    </div>
+    <div class="cd-block">
+      <span class="cd-num" id="cd-mins">00</span>
+      <span class="cd-label">Minutes</span>
+    </div>
+    <div class="cd-block">
+      <span class="cd-num" id="cd-secs">00</span>
+      <span class="cd-label">Seconds</span>
+    </div>
+  </div>
+
+  <!-- CTAs -->
+  <div class="hero-ctas">
+    <a href="#groups" class="btn-primary">Explore the Draw</a>
+    <a href="#predictor" class="btn-secondary">Make a Prediction</a>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="scroll-indicator" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="scroll-indicator-line"></div>
+  </div>
+</section>
+
+<!-- =====================================================
+     SECTION 3 — LIVE SCORES TICKER
+     ===================================================== -->
+<div id="ticker" aria-hidden="true" role="marquee">
+  <div class="ticker-label">
+    <span>⚽ LIVE</span>
+  </div>
+  <div class="ticker-scroll">
+    <div class="ticker-track" id="ticker-track">
+      <!-- Items rendered by JS to avoid repetition -->
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     SECTION 4 — STATS STRIP
+     ===================================================== -->
+<section id="stats" aria-labelledby="stats-heading" class="stats-strip">
+  <h2 id="stats-heading" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Tournament Statistics</h2>
+  <div class="stats-grid">
+    <div class="stat-item fade-up">
+      <span class="stat-num" data-target="48" id="stat-teams">0</span>
+      <span class="stat-label">Teams</span>
+    </div>
+    <div class="stat-item fade-up">
+      <span class="stat-num" data-target="104" id="stat-matches">0</span>
+      <span class="stat-label">Matches</span>
+    </div>
+    <div class="stat-item fade-up">
+      <span class="stat-num" data-target="16" id="stat-cities">0</span>
+      <span class="stat-label">Host Cities</span>
+    </div>
+    <div class="stat-item fade-up">
+      <span class="stat-num" id="stat-viewers">5B+</span>
+      <span class="stat-label">Expected Viewers</span>
+    </div>
+    <div class="stat-item fade-up">
+      <span class="stat-num" data-target="3" id="stat-nations">0</span>
+      <span class="stat-label">Host Nations</span>
+    </div>
+    <div class="stat-item fade-up">
+      <span class="stat-num" id="stat-prize">$100M</span>
+      <span class="stat-label">Prize Fund</span>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+     SECTION 5 — VENUES
+     ===================================================== -->
+<section id="venues" aria-labelledby="venues-heading">
+  <div class="section-inner">
+    <span class="section-label fade-left">Host Stadiums</span>
+    <h2 class="section-heading fade-left" id="venues-heading">ICONIC <em>VENUES</em></h2>
+    <p class="section-sub fade-left">World-class arenas across three nations hosting the greatest sporting event on Earth.</p>
+    <div class="venues-grid">
+      <div class="venue-card fade-up">
+        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
+        <div class="venue-info">
+          <div class="venue-city">New York / NJ</div>
+          <div class="venue-name">MetLife Stadium</div>
+          <div class="venue-cap"><span aria-hidden="true">⚽</span> 82,500 seats · <strong>FINAL</strong></div>
         </div>
       </div>
-    </header>
-
-    <!-- ===== MAIN ===== -->
-    <main class="main-content" id="main" role="main">
-
-      <!-- Scoreboard / Stats Panel -->
-      <section class="scoreboard" aria-label="Scoreboard">
-        <div class="score-card" id="score-card-kicks">
-          <span class="score-value" id="kick-count" aria-live="polite" aria-atomic="true">0</span>
-          <span class="score-label">Kicks</span>
+      <div class="venue-card fade-up">
+        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
+        <div class="venue-info">
+          <div class="venue-city">Mexico City</div>
+          <div class="venue-name">Estadio Azteca</div>
+          <div class="venue-cap"><span aria-hidden="true">⚽</span> 87,523 seats · <strong>OPENING MATCH</strong></div>
         </div>
-        <div class="score-divider" aria-hidden="true">VS</div>
-        <div class="score-card" id="score-card-record">
-          <span class="score-value" id="record-count" aria-live="polite" aria-atomic="true">0</span>
-          <span class="score-label">Record</span>
+      </div>
+      <div class="venue-card fade-up">
+        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
+        <div class="venue-info">
+          <div class="venue-city">Los Angeles</div>
+          <div class="venue-name">SoFi Stadium</div>
+          <div class="venue-cap"><span aria-hidden="true">⚽</span> 70,000 seats · <strong>SEMI-FINAL</strong></div>
         </div>
-        <div class="score-divider score-divider--thin" aria-hidden="true"></div>
-        <div class="score-card" id="score-card-streak">
-          <span class="score-value" id="streak-count" aria-live="polite" aria-atomic="true">0</span>
-          <span class="score-label">Streak 🔥</span>
+      </div>
+      <div class="venue-card fade-up">
+        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
+        <div class="venue-info">
+          <div class="venue-city">Dallas</div>
+          <div class="venue-name">AT&amp;T Stadium</div>
+          <div class="venue-cap"><span aria-hidden="true">⚽</span> 80,000 seats · <strong>QUARTER-FINAL</strong></div>
         </div>
-      </section>
-
-      <!-- Status message -->
-      <p class="status-message" id="status-message" role="status" aria-live="polite">
-        Click the ball to kick!
-      </p>
-
-      <!-- Game Arena -->
-      <section class="arena" aria-label="Game arena">
-        <div class="arena-inner">
-          <!-- Ball + shadow -->
-          <div
-            class="football-wrapper"
-            id="football-wrapper"
-            role="button"
-            tabindex="0"
-            aria-label="Football — click to kick"
-          >
-            <div class="football" id="football" aria-hidden="true">⚽</div>
-            <div class="shadow" id="shadow" aria-hidden="true"></div>
-          </div>
+      </div>
+      <div class="venue-card fade-up">
+        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
+        <div class="venue-info">
+          <div class="venue-city">Vancouver</div>
+          <div class="venue-name">BC Place</div>
+          <div class="venue-cap"><span aria-hidden="true">⚽</span> 54,500 seats · <strong>GROUP STAGE</strong></div>
         </div>
+      </div>
+      <div class="venue-card fade-up">
+        <div class="venue-img"><span aria-hidden="true">🏟️</span></div>
+        <div class="venue-info">
+          <div class="venue-city">San Francisco</div>
+          <div class="venue-name">Levi's Stadium</div>
+          <div class="venue-cap"><span aria-hidden="true">⚽</span> 68,500 seats · <strong>GROUP STAGE</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <!-- Kick feedback burst -->
-        <div class="burst-container" id="burst-container" aria-hidden="true"></div>
-      </section>
+<!-- =====================================================
+     SECTION 6 — GROUP STAGE DRAW
+     ===================================================== -->
+<section id="groups" aria-labelledby="groups-heading">
+  <div class="section-inner">
+    <span class="section-label fade-left">Group Stage</span>
+    <h2 class="section-heading fade-left" id="groups-heading">THE <em>DRAW</em></h2>
+    <p class="section-sub fade-left">48 nations divided into 12 groups competing for a place in the round of 32.</p>
 
-      <!-- Action bar -->
-      <div class="action-bar">
-        <button class="btn btn--primary" id="kick-btn" aria-label="Kick the football">
-          <span class="btn-icon">👟</span>
-          <span class="btn-text">Kick!</span>
-        </button>
-        <button class="btn btn--ghost" id="reset-btn" aria-label="Reset the game">
-          <span class="btn-icon">🔄</span>
-          <span class="btn-text">Reset</span>
-        </button>
+    <div class="groups-grid" id="groups-grid">
+      <!-- Group A -->
+      <div class="group-card fade-up">
+        <div class="group-header">
+          <span class="group-letter">A</span>
+          <span class="group-badge">GROUP A</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇺🇸</span><span class="team-name">United States</span><span class="team-pts">6</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class="team-name">England</span><span class="team-pts">4</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇮🇷</span><span class="team-name">Iran</span><span class="team-pts">3</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🏴󠁧󠁢󠁷󠁬󠁳󠁿</span><span class="team-name">Wales</span><span class="team-pts">0</span></div>
+      </div>
+      <!-- Group B -->
+      <div class="group-card fade-up">
+        <div class="group-header">
+          <span class="group-letter">B</span>
+          <span class="group-badge">GROUP B</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇦🇷</span><span class="team-name">Argentina</span><span class="team-pts">9</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇲🇽</span><span class="team-name">Mexico</span><span class="team-pts">4</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇵🇱</span><span class="team-name">Poland</span><span class="team-pts">3</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇸🇦</span><span class="team-name">Saudi Arabia</span><span class="team-pts">1</span></div>
+      </div>
+      <!-- Group C -->
+      <div class="group-card fade-up">
+        <div class="group-header">
+          <span class="group-letter">C</span>
+          <span class="group-badge">GROUP C</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇫🇷</span><span class="team-name">France</span><span class="team-pts">7</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇩🇰</span><span class="team-name">Denmark</span><span class="team-pts">5</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇹🇳</span><span class="team-name">Tunisia</span><span class="team-pts">2</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇦🇺</span><span class="team-name">Australia</span><span class="team-pts">1</span></div>
+      </div>
+      <!-- Group D -->
+      <div class="group-card fade-up">
+        <div class="group-header">
+          <span class="group-letter">D</span>
+          <span class="group-badge">GROUP D</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇧🇷</span><span class="team-name">Brazil</span><span class="team-pts">9</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇭</span><span class="team-name">Switzerland</span><span class="team-pts">4</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇲</span><span class="team-name">Cameroon</span><span class="team-pts">3</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇷🇸</span><span class="team-name">Serbia</span><span class="team-pts">0</span></div>
+      </div>
+      <!-- Group E -->
+      <div class="group-card fade-up">
+        <div class="group-header">
+          <span class="group-letter">E</span>
+          <span class="group-badge">GROUP E</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇪🇸</span><span class="team-name">Spain</span><span class="team-pts">7</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇯🇵</span><span class="team-name">Japan</span><span class="team-pts">6</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇩🇪</span><span class="team-name">Germany</span><span class="team-pts">3</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇷</span><span class="team-name">Costa Rica</span><span class="team-pts">0</span></div>
+      </div>
+      <!-- Group F -->
+      <div class="group-card fade-up">
+        <div class="group-header">
+          <span class="group-letter">F</span>
+          <span class="group-badge">GROUP F</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇧🇪</span><span class="team-name">Belgium</span><span class="team-pts">6</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇦</span><span class="team-name">Canada</span><span class="team-pts">4</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇭🇷</span><span class="team-name">Croatia</span><span class="team-pts">4</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇲🇦</span><span class="team-name">Morocco</span><span class="team-pts">3</span></div>
+      </div>
+      <!-- Group G (hidden) -->
+      <div class="group-card hidden-group fade-up">
+        <div class="group-header">
+          <span class="group-letter">G</span>
+          <span class="group-badge">GROUP G</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇳🇱</span><span class="team-name">Netherlands</span><span class="team-pts">7</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇪🇨</span><span class="team-name">Ecuador</span><span class="team-pts">4</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇸🇳</span><span class="team-name">Senegal</span><span class="team-pts">3</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇶🇦</span><span class="team-name">Qatar</span><span class="team-pts">0</span></div>
+      </div>
+      <!-- Group H (hidden) -->
+      <div class="group-card hidden-group fade-up">
+        <div class="group-header">
+          <span class="group-letter">H</span>
+          <span class="group-badge">GROUP H</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇵🇹</span><span class="team-name">Portugal</span><span class="team-pts">9</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇺🇾</span><span class="team-name">Uruguay</span><span class="team-pts">5</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇬🇭</span><span class="team-name">Ghana</span><span class="team-pts">1</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇰🇷</span><span class="team-name">South Korea</span><span class="team-pts">1</span></div>
+      </div>
+      <!-- Group I (hidden) -->
+      <div class="group-card hidden-group fade-up">
+        <div class="group-header">
+          <span class="group-letter">I</span>
+          <span class="group-badge">GROUP I</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇩🇪</span><span class="team-name">Germany</span><span class="team-pts">7</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇴</span><span class="team-name">Colombia</span><span class="team-pts">5</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇵🇦</span><span class="team-name">Panama</span><span class="team-pts">2</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇹🇿</span><span class="team-name">Tanzania</span><span class="team-pts">0</span></div>
+      </div>
+      <!-- Group J (hidden) -->
+      <div class="group-card hidden-group fade-up">
+        <div class="group-header">
+          <span class="group-letter">J</span>
+          <span class="group-badge">GROUP J</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇮🇹</span><span class="team-name">Italy</span><span class="team-pts">6</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇲🇽</span><span class="team-name">Mexico</span><span class="team-pts">5</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇺🇦</span><span class="team-name">Ukraine</span><span class="team-pts">3</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇸🇿</span><span class="team-name">Eswatini</span><span class="team-pts">0</span></div>
+      </div>
+      <!-- Group K (hidden) -->
+      <div class="group-card hidden-group fade-up">
+        <div class="group-header">
+          <span class="group-letter">K</span>
+          <span class="group-badge">GROUP K</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇳🇬</span><span class="team-name">Nigeria</span><span class="team-pts">7</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇦🇹</span><span class="team-name">Austria</span><span class="team-pts">4</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇿🇦</span><span class="team-name">South Africa</span><span class="team-pts">3</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇸🇻</span><span class="team-name">El Salvador</span><span class="team-pts">0</span></div>
+      </div>
+      <!-- Group L (hidden) -->
+      <div class="group-card hidden-group fade-up">
+        <div class="group-header">
+          <span class="group-letter">L</span>
+          <span class="group-badge">GROUP L</span>
+        </div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇨🇱</span><span class="team-name">Chile</span><span class="team-pts">6</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇷🇴</span><span class="team-name">Romania</span><span class="team-pts">4</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇿🇲</span><span class="team-name">Zambia</span><span class="team-pts">3</span></div>
+        <div class="team-row"><span class="team-flag" aria-hidden="true">🇯🇲</span><span class="team-name">Jamaica</span><span class="team-pts">1</span></div>
+      </div>
+    </div>
+
+    <button class="groups-toggle fade-up" id="groups-toggle" type="button">VIEW ALL 12 GROUPS ↓</button>
+  </div>
+</section>
+
+<!-- =====================================================
+     SECTION 7 — PLAYER SPOTLIGHT
+     ===================================================== -->
+<section id="players" aria-labelledby="players-heading">
+  <div class="section-inner">
+    <span class="section-label fade-left">Player Spotlight</span>
+    <h2 class="section-heading fade-left" id="players-heading">WORLD <em>STARS</em></h2>
+    <p class="section-sub fade-left">The legends who will write history at the 2026 FIFA World Cup.</p>
+    <div class="players-grid">
+
+      <article class="player-card fade-up" aria-label="Kylian Mbappé">
+        <span class="player-jersey" aria-hidden="true">10</span>
+        <span class="player-emoji" aria-hidden="true">⚡</span>
+        <div class="player-name">Kylian Mbappé</div>
+        <div class="player-nation"><span aria-hidden="true">🇫🇷</span> France</div>
+        <span class="player-stat-num">8</span>
+        <span class="player-stat-label">Goals</span>
+      </article>
+
+      <article class="player-card fade-up" aria-label="Erling Haaland">
+        <span class="player-jersey" aria-hidden="true">9</span>
+        <span class="player-emoji" aria-hidden="true">🎯</span>
+        <div class="player-name">Erling Haaland</div>
+        <div class="player-nation"><span aria-hidden="true">🇳🇴</span> Norway</div>
+        <span class="player-stat-num">6</span>
+        <span class="player-stat-label">Goals</span>
+      </article>
+
+      <article class="player-card fade-up" aria-label="Vinícius Jr.">
+        <span class="player-jersey" aria-hidden="true">11</span>
+        <span class="player-emoji" aria-hidden="true">🌪️</span>
+        <div class="player-name">Vinícius Jr.</div>
+        <div class="player-nation"><span aria-hidden="true">🇧🇷</span> Brazil</div>
+        <span class="player-stat-num">5</span>
+        <span class="player-stat-label">Goal + Assist</span>
+      </article>
+
+      <article class="player-card fade-up" aria-label="Pedri">
+        <span class="player-jersey" aria-hidden="true">8</span>
+        <span class="player-emoji" aria-hidden="true">💫</span>
+        <div class="player-name">Pedri</div>
+        <div class="player-nation"><span aria-hidden="true">🇪🇸</span> Spain</div>
+        <span class="player-stat-num">94%</span>
+        <span class="player-stat-label">Pass Accuracy</span>
+      </article>
+
+      <article class="player-card fade-up" aria-label="Bukayo Saka">
+        <span class="player-jersey" aria-hidden="true">7</span>
+        <span class="player-emoji" aria-hidden="true">🔥</span>
+        <div class="player-name">Bukayo Saka</div>
+        <div class="player-nation"><span aria-hidden="true">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span> England</div>
+        <span class="player-stat-num">7</span>
+        <span class="player-stat-label">Key Passes</span>
+      </article>
+
+      <article class="player-card fade-up" aria-label="Jude Bellingham">
+        <span class="player-jersey" aria-hidden="true">10</span>
+        <span class="player-emoji" aria-hidden="true">🏆</span>
+        <div class="player-name">Jude Bellingham</div>
+        <div class="player-nation"><span aria-hidden="true">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span> England</div>
+        <span class="player-stat-num">4</span>
+        <span class="player-stat-label">Match Goals</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+     SECTION 8 — TOURNAMENT TIMELINE
+     ===================================================== -->
+<section id="schedule" aria-labelledby="schedule-heading">
+  <div class="section-inner">
+    <span class="section-label fade-left">Tournament Calendar</span>
+    <h2 class="section-heading fade-left" id="schedule-heading">ROAD TO <em>GLORY</em></h2>
+    <div class="timeline-wrap">
+
+      <div class="t-event fade-up">
+        <div class="t-dot" aria-hidden="true"></div>
+        <div class="t-date">June 11, 2026</div>
+        <div class="t-title">Opening Match</div>
+        <div class="t-desc">Estadio Azteca, Mexico City — The world holds its breath as the 48-nation tournament begins.</div>
       </div>
 
-    </main>
+      <div class="t-event fade-up">
+        <div class="t-dot" aria-hidden="true"></div>
+        <div class="t-date">June 11 – July 2, 2026</div>
+        <div class="t-title">Group Stage</div>
+        <div class="t-desc">48 nations, 12 groups, 64 matches — every point matters in the race to qualify.</div>
+      </div>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="site-footer" role="contentinfo">
-      <p class="footer-text">
-        Built with <span aria-label="love">❤️</span> · FootballApp &copy; 2025
-      </p>
-    </footer>
+      <div class="t-event fade-up">
+        <div class="t-dot" aria-hidden="true"></div>
+        <div class="t-date">July 4–9, 2026</div>
+        <div class="t-title">Round of 32</div>
+        <div class="t-desc">Knockout football begins — one result, one chance, one dream on the line.</div>
+      </div>
 
-    <script type="module" src="app.js"></script>
-  </body>
+      <div class="t-event fade-up">
+        <div class="t-dot" aria-hidden="true"></div>
+        <div class="t-date">July 11–14, 2026</div>
+        <div class="t-title">Round of 16 &amp; Quarter-Finals</div>
+        <div class="t-desc">The last 16 battle it out — eight nations will be eliminated over four incredible days.</div>
+      </div>
+
+      <div class="t-event fade-up">
+        <div class="t-dot" aria-hidden="true"></div>
+        <div class="t-date">July 18–19, 2026</div>
+        <div class="t-title">Semi-Finals</div>
+        <div class="t-desc">New York and Los Angeles host the last four — who survives to reach the Final?</div>
+      </div>
+
+      <div class="t-event fade-up">
+        <div class="t-dot" aria-hidden="true"></div>
+        <div class="t-date">July 22, 2026</div>
+        <div class="t-title">Third Place Play-off</div>
+        <div class="t-desc">Two fallen giants compete for bronze — the last consolation prize of the tournament.</div>
+      </div>
+
+      <div class="t-event fade-up">
+        <div class="t-dot" aria-hidden="true"></div>
+        <div class="t-date">July 23, 2026 <span aria-hidden="true">🏆</span></div>
+        <div class="t-title">THE FINAL</div>
+        <div class="t-desc">MetLife Stadium, East Rutherford, New Jersey — the greatest stage in world football.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+     SECTION 9 — MATCH PREDICTOR
+     ===================================================== -->
+<section id="predictor" aria-labelledby="predictor-heading">
+  <div class="section-inner" style="text-align:center;">
+    <span class="section-label fade-left">Interactive</span>
+    <h2 class="section-heading fade-left" id="predictor-heading">WHO WINS <em>TODAY?</em></h2>
+    <p class="section-sub fade-left" style="margin:0 auto 0;">Pick a scoreline for the Argentina vs France showdown and see your prediction.</p>
+
+    <div class="predictor-card fade-up">
+      <div class="predictor-match">
+        <div class="predictor-team">
+          <span class="predictor-team-flag" aria-hidden="true">🇦🇷</span>
+          <span class="predictor-team-name">Argentina</span>
+        </div>
+        <span class="predictor-vs" aria-hidden="true">VS</span>
+        <div class="predictor-team">
+          <span class="predictor-team-flag" aria-hidden="true">🇫🇷</span>
+          <span class="predictor-team-name">France</span>
+        </div>
+      </div>
+
+      <p class="predictor-instruction">Pick your predicted score:</p>
+
+      <div class="score-buttons" role="radiogroup" aria-label="Predicted score">
+        <button class="score-btn" role="radio" aria-pressed="false" data-score="1-0" onclick="pickScore(this,'1-0')">1–0</button>
+        <button class="score-btn" role="radio" aria-pressed="false" data-score="2-0" onclick="pickScore(this,'2-0')">2–0</button>
+        <button class="score-btn" role="radio" aria-pressed="false" data-score="1-1" onclick="pickScore(this,'1-1')">1–1</button>
+        <button class="score-btn" role="radio" aria-pressed="false" data-score="2-1" onclick="pickScore(this,'2-1')">2–1</button>
+        <button class="score-btn" role="radio" aria-pressed="false" data-score="0-1" onclick="pickScore(this,'0-1')">0–1</button>
+        <button class="score-btn" role="radio" aria-pressed="false" data-score="0-2" onclick="pickScore(this,'0-2')">0–2</button>
+        <button class="score-btn" role="radio" aria-pressed="false" data-score="3-1" onclick="pickScore(this,'3-1')">3–1</button>
+        <button class="score-btn" role="radio" aria-pressed="false" data-score="1-3" onclick="pickScore(this,'1-3')">1–3</button>
+      </div>
+
+      <button class="predict-submit" id="predict-submit" type="button" onclick="submitPrediction()">LOCK IN PREDICTION</button>
+      <p id="predict-result" aria-live="polite" aria-atomic="true"></p>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+     SECTION 10 — FOOTER
+     ===================================================== -->
+<footer id="footer" role="contentinfo">
+  <div class="footer-logo-wrap" aria-hidden="true">
+    <svg class="logo-footer" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg" style="width:80px;" aria-hidden="true">
+      <defs>
+        <linearGradient id="goldGrad-f" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#f5d675"/>
+          <stop offset="50%" stop-color="#c9a227"/>
+          <stop offset="100%" stop-color="#a07a10"/>
+        </linearGradient>
+        <radialGradient id="trophyGrad-f" cx="50%" cy="35%" r="55%">
+          <stop offset="0%" stop-color="#f5e88a"/>
+          <stop offset="100%" stop-color="#c9a227"/>
+        </radialGradient>
+        <filter id="trophyShadow-f">
+          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#c9a227" flood-opacity="0.7"/>
+        </filter>
+      </defs>
+      <rect width="280" height="380" rx="4" fill="#0a1628"/>
+      <rect x="1" y="1" width="278" height="378" rx="4" fill="none" stroke="#c9a227" stroke-width="2"/>
+      <g fill="url(#goldGrad-f)">
+        <rect x="60" y="28" width="160" height="22" rx="3"/>
+        <rect x="172" y="28" width="48" height="80" rx="3"/>
+        <rect x="60" y="88" width="160" height="22" rx="3"/>
+        <rect x="60" y="88" width="48" height="80" rx="3"/>
+        <rect x="60" y="148" width="160" height="22" rx="3"/>
+      </g>
+      <g fill="url(#goldGrad-f)">
+        <rect x="60" y="192" width="160" height="22" rx="3"/>
+        <rect x="60" y="192" width="48" height="80" rx="3"/>
+        <rect x="60" y="252" width="160" height="22" rx="3"/>
+        <rect x="172" y="252" width="48" height="80" rx="3"/>
+        <rect x="60" y="312" width="160" height="22" rx="3"/>
+      </g>
+      <g filter="url(#trophyShadow-f)" fill="url(#trophyGrad-f)">
+        <rect x="116" y="316" width="48" height="18" rx="2"/>
+        <rect x="108" y="306" width="64" height="14" rx="2"/>
+        <rect x="124" y="210" width="32" height="96" rx="3"/>
+        <ellipse cx="140" cy="205" rx="52" ry="36"/>
+        <ellipse cx="140" cy="185" rx="40" ry="28"/>
+        <path d="M106 185 Q88 175 84 155 Q80 135 106 130 L106 185Z"/>
+        <path d="M174 185 Q192 175 196 155 Q200 135 174 130 L174 185Z"/>
+        <circle cx="118" cy="118" r="10"/>
+        <circle cx="162" cy="118" r="10"/>
+        <circle cx="140" cy="88" r="14"/>
+      </g>
+      <text x="140" y="354" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="38" fill="#ffffff" letter-spacing="4">FIFA</text>
+      <text x="140" y="372" text-anchor="middle" font-family="'Inter', sans-serif" font-size="8" fill="#b0b8c8" letter-spacing="1.5">CANADA · MEXICO · USA</text>
+    </svg>
+  </div>
+
+  <ul class="footer-links" role="list">
+    <li><a href="#venues">Venues</a></li>
+    <li><a href="#groups">Groups</a></li>
+    <li><a href="#players">Stars</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#predictor">Predictor</a></li>
+  </ul>
+
+  <div class="footer-flags" aria-label="Host nations: United States, Canada, Mexico">
+    <span aria-hidden="true">🇺🇸</span>
+    <span aria-hidden="true">🇨🇦</span>
+    <span aria-hidden="true">🇲🇽</span>
+  </div>
+
+  <p class="footer-legal">
+    &copy; 2026 FIFA&trade; — This is a fan-made showcase for educational purposes.<br>
+    FIFA&trade; and FIFA World Cup&trade; are registered trademarks of Fédération Internationale de Football Association.
+  </p>
+</footer>
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+<script>
+(function() {
+  'use strict';
+
+  /* =====================================================
+     CANVAS — ANIMATED FOOTBALLS
+     ===================================================== */
+  const canvas = document.getElementById('ball-canvas');
+  const ctx = canvas.getContext('2d');
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const ballSizes = [16, 24, 32, 38, 44];
+
+  function rand(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function randSign() {
+    return Math.random() > 0.5 ? 1 : -1;
+  }
+
+  const balls = ballSizes.map((r, i) => ({
+    x: rand(r, W - r),
+    y: rand(r, H - r),
+    vx: rand(0.4, 1.8) * randSign(),
+    vy: rand(0.4, 1.8) * randSign(),
+    r: r,
+    rot: rand(0, Math.PI * 2),
+    rotSpeed: rand(0.015, 0.03) * randSign()
+  }));
+
+  function pentagon(ctx, cx, cy, radius) {
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+      const angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+      const px = cx + radius * Math.cos(angle);
+      const py = cy + radius * Math.sin(angle);
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+  }
+
+  function drawBall(ctx, ball) {
+    ctx.save();
+    ctx.translate(ball.x, ball.y);
+    ctx.rotate(ball.rot);
+
+    const r = ball.r;
+
+    // Shadow glow
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = 'rgba(201,162,39,0.35)';
+
+    // Main circle
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(201,162,39,0.65)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Pentagon patch centers
+    const patchRadius = r * 0.52;
+    const pentSize = r * 0.2;
+
+    const patchCenters = [
+      [0, -patchRadius],
+      [patchRadius * Math.cos(-Math.PI / 10), patchRadius * Math.sin(-Math.PI / 10)],
+      [patchRadius * Math.cos(Math.PI * 0.3 - Math.PI / 10), patchRadius * Math.sin(Math.PI * 0.3 - Math.PI / 10)],
+      [-patchRadius * Math.cos(Math.PI * 0.3 - Math.PI / 10), patchRadius * Math.sin(Math.PI * 0.3 - Math.PI / 10)],
+      [-patchRadius * Math.cos(-Math.PI / 10), patchRadius * Math.sin(-Math.PI / 10)]
+    ];
+
+    // Lines from center patch to outer patches
+    ctx.strokeStyle = 'rgba(201,162,39,0.2)';
+    ctx.lineWidth = 0.7;
+    for (let i = 1; i < patchCenters.length; i++) {
+      ctx.beginPath();
+      ctx.moveTo(patchCenters[0][0], patchCenters[0][1]);
+      ctx.lineTo(patchCenters[i][0], patchCenters[i][1]);
+      ctx.stroke();
+    }
+
+    // Pentagon patches
+    ctx.strokeStyle = 'rgba(201,162,39,0.4)';
+    ctx.lineWidth = 1.0;
+    for (const [px, py] of patchCenters) {
+      pentagon(ctx, px, py, pentSize);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  let rafId = null;
+
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    for (const ball of balls) {
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+      ball.rot += ball.rotSpeed;
+      // Edge wrap
+      if (ball.x < -ball.r)  ball.x = W + ball.r;
+      if (ball.x > W + ball.r) ball.x = -ball.r;
+      if (ball.y < -ball.r)  ball.y = H + ball.r;
+      if (ball.y > H + ball.r) ball.y = -ball.r;
+      drawBall(ctx, ball);
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  if (!reducedMotion) {
+    tick();
+  }
+
+  window.addEventListener('resize', () => {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (reducedMotion) return;
+    if (document.hidden) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    } else {
+      if (!rafId) tick();
+    }
+  });
+
+  /* =====================================================
+     NAVIGATION — SCROLL + HAMBURGER
+     ===================================================== */
+  const nav = document.getElementById('main-nav');
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenuWrap = document.getElementById('mobile-menu-wrap');
+  let menuOpen = false;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+  });
+
+  hamburger.addEventListener('click', () => {
+    menuOpen = !menuOpen;
+    mobileMenu.classList.toggle('open', menuOpen);
+    hamburger.setAttribute('aria-expanded', String(menuOpen));
+    mobileMenuWrap.setAttribute('aria-hidden', String(!menuOpen));
+    hamburger.textContent = menuOpen ? '✕' : '☰';
+  });
+
+  // Close menu when a mobile link is tapped
+  mobileMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      menuOpen = false;
+      mobileMenu.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      mobileMenuWrap.setAttribute('aria-hidden', 'true');
+      hamburger.textContent = '☰';
+    });
+  });
+
+  /* =====================================================
+     COUNTDOWN
+     ===================================================== */
+  const TARGET_DATE = new Date('2026-06-11T20:00:00Z').getTime();
+
+  function updateCountdown() {
+    const now = Date.now();
+    const diff = TARGET_DATE - now;
+
+    if (diff <= 0) {
+      document.getElementById('cd-days').textContent = '000';
+      document.getElementById('cd-hours').textContent = '00';
+      document.getElementById('cd-mins').textContent = '00';
+      document.getElementById('cd-secs').textContent = '00';
+      return;
+    }
+
+    const days    = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('cd-days').textContent = String(days).padStart(3, '0');
+    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cd-mins').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('cd-secs').textContent = String(seconds).padStart(2, '0');
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  /* =====================================================
+     LIVE SCORES TICKER
+     ===================================================== */
+  const tickerItems = [
+    { teams: 'Argentina vs France',    score: '2–1', status: 'LIVE', minute: "74'" },
+    { teams: 'Brazil vs Spain',        score: '1–1', status: 'LIVE', minute: "58'" },
+    { teams: 'Germany vs Japan',       score: '3–2', status: 'FT',   minute: null  },
+    { teams: 'Portugal vs Morocco',    score: '2–0', status: 'FT',   minute: null  },
+    { teams: 'England vs Netherlands', score: '1–0', status: 'LIVE', minute: "88'" },
+    { teams: 'USA vs Canada',          score: '0–0', status: 'LIVE', minute: "22'" },
+  ];
+
+  function buildTickerItem(item) {
+    const badgeHtml = item.status === 'LIVE'
+      ? `<span class="ticker-live live-badge-pulse" aria-hidden="true">${item.minute} LIVE</span>`
+      : `<span class="ticker-ft" aria-hidden="true">FT</span>`;
+    return `<div class="ticker-item">${item.teams} <span class="ticker-score">${item.score}</span>${badgeHtml}</div>`;
+  }
+
+  const track = document.getElementById('ticker-track');
+  const allItems = [...tickerItems, ...tickerItems]; // duplicate for seamless loop
+  track.innerHTML = allItems.map(buildTickerItem).join('');
+
+  /* =====================================================
+     STATS COUNT-UP
+     ===================================================== */
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function animateCountUp(el, target, duration) {
+    const start = performance.now();
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(progress);
+      el.textContent = Math.floor(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+
+  const statsStrip = document.querySelector('.stats-strip');
+  let statsAnimated = false;
+
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !statsAnimated) {
+        statsAnimated = true;
+        statsObserver.unobserve(statsStrip);
+        document.querySelectorAll('[data-target]').forEach(el => {
+          const target = parseInt(el.dataset.target, 10);
+          animateCountUp(el, target, 1600);
+        });
+      }
+    });
+  }, { threshold: 0.2 });
+
+  if (statsStrip) statsObserver.observe(statsStrip);
+
+  /* =====================================================
+     GROUPS TOGGLE
+     ===================================================== */
+  const groupsToggle = document.getElementById('groups-toggle');
+  let groupsExpanded = false;
+
+  groupsToggle.addEventListener('click', () => {
+    groupsExpanded = !groupsExpanded;
+    document.querySelectorAll('.hidden-group').forEach(card => {
+      card.style.display = groupsExpanded ? 'block' : 'none';
+    });
+    groupsToggle.textContent = groupsExpanded ? 'SHOW LESS ↑' : 'VIEW ALL 12 GROUPS ↓';
+
+    // Re-observe newly visible cards
+    if (groupsExpanded) {
+      document.querySelectorAll('.hidden-group').forEach(card => {
+        scrollObserver.observe(card);
+      });
+    }
+  });
+
+  /* =====================================================
+     SCROLL ANIMATIONS
+     ===================================================== */
+  const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        scrollObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  function initScrollObserver() {
+    // Stagger siblings within same parent
+    const fadeUpGroups = {};
+    document.querySelectorAll('.fade-up, .fade-left').forEach(el => {
+      const parent = el.parentElement;
+      if (!fadeUpGroups[parent]) fadeUpGroups[parent] = [];
+      fadeUpGroups[parent].push(el);
+    });
+
+    Object.values(fadeUpGroups).forEach(siblings => {
+      siblings.forEach((el, i) => {
+        if (!reducedMotion) {
+          el.style.transitionDelay = `${i * 0.08}s`;
+        }
+        scrollObserver.observe(el);
+      });
+    });
+  }
+
+  initScrollObserver();
+
+  /* =====================================================
+     MATCH PREDICTOR
+     ===================================================== */
+  let selectedScore = null;
+
+  window.pickScore = function(btn, score) {
+    // Deactivate all
+    document.querySelectorAll('.score-btn').forEach(b => {
+      b.setAttribute('aria-pressed', 'false');
+    });
+    // Activate clicked
+    btn.setAttribute('aria-pressed', 'true');
+    selectedScore = score;
+
+    // Reset result if re-picking
+    const result = document.getElementById('predict-result');
+    result.classList.remove('visible');
+    const submitBtn = document.getElementById('predict-submit');
+    submitBtn.classList.remove('locked');
+    submitBtn.textContent = 'LOCK IN PREDICTION';
+  };
+
+  window.submitPrediction = function() {
+    const result = document.getElementById('predict-result');
+    const submitBtn = document.getElementById('predict-submit');
+
+    if (!selectedScore) {
+      result.textContent = 'Please pick a score first ⚽';
+      result.classList.add('visible');
+      return;
+    }
+
+    const [a, b] = selectedScore.split('-').map(Number);
+    let message = '';
+
+    if (a > b) {
+      message = '🇦🇷 Argentina win! The Albiceleste faithful will love you for that prediction.';
+    } else if (b > a) {
+      message = '🇫🇷 France take it! Vive la France — Les Bleus march on to glory.';
+    } else {
+      message = '⚖️ All square! You\'re predicting extra-time drama and possibly penalties.';
+    }
+
+    result.textContent = message;
+    result.classList.add('visible');
+    submitBtn.classList.add('locked');
+    submitBtn.textContent = '✓ Prediction Locked!';
+  };
+
+})();
+</script>
+</body>
 </html>
