@@ -1,22 +1,18 @@
 # Project
 
----
-
-The solution delivers a fully branded **FIFA World Cup 2026™** single-page application with a sticky glassmorphism header featuring an SVG tournament logo, a live animated score ticker, a hero section with countdown timer, a Today/Tomorrow match grid with live-score simulation, group standings carousel, a pageable/filterable news feed with hero article card, top scorers leaderboard, and a host cities carousel — all built with the official navy/red/gold palette. Two new data modules (`data/matches.js`, `data/news.js`) supply structured mock fixtures and news articles, while `app.js` provides all rendering functions and live-score polling. The test suite in `app.test.js` covers every data module, every rendering helper, DOM injection, ARIA attributes, toast notifications, countdown logic, and edge cases across 80+ assertions.
+The solution delivers a completely revamped FIFA World Cup 2026™ single-page app with 60+ CSS keyframe animations (flip-digit countdown, particle drift, shimmer skeletons, score-flash, gradient-shift hero, scroll-reveal stagger), a full glassmorphism sticky header with scroll-shrink, floating hero particles, 3D-perspective match cards with live-score glow pulses, animated goal-bar fills driven by IntersectionObserver, swipe-capable carousels with animated dot indicators, slide-in toast notifications with auto-dismiss, and a parallax news hero card — all wired together in `app.js` with an `IntersectionObserver`-based scroll-reveal system and an extended `app.test.js` covering 85+ assertions across every component.
 
 ## Recent Changes
 
-### 2026-06-18 14:40:38 UTC
+### 2026-06-18 15:07:06 UTC
 
-**Task:** I need to add more UI elements to the app wherein the UI should look like an official fifa 2026 application, it should show current live updates on matches taking place today and tomorrow on the home page, add latest news section and make sure to use the FIFA Worldcup 2026 logo
+**Task:** enhance the UI look and feel and add animations whereever possible
 
 **Files modified:**
+- `app.js`
 - `data/matches.js`
 - `data/news.js`
-- `app.js`
 - `app.test.js`
-- `vitest.config.js`
-- `package.json`
 
 ## Getting Started
 
@@ -41,4 +37,4 @@ pnpm build
 
 ---
 
-*Last updated by Forge on 2026-06-18 14:40:38 UTC*
+*Last updated by Forge on 2026-06-18 15:07:06 UTC*
