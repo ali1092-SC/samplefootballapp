@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIFA World Cup 2026 — Live Scores Banner Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fifa-navy:       #0a1628;
+    --fifa-blue:       #1a3a6e;
+    --fifa-gold:       #c9a227;
+    --fifa-gold-light: #f5d675;
+    --fifa-red:        #c1272d;
+    --fifa-white:      #f5f5f0;
+    --fifa-silver:     #b0b8c8;
+    --glow-gold: 0 0 40px rgba(201,162,39,0.4);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--fifa-navy);
+    color: var(--fifa-white);
+    padding-top: 102px; /* 64px nav + 38px banner */
+  }
+
+  /* ─── FIXED NAV (placeholder) ──────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    height: 64px;
+    padding: 0 40px;
+    background: rgba(10,22,40,0.93);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(201,162,39,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  nav .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  nav .nav-placeholder-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--fifa-gold);
+    letter-spacing: 2px;
+  }
+
+  /* ─── LIVE SCORES BANNER ────────────────────────────────────── */
+  #live-banner {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    height: 38px;
+    overflow: hidden;
+    background: var(--fifa-red);
+    border-bottom: 2px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+  }
+
+  /* Left anchor — stays fixed, never scrolls */
+  #banner-anchor {
+    flex-shrink: 0;
+    width: 130px;
+    height: 38px;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    border-right: 1px solid rgba(255,255,255,0.18);
+  }
+
+  #banner-anchor .live-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+
+  #banner-anchor .pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff4444;
+    flex-shrink: 0;
+    animation: pulseDot 0.9s ease-in-out infinite;
+  }
+
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+  }
+
+  /* Rotating match display area */
+  #banner-rotate-area {
+    flex: 1;
+    height: 38px;
+    position: relative;
+    margin-left: 0;
+    overflow: hidden;
+  }
+
+  #ticker-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    height: 38px;
+    padding: 0 16px;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+  }
+
+  .match-team {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fifa-white);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .match-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--fifa-white);
+    background: rgba(0,0,0,0.28);
+    padding: 2px 12px;
+    border-radius: 3px;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  .match-status {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .match-status.live {
+    background: #ffffff;
+    color: var(--fifa-red);
+    animation: statusPulse 1.1s ease-in-out infinite;
+  }
+
+  .match-status.ft {
+    background: rgba(255,255,255,0.15);
+    color: #ffffff;
+  }
+
+  @keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  /* Navigation dots */
+  #banner-dots {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+  }
+
+  .banner-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #ffffff;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+  }
+
+  .banner-dot.active {
+    opacity: 1;
+  }
+
+  @media (max-width: 480px) {
+    #banner-dots { display: none; }
+    .match-team  { font-size: 11px; }
+    .match-score { font-size: 16px; padding: 2px 8px; }
+    #banner-anchor { width: 110px; }
+  }
+
+  /* ─── DEMO PAGE CONTENT ─────────────────────────────────────── */
+  .demo-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 24px;
+  }
+
+  .demo-content h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--fifa-gold);
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+
+  .demo-content p {
+    font-size: 15px;
+    color: var(--fifa-silver);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  .spec-list {
+    list-style: none;
+    margin: 24px 0;
+  }
+
+  .spec-list li {
+    font-size: 13px;
+    color: var(--fifa-silver);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .spec-list li::before {
+    content: '✓';
+    color: var(--fifa-gold);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* focus visible */
+  *:focus-visible {
+    outline: 2px solid var(--fifa-gold);
+    outline-offset: 2px;
+  }
+
+  /* prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-dot,
+    .match-status.live {
+      animation: none;
+    }
+    #ticker-item {
+      transition: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FIXED NAV (minimal placeholder — full nav in index.html)
+════════════════════════════════════════════════════════════════ -->
+<nav role="navigation" aria-label="Main navigation">
+  <div class="nav-brand">
+    <!-- FIFA 2026 Logo SVG — logo-nav size (height: 36px) -->
+    <svg class="logo-nav" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg"
+         style="height:36px;width:auto;" aria-label="FIFA World Cup 2026" role="img">
+      <defs>
+        <linearGradient id="goldGradNav" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#f5d675"/>
+          <stop offset="50%"  stop-color="#c9a227"/>
+          <stop offset="100%" stop-color="#a07a10"/>
+        </linearGradient>
+        <radialGradient id="trophyGradNav" cx="50%" cy="40%" r="55%">
+          <stop offset="0%"  stop-color="#f5e88a"/>
+          <stop offset="100%" stop-color="#c9a227"/>
+        </radialGradient>
+        <filter id="trophyGlowNav">
+          <feDropShadow dx="0" dy="4" stdDeviation="8"
+                        flood-color="#c9a227" flood-opacity="0.7"/>
+        </filter>
+      </defs>
+      <!-- Background -->
+      <rect width="280" height="380" fill="#0a1628" rx="4"/>
+      <!-- Gold border -->
+      <rect x="1" y="1" width="278" height="378" fill="none"
+            stroke="#c9a227" stroke-width="2" rx="4"/>
+      <!-- "2" numeral -->
+      <text x="140" y="148" text-anchor="middle"
+            font-family="Arial Black, sans-serif" font-size="148"
+            font-weight="900" fill="url(#goldGradNav)">2</text>
+      <!-- "6" numeral -->
+      <text x="140" y="295" text-anchor="middle"
+            font-family="Arial Black, sans-serif" font-size="148"
+            font-weight="900" fill="url(#goldGradNav)">6</text>
+      <!-- Trophy silhouette overlay -->
+      <g filter="url(#trophyGlowNav)" transform="translate(90,20)">
+        <!-- Base tiers -->
+        <rect x="10" y="255" width="80" height="10" rx="2" fill="url(#trophyGradNav)"/>
+        <rect x="16" y="245" width="68" height="12" rx="2" fill="url(#trophyGradNav)"/>
+        <rect x="22" y="233" width="56" height="14" rx="2" fill="url(#trophyGradNav)"/>
+        <!-- Stem -->
+        <rect x="36" y="175" width="28" height="60" rx="4" fill="url(#trophyGradNav)"/>
+        <!-- Cup body -->
+        <path d="M18,80 Q10,130 14,165 Q30,175 50,177 Q70,175 86,165 Q90,130 82,80 Z"
+              fill="url(#trophyGradNav)"/>
+        <!-- Cup opening -->
+        <ellipse cx="50" cy="80" rx="32" ry="10" fill="url(#trophyGradNav)"/>
+        <!-- Left handle -->
+        <path d="M18,100 Q2,110 4,130 Q6,148 18,150" fill="none"
+              stroke="url(#trophyGradNav)" stroke-width="7" stroke-linecap="round"/>
+        <!-- Right handle -->
+        <path d="M82,100 Q98,110 96,130 Q94,148 82,150" fill="none"
+              stroke="url(#trophyGradNav)" stroke-width="7" stroke-linecap="round"/>
+        <!-- Human figure left (arms raised) -->
+        <circle cx="30" cy="38" r="8" fill="url(#trophyGradNav)"/>
+        <path d="M30,46 L26,72 M26,56 L16,48 M26,56 L30,48" fill="none"
+              stroke="url(#trophyGradNav)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Human figure right -->
+        <circle cx="70" cy="38" r="8" fill="url(#trophyGradNav)"/>
+        <path d="M70,46 L74,72 M74,56 L84,48 M74,56 L70,48" fill="none"
+              stroke="url(#trophyGradNav)" stroke-width="4" stroke-linecap="round"/>
+        <!-- Globe held between figures -->
+        <circle cx="50" cy="24" r="14" fill="url(#trophyGradNav)" opacity="0.9"/>
+        <path d="M37,24 Q50,16 63,24" fill="none"
+              stroke="#a07a10" stroke-width="1.2" opacity="0.6"/>
+        <path d="M37,24 Q50,32 63,24" fill="none"
+              stroke="#a07a10" stroke-width="1.2" opacity="0.6"/>
+        <line x1="50" y1="10" x2="50" y2="38" stroke="#a07a10" stroke-width="1.2" opacity="0.6"/>
+      </g>
+      <!-- FIFA wordmark -->
+      <text x="140" y="340" text-anchor="middle"
+            font-family="'Bebas Neue', sans-serif" font-size="38"
+            fill="#ffffff" letter-spacing="4">FIFA</text>
+      <!-- Host nations -->
+      <text x="140" y="362" text-anchor="middle"
+            font-family="'Inter', sans-serif" font-size="9"
+            fill="#b0b8c8" letter-spacing="2">CANADA · MEXICO · USA</text>
+    </svg>
+    <span class="nav-placeholder-text">FIFA World Cup 2026™</span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FIXED LIVE SCORES ROTATION BANNER
+     Position: fixed, top: 64px (below nav), z-index: 99
+     Height: 38px
+     Cycles through 8 match objects every 3.5s with 0.4s crossfade
+════════════════════════════════════════════════════════════════ -->
+<div id="live-banner"
+     role="marquee"
+     aria-label="Live match scores">
+
+  <!-- Left anchor: logo + LIVE label + pulsing dot (stays fixed) -->
+  <div id="banner-anchor">
+    <!-- FIFA 2026 Logo — logo-ticker size (height: 28px) -->
+    <svg class="logo-ticker" viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg"
+         style="height:24px;width:auto;flex-shrink:0;" aria-hidden="true">
+      <defs>
+        <linearGradient id="goldGradTicker" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stop-color="#f5d675"/>
+          <stop offset="50%"  stop-color="#c9a227"/>
+          <stop offset="100%" stop-color="#a07a10"/>
+        </linearGradient>
+        <radialGradient id="trophyGradTicker" cx="50%" cy="40%" r="55%">
+          <stop offset="0%"  stop-color="#f5e88a"/>
+          <stop offset="100%" stop-color="#c9a227"/>
+        </radialGradient>
+      </defs>
+      <rect width="280" height="380" fill="#0a1628" rx="4"/>
+      <rect x="1" y="1" width="278" height="378" fill="none"
+            stroke="#c9a227" stroke-width="2" rx="4"/>
+      <text x="140" y="148" text-anchor="middle"
+            font-family="Arial Black, sans-serif" font-size="148"
+            font-weight="900" fill="url(#goldGradTicker)">2</text>
+      <text x="140" y="295" text-anchor="middle"
+            font-family="Arial Black, sans-serif" font-size="148"
+            font-weight="900" fill="url(#goldGradTicker)">6</text>
+      <g transform="translate(90,20)">
+        <rect x="10" y="255" width="80" height="10" rx="2" fill="url(#trophyGradTicker)"/>
+        <rect x="16" y="245" width="68" height="12" rx="2" fill="url(#trophyGradTicker)"/>
+        <rect x="22" y="233" width="56" height="14" rx="2" fill="url(#trophyGradTicker)"/>
+        <rect x="36" y="175" width="28" height="60" rx="4" fill="url(#trophyGradTicker)"/>
+        <path d="M18,80 Q10,130 14,165 Q30,175 50,177 Q70,175 86,165 Q90,130 82,80 Z"
+              fill="url(#trophyGradTicker)"/>
+        <ellipse cx="50" cy="80" rx="32" ry="10" fill="url(#trophyGradTicker)"/>
+        <path d="M18,100 Q2,110 4,130 Q6,148 18,150" fill="none"
+              stroke="url(#trophyGradTicker)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M82,100 Q98,110 96,130 Q94,148 82,150" fill="none"
+              stroke="url(#trophyGradTicker)" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="30" cy="38" r="8" fill="url(#trophyGradTicker)"/>
+        <path d="M30,46 L26,72 M26,56 L16,48 M26,56 L30,48" fill="none"
+              stroke="url(#trophyGradTicker)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="70" cy="38" r="8" fill="url(#trophyGradTicker)"/>
+        <path d="M70,46 L74,72 M74,56 L84,48 M74,56 L70,48" fill="none"
+              stroke="url(#trophyGradTicker)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="24" r="14" fill="url(#trophyGradTicker)" opacity="0.9"/>
+      </g>
+      <text x="140" y="340" text-anchor="middle"
+            font-family="'Bebas Neue', sans-serif" font-size="38"
+            fill="#ffffff" letter-spacing="4">FIFA</text>
+      <text x="140" y="362" text-anchor="middle"
+            font-family="'Inter', sans-serif" font-size="9"
+            fill="#b0b8c8" letter-spacing="2">CANADA · MEXICO · USA</text>
+    </svg>
+    <span class="live-label">LIVE</span>
+    <span class="pulse-dot" aria-hidden="true"></span>
+  </div>
+
+  <!-- Rotating match display -->
+  <div id="banner-rotate-area">
+    <div id="ticker-item"
+         aria-live="polite"
+         aria-atomic="true">
+      <!-- Populated by JavaScript -->
+    </div>
+
+    <!-- Navigation dots (one per match, 8 total) -->
+    <div id="banner-dots" aria-hidden="true">
+      <!-- Populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DEMO PAGE CONTENT
+     (In the full index.html this area is replaced by all page sections)
+════════════════════════════════════════════════════════════════ -->
+<main class="demo-content">
+  <h1>Live Scores Banner — 3.5s Rotation</h1>
+  <p>
+    The fixed banner above demonstrates the complete live scores rotation
+    feature as specified. It sits at <code style="color:var(--fifa-gold)">top: 64px</code>
+    (immediately below the fixed navigation bar) and has
+    <code style="color:var(--fifa-gold)">z-index: 99</code> so it stays under the nav.
+  </p>
+  <p>
+    The page body has <code style="color:var(--fifa-gold)">padding-top: 102px</code>
+    (64px nav + 38px banner) so content starts below both fixed elements.
+  </p>
+
+  <ul class="spec-list">
+    <li>Banner fixed at <strong>top: 64px</strong>, height 38px, z-index 99 (below nav z-index 100)</li>
+    <li>Left anchor: FIFA 2026 logo (logo-ticker / 24px height) + "LIVE" label + pulsing red dot — stays static</li>
+    <li>Match display rotates through <strong>8 match objects</strong> every <strong>3.5 seconds</strong></li>
+    <li>Crossfade transition: opacity 0 → 1 over <strong>0.4s</strong> between matches</li>
+    <li>Live matches show a white badge with red text that pulses; finished matches show a static "FT" badge</li>
+    <li><strong>8 navigation dots</strong> on the right side — active dot is full white, inactive are 30% opacity</li>
+    <li>Navigation dots hidden on screens narrower than 480px</li>
+    <li>body <strong>padding-top: 102px</strong> accounts for both fixed bars</li>
+    <li>aria-live="polite" aria-atomic="true" on #ticker-item for screen readers</li>
+    <li>Animation pauses automatically when prefers-reduced-motion is set</li>
+  </ul>
+
+  <p style="margin-top:32px;color:var(--fifa-silver);font-size:13px;">
+    Matches cycling: Argentina vs France · Brazil vs Serbia · Germany vs Spain ·
+    England vs Morocco · Portugal vs Japan · Netherlands vs Mexico ·
+    USA vs Canada · Croatia vs Belgium
+  </p>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT — Banner rotation logic
+════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  // ── Match data ───────────────────────────────────────────────
+  const matches = [
+    { home: '🇦🇷 Argentina',    score: '2 – 1', away: 'France 🇫🇷',      status: "LIVE 67'",  live: true  },
+    { home: '🇧🇷 Brazil',       score: '3 – 0', away: 'Serbia 🇷🇸',      status: "LIVE 82'",  live: true  },
+    { home: '🇩🇪 Germany',      score: '1 – 1', away: 'Spain 🇪🇸',       status: "LIVE 55'",  live: true  },
+    { home: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 England',    score: '2 – 0', away: 'Morocco 🇲🇦',    status: "LIVE 71'",  live: true  },
+    { home: '🇵🇹 Portugal',     score: '1 – 0', away: 'Japan 🇯🇵',       status: 'FT',        live: false },
+    { home: '🇳🇱 Netherlands',  score: '2 – 2', away: 'Mexico 🇲🇽',      status: 'FT',        live: false },
+    { home: '🇺🇸 USA',          score: '1 – 0', away: 'Canada 🇨🇦',      status: "LIVE 43'",  live: true  },
+    { home: '🇭🇷 Croatia',      score: '0 – 0', away: 'Belgium 🇧🇪',     status: "LIVE 28'",  live: true  },
+  ];
+
+  // ── Build navigation dots ────────────────────────────────────
+  const dotsContainer = document.getElementById('banner-dots');
+  matches.forEach(function (_, i) {
+    const dot = document.createElement('span');
+    dot.className = 'banner-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-hidden', 'true');
+    dotsContainer.appendChild(dot);
+  });
+
+  // ── Build match HTML ─────────────────────────────────────────
+  function buildMatchHTML(match) {
+    const statusClass = match.live ? 'live' : 'ft';
+    return (
+      '<span class="match-team" aria-hidden="true">' + escapeHTML(match.home) + '</span>' +
+      '<span class="match-score">' + escapeHTML(match.score) + '</span>' +
+      '<span class="match-team" aria-hidden="true">' + escapeHTML(match.away) + '</span>' +
+      '<span class="match-status ' + statusClass + '">' + escapeHTML(match.status) + '</span>'
+    );
+  }
+
+  // Minimal HTML escape for safety
+  function escapeHTML(str) {
+    // Emoji + plain text — no user input, but good practice
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  // ── Update active dot ────────────────────────────────────────
+  function updateDots(index) {
+    const dots = dotsContainer.querySelectorAll('.banner-dot');
+    dots.forEach(function (dot, i) {
+      dot.classList.toggle('active', i === index);
+    });
+  }
+
+  // ── Rotation state ───────────────────────────────────────────
+  let currentIndex = 0;
+  const tickerEl = document.getElementById('ticker-item');
+
+  function rotateBanner() {
+    const item = matches[currentIndex];
+
+    // Fade out
+    tickerEl.style.opacity = '0';
+
+    setTimeout(function () {
+      // Swap content while invisible
+      tickerEl.innerHTML = buildMatchHTML(item);
+      updateDots(currentIndex);
+
+      // Fade in
+      tickerEl.style.opacity = '1';
+    }, 400); // matches the CSS transition duration
+
+    // Advance index for next rotation
+    currentIndex = (currentIndex + 1) % matches.length;
+  }
+
+  // ── Reduced motion check ─────────────────────────────────────
+  const prefersReducedMotion = window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
+
+  // Show first match immediately regardless of motion preference
+  // (content must always be visible even without animation)
+  tickerEl.style.opacity = '1';
+  tickerEl.innerHTML = buildMatchHTML(matches[0]);
+  updateDots(0);
+  currentIndex = 1; // next rotation starts at index 1
+
+  if (!prefersReducedMotion) {
+    // Start 3.5s rotation interval
+    var rotationInterval = setInterval(rotateBanner, 3500);
+
+    // Pause rotation when tab is hidden, resume when visible
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        clearInterval(rotationInterval);
+      } else {
+        rotationInterval = setInterval(rotateBanner, 3500);
+      }
+    });
+  }
+  // If reduced motion: content stays static at first match — no rotation
+
+})();
+</script>
+
+</body>
+</html>
