@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #000D2E;
+  color: #FFFFFF;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000D2E;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9A84C;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E8C96A;
+}
+
+@layer components {
+  .section-title {
+    @apply font-bebas text-5xl md:text-6xl text-white tracking-widest;
+  }
+
+  .section-subtitle {
+    @apply font-inter text-fifa-gold text-sm font-semibold tracking-[0.3em] uppercase;
+  }
+
+  .fifa-card {
+    @apply bg-gradient-to-b from-fifa-navyLight to-fifa-navyDark border border-fifa-gold/20 rounded-2xl overflow-hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .fifa-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(201, 168, 76, 0.15);
+  }
+
+  .fifa-btn {
+    @apply bg-gold-gradient text-fifa-navyDark font-bold text-sm tracking-widest uppercase px-6 py-3 rounded-full;
+    transition: all 0.3s ease;
+  }
+
+  .fifa-btn:hover {
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.5);
+    transform: scale(1.05);
+  }
+
+  .live-badge {
+    @apply bg-fifa-red text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse;
+  }
+
+  .gold-border {
+    border: 1px solid rgba(201, 168, 76, 0.3);
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 30px rgba(201, 168, 76, 0.1);
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #C9A84C 0%, #E8C96A 25%, #ffffff 50%, #E8C96A 75%, #C9A84C 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.flag-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.stadium-bg {
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(201, 168, 76, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, #000D2E 0%, #001A5C 50%, #000D2E 100%);
+}
+
+.news-card {
+  transition: all 0.3s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-2px);
+}
+
+.match-card {
+  transition: all 0.3s ease;
+}
+
+.match-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 50px rgba(201, 168, 76, 0.12);
+}

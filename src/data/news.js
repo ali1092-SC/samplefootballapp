@@ -1,0 +1,80 @@
+export const newsArticles = [
+  {
+    id: 1,
+    category: "Match Report",
+    tag: "BREAKING",
+    tagColor: "bg-red-600",
+    headline: "Messi Nets Brace as Argentina Demolish Nigeria 3-0 in Vancouver",
+    summary: "Lionel Messi was unstoppable at BC Place as the defending champions made a statement with a dominant 3-0 victory over Nigeria. The GOAT scored twice inside 35 minutes before Julián Álvarez put the game to bed. A vintage Messi masterclass that had fans on their feet from whistle to whistle.",
+    fullText: "Lionel Messi put in one of the performances of his storied career as Argentina dismantled Nigeria 3-0 at BC Place in Vancouver. The 38-year-old, in what could be his final World Cup, showed absolutely no signs of slowing down — threading passes through impossibly tight spaces, drawing fouls, and scoring twice with his trademark precision...",
+    image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&h=400&fit=crop",
+    author: "FIFA Media",
+    timestamp: "2 hours ago",
+    readTime: "4 min read"
+  },
+  {
+    id: 2,
+    category: "Match Report",
+    tag: "FULL TIME",
+    tagColor: "bg-green-600",
+    headline: "Spain Edge Brazil in Azteca Thriller — Yamal's Masterclass Decides Classic",
+    summary: "In what many are calling the match of the tournament already, Spain edged past Brazil 2-1 at the iconic Estadio Azteca. Lamine Yamal's goal and assist were the difference as Spain started their title defence in the most emphatic of fashions.",
+    fullText: "The Estadio Azteca witnessed one of the great World Cup spectacles as Spain and Brazil delivered a classic full of skill, drama and moments of pure genius. Lamine Yamal, just 18, played with the poise of a veteran and the unpredictability of youth...",
+    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=400&fit=crop",
+    author: "FIFA Media",
+    timestamp: "5 hours ago",
+    readTime: "6 min read"
+  },
+  {
+    id: 3,
+    category: "Preview",
+    tag: "PREVIEW",
+    tagColor: "bg-blue-600",
+    headline: "France vs Portugal: Mbappé and Ronaldo Set for Epic Group D Showdown",
+    summary: "The most anticipated group stage match of the tournament arrives on June 15 when France face Portugal. Kylian Mbappé faces his Real Madrid teammate Cristiano Ronaldo in what could be a defining moment in the transition between football generations.",
+    fullText: "When France and Portugal walk out onto the pitch at Estadio Guadalajara, the eyes of the footballing world will be watching. This is not just a group stage match — it is a statement of intent from two of the sport's heavyweights...",
+    image: "https://images.unsplash.com/photo-1504016798967-59a258a9d254?w=600&h=400&fit=crop",
+    author: "FIFA Preview Desk",
+    timestamp: "8 hours ago",
+    readTime: "5 min read"
+  },
+  {
+    id: 4,
+    category: "Stats",
+    tag: "STATS",
+    tagColor: "bg-purple-600",
+    headline: "Messi vs Ronaldo World Cup Goals: The Numbers That Define a Rivalry",
+    summary: "With Messi netting twice against Nigeria, the numbers in the greatest rivalry in football history are being updated in real time. We break down every World Cup goal, assist and moment from both legends across their extraordinary careers.",
+    fullText: "The numbers are staggering when you lay them side by side. Messi now has 13 World Cup goals across six tournaments, while Ronaldo sits on 8 across five. But statistics only tell part of the story of the greatest individual rivalry the sport has ever produced...",
+    image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=600&h=400&fit=crop",
+    author: "FIFA Stats Centre",
+    timestamp: "10 hours ago",
+    readTime: "7 min read"
+  },
+  {
+    id: 5,
+    category: "Feature",
+    tag: "FEATURE",
+    tagColor: "bg-yellow-600",
+    headline: "Inside the Azteca: How Mexico Prepared Its Most Iconic Stadium for 2026",
+    summary: "The Estadio Azteca has hosted more World Cup matches than any other ground on earth. We go behind the scenes to see the $400 million renovation that has transformed the cathedral of football into a 21st century marvel while preserving its legendary atmosphere.",
+    fullText: "Walking into the Azteca on match day is an experience unlike any other in world football. The sheer scale of the bowl, the noise, the history — it hits you all at once. And now, after a monumental renovation project...",
+    image: "https://images.unsplash.com/photo-1551958219-acbc595b8f97?w=600&h=400&fit=crop",
+    author: "FIFA Feature",
+    timestamp: "1 day ago",
+    readTime: "8 min read"
+  },
+  {
+    id: 6,
+    category: "Injury",
+    tag: "INJURY",
+    tagColor: "bg-orange-600",
+    headline: "Harry Kane Passes Fitness Test — England Captain Clear for Netherlands Clash",
+    summary: "England received a major boost as captain Harry Kane was passed fit to face the Netherlands after picking up a minor ankle concern in training. The Bayern Munich striker is fully available for selection as England bid to end their wait for a major tournament trophy.",
+    fullText: "England fans can breathe easy. Harry Kane, the nation's all-time leading scorer, has been declared fully fit and is available for Thursday's Group F opener against the Netherlands at AT&T Stadium in Dallas...",
+    image: "https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=600&h=400&fit=crop",
+    author: "FIFA News Desk",
+    timestamp: "1 day ago",
+    readTime: "3 min read"
+  }
+];
