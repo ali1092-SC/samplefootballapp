@@ -1,109 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Football App</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <!-- Animated background layers -->
-    <div class="bg-gradient" aria-hidden="true"></div>
-    <div class="field-pattern" aria-hidden="true"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIFA World Cup 2026™</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
 
-    <!-- ===== HEADER ===== -->
-    <header class="site-header" role="banner">
-      <div class="header-inner">
-        <div class="logo-area">
-          <span class="logo-icon" aria-hidden="true">⚽</span>
-          <span class="logo-text">FootballApp</span>
+  <!-- ═══════════════════════════════════════════════════════════
+       NAVIGATION
+  ═══════════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <nav class="nav-container" aria-label="Main navigation">
+      <div class="nav-logo">
+        <a href="#" aria-label="FIFA World Cup 2026 Home">
+          <!-- FIFA World Cup 2026 Official Logo SVG -->
+          <svg class="fifa-logo" viewBox="0 0 220 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <!-- Trophy cup body -->
+            <g transform="translate(10, 4)">
+              <path d="M30 8 L34 28 Q36 38 30 44 Q24 50 20 54 L40 54 L38 58 L22 58 L22 62 L38 62 L38 66 L18 66 L18 70 L42 70 L42 66 L42 62 L42 58 L40 54 Q44 50 44 44 Q48 34 46 28 L50 8 Z" fill="#C9A84C"/>
+              <path d="M34 8 L34 14 Q42 14 44 20 Q46 26 44 32 Q42 40 38 44 L46 44 Q52 38 52 28 Q52 18 46 12 Q42 8 34 8 Z" fill="#E8C96A"/>
+              <path d="M26 8 L26 14 Q18 14 16 20 Q14 26 16 32 Q18 40 22 44 L14 44 Q8 38 8 28 Q8 18 14 12 Q18 8 26 8 Z" fill="#E8C96A"/>
+              <!-- Stars above trophy -->
+              <path d="M24 2 L25 5 L28 5 L26 7 L27 10 L24 8 L21 10 L22 7 L20 5 L23 5 Z" fill="#C9A84C"/>
+              <path d="M36 2 L37 5 L40 5 L38 7 L39 10 L36 8 L33 10 L34 7 L32 5 L35 5 Z" fill="#C9A84C"/>
+              <path d="M30 0 L31.2 3.6 L35 3.6 L32 5.8 L33.2 9.4 L30 7.2 L26.8 9.4 L28 5.8 L25 3.6 L28.8 3.6 Z" fill="#FFD700"/>
+            </g>
+            <!-- FIFA Text -->
+            <text x="68" y="32" font-family="'Bebas Neue', sans-serif" font-size="28" fill="#FFFFFF" letter-spacing="3">FIFA</text>
+            <!-- World Cup Text -->
+            <text x="68" y="50" font-family="'Bebas Neue', sans-serif" font-size="16" fill="#C9A84C" letter-spacing="2">WORLD CUP</text>
+            <!-- 2026 Text -->
+            <text x="68" y="68" font-family="'Bebas Neue', sans-serif" font-size="22" fill="#FFFFFF" letter-spacing="2">2026™</text>
+            <!-- USA / CAN / MEX hosts -->
+            <text x="68" y="78" font-family="'Inter', sans-serif" font-size="7" fill="#8899BB" letter-spacing="1.5">USA · CANADA · MEXICO</text>
+          </svg>
+        </a>
+      </div>
+
+      <button class="nav-hamburger" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav-menu" id="navMenu" role="list">
+        <li><a href="#matches" class="nav-link active">Matches</a></li>
+        <li><a href="#news" class="nav-link">News</a></li>
+        <li><a href="#teams" class="nav-link">Teams</a></li>
+        <li><a href="#stadiums" class="nav-link">Stadiums</a></li>
+        <li><a href="#tickets" class="nav-link">Tickets</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="btn-nav-cta" aria-label="Buy tickets">🎟 Buy Tickets</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HERO BANNER
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="hero" aria-label="Tournament hero banner">
+    <div class="hero-bg-particles" id="heroBgParticles" aria-hidden="true"></div>
+    <div class="hero-content">
+      <div class="hero-badge">GROUP STAGE · WEEK 3</div>
+      <h1 class="hero-title">
+        The World's<br/>
+        <span class="hero-title-accent">Greatest Stage</span>
+      </h1>
+      <p class="hero-subtitle">48 Teams · 16 Host Cities · 104 Matches · One Trophy</p>
+      <div class="hero-cta-group">
+        <a href="#matches" class="btn-primary">View Today's Matches</a>
+        <a href="#news" class="btn-secondary">Latest News</a>
+      </div>
+      <div class="hero-stats" role="list" aria-label="Tournament statistics">
+        <div class="hero-stat" role="listitem">
+          <span class="hero-stat-number" id="statGoals">0</span>
+          <span class="hero-stat-label">Goals Scored</span>
         </div>
-        <nav class="header-nav" aria-label="Primary navigation">
-          <button class="nav-btn active" data-view="game" aria-current="page">
-            Game
-          </button>
-          <button class="nav-btn" data-view="stats">Stats</button>
-        </nav>
-        <div class="header-badge">
-          <span class="badge-label">Season</span>
-          <span class="badge-value">2025</span>
+        <div class="hero-stat" role="listitem">
+          <span class="hero-stat-number" id="statMatches">0</span>
+          <span class="hero-stat-label">Matches Played</span>
+        </div>
+        <div class="hero-stat" role="listitem">
+          <span class="hero-stat-number" id="statViewers">0</span>
+          <span class="hero-stat-label">M Viewers</span>
         </div>
       </div>
-    </header>
+    </div>
+    <div class="hero-trophy-visual" aria-hidden="true">
+      <div class="trophy-glow"></div>
+      <svg class="hero-trophy-svg" viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="trophyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#C9A84C;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#8B6914;stop-opacity:1" />
+          </linearGradient>
+          <linearGradient id="trophyHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#FFF8DC;stop-opacity:0.6" />
+            <stop offset="100%" style="stop-color:#C9A84C;stop-opacity:0" />
+          </linearGradient>
+          <filter id="trophyGlow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Base / Pedestal -->
+        <rect x="60" y="230" width="80" height="8" rx="4" fill="url(#trophyGrad)"/>
+        <rect x="70" y="218" width="60" height="14" rx="3" fill="url(#trophyGrad)"/>
+        <rect x="75" y="205" width="50" height="15" rx="2" fill="url(#trophyGrad)"/>
+        <!-- Stem -->
+        <rect x="88" y="175" width="24" height="32" rx="4" fill="url(#trophyGrad)"/>
+        <!-- Cup body -->
+        <path d="M55 60 Q50 120 65 150 Q80 175 100 175 Q120 175 135 150 Q150 120 145 60 Z" fill="url(#trophyGrad)" filter="url(#trophyGlow)"/>
+        <!-- Highlight -->
+        <path d="M65 65 Q60 110 72 140 Q78 155 88 165 Q75 150 72 120 Q68 95 72 65 Z" fill="url(#trophyHighlight)"/>
+        <!-- Handles -->
+        <path d="M55 80 Q30 80 28 100 Q26 120 50 125 Q55 126 60 120" stroke="url(#trophyGrad)" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M145 80 Q170 80 172 100 Q174 120 150 125 Q145 126 140 120" stroke="url(#trophyGrad)" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <!-- Hexagonal football pattern on cup -->
+        <path d="M85 90 L100 82 L115 90 L115 106 L100 114 L85 106 Z" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <path d="M100 82 L100 70" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <!-- Stars above -->
+        <g fill="#FFD700" filter="url(#trophyGlow)">
+          <path d="M80 40 L82 46 L88 46 L83 50 L85 56 L80 52 L75 56 L77 50 L72 46 L78 46 Z"/>
+          <path d="M100 32 L102.4 39.2 L110 39.2 L104 43.6 L106.4 50.8 L100 46.4 L93.6 50.8 L96 43.6 L90 39.2 L97.6 39.2 Z"/>
+          <path d="M120 40 L122 46 L128 46 L123 50 L125 56 L120 52 L115 56 L117 50 L112 46 L118 46 Z"/>
+        </g>
+        <!-- Top opening of cup -->
+        <ellipse cx="100" cy="60" rx="45" ry="10" fill="#B8942A" opacity="0.6"/>
+      </svg>
+    </div>
+  </section>
 
-    <!-- ===== MAIN ===== -->
-    <main class="main-content" id="main" role="main">
+  <!-- ═══════════════════════════════════════════════════════════
+       LIVE TICKER BAR
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="ticker-bar" role="marquee" aria-label="Live match updates ticker" aria-live="polite">
+    <div class="ticker-label" aria-hidden="true">
+      <span class="ticker-pulse"></span>LIVE
+    </div>
+    <div class="ticker-track" id="tickerTrack">
+      <span class="ticker-item">🇧🇷 Brazil 2–1 Croatia 🇭🇷 · 74'</span>
+      <span class="ticker-separator">◆</span>
+      <span class="ticker-item">🇦🇷 Argentina 0–0 Netherlands 🇳🇱 · 45+2'</span>
+      <span class="ticker-separator">◆</span>
+      <span class="ticker-item">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England 3–0 Iran 🇮🇷 · FT</span>
+      <span class="ticker-separator">◆</span>
+      <span class="ticker-item">🇫🇷 France 1–1 Denmark 🇩🇰 · 88'</span>
+      <span class="ticker-separator">◆</span>
+      <span class="ticker-item">🇩🇪 Germany 2–0 Japan 🇯🇵 · HT</span>
+      <span class="ticker-separator">◆</span>
+      <span class="ticker-item">🇵🇹 Portugal 4–0 Ghana 🇬🇭 · FT</span>
+      <span class="ticker-separator">◆</span>
+      <span class="ticker-item">🇺🇸 USA 1–2 Mexico 🇲🇽 · 61'</span>
+      <span class="ticker-separator">◆</span>
+      <span class="ticker-item">🇪🇸 Spain 2–1 Costa Rica 🇨🇷 · FT</span>
+    </div>
+  </div>
 
-      <!-- Scoreboard / Stats Panel -->
-      <section class="scoreboard" aria-label="Scoreboard">
-        <div class="score-card" id="score-card-kicks">
-          <span class="score-value" id="kick-count" aria-live="polite" aria-atomic="true">0</span>
-          <span class="score-label">Kicks</span>
-        </div>
-        <div class="score-divider" aria-hidden="true">VS</div>
-        <div class="score-card" id="score-card-record">
-          <span class="score-value" id="record-count" aria-live="polite" aria-atomic="true">0</span>
-          <span class="score-label">Record</span>
-        </div>
-        <div class="score-divider score-divider--thin" aria-hidden="true"></div>
-        <div class="score-card" id="score-card-streak">
-          <span class="score-value" id="streak-count" aria-live="polite" aria-atomic="true">0</span>
-          <span class="score-label">Streak 🔥</span>
-        </div>
-      </section>
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════════════════════ -->
+  <main id="main-content" role="main">
 
-      <!-- Status message -->
-      <p class="status-message" id="status-message" role="status" aria-live="polite">
-        Click the ball to kick!
-      </p>
-
-      <!-- Game Arena -->
-      <section class="arena" aria-label="Game arena">
-        <div class="arena-inner">
-          <!-- Ball + shadow -->
-          <div
-            class="football-wrapper"
-            id="football-wrapper"
-            role="button"
-            tabindex="0"
-            aria-label="Football — click to kick"
-          >
-            <div class="football" id="football" aria-hidden="true">⚽</div>
-            <div class="shadow" id="shadow" aria-hidden="true"></div>
+    <!-- LIVE MATCHES TODAY -->
+    <section class="section matches-section" id="matches" aria-labelledby="matchesTodayHeading">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-tag live-tag">
+              <span class="pulse-dot"></span>LIVE NOW
+            </span>
+            <h2 class="section-title" id="matchesTodayHeading">Today's Matches</h2>
+          </div>
+          <div class="section-meta">
+            <span class="last-updated" id="lastUpdated" aria-live="polite">Updated just now</span>
+            <button class="btn-refresh" id="refreshBtn" aria-label="Refresh live scores">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M23 4v6h-6M1 20v-6h6"/>
+                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+              </svg>
+              Refresh
+            </button>
           </div>
         </div>
 
-        <!-- Kick feedback burst -->
-        <div class="burst-container" id="burst-container" aria-hidden="true"></div>
-      </section>
+        <div class="matches-filter" role="tablist" aria-label="Match day filter">
+          <button class="filter-tab active" role="tab" aria-selected="true" data-filter="today">Today</button>
+          <button class="filter-tab" role="tab" aria-selected="false" data-filter="tomorrow">Tomorrow</button>
+          <button class="filter-tab" role="tab" aria-selected="false" data-filter="all">All Fixtures</button>
+        </div>
 
-      <!-- Action bar -->
-      <div class="action-bar">
-        <button class="btn btn--primary" id="kick-btn" aria-label="Kick the football">
-          <span class="btn-icon">👟</span>
-          <span class="btn-text">Kick!</span>
-        </button>
-        <button class="btn btn--ghost" id="reset-btn" aria-label="Reset the game">
-          <span class="btn-icon">🔄</span>
-          <span class="btn-text">Reset</span>
-        </button>
+        <div class="matches-grid" id="matchesGrid" aria-label="Match cards" aria-live="polite">
+          <!-- Populated by app.js -->
+        </div>
+
+        <div class="matches-tomorrow-section hidden" id="tomorrowSection">
+          <div class="section-header" style="margin-top:2rem">
+            <div class="section-title-group">
+              <span class="section-tag upcoming-tag">TOMORROW</span>
+              <h2 class="section-title">Tomorrow's Fixtures</h2>
+            </div>
+          </div>
+          <div class="matches-grid" id="tomorrowMatchesGrid" aria-label="Tomorrow's match cards">
+            <!-- Populated by app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GROUP STANDINGS WIDGET -->
+    <section class="section standings-section" aria-labelledby="standingsHeading">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-tag">GROUP STAGE</span>
+            <h2 class="section-title" id="standingsHeading">Group Standings</h2>
+          </div>
+          <div class="standings-nav" role="tablist" aria-label="Group selector">
+            <button class="group-tab active" role="tab" aria-selected="true" data-group="A">A</button>
+            <button class="group-tab" role="tab" aria-selected="false" data-group="B">B</button>
+            <button class="group-tab" role="tab" aria-selected="false" data-group="C">C</button>
+            <button class="group-tab" role="tab" aria-selected="false" data-group="D">D</button>
+            <button class="group-tab" role="tab" aria-selected="false" data-group="E">E</button>
+            <button class="group-tab" role="tab" aria-selected="false" data-group="F">F</button>
+          </div>
+        </div>
+        <div class="standings-table-wrapper" id="standingsTable" aria-live="polite">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TOP SCORERS WIDGET -->
+    <section class="section scorers-section" aria-labelledby="scorersHeading">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-tag gold-tag">⚽ GOLDEN BOOT</span>
+            <h2 class="section-title" id="scorersHeading">Top Scorers</h2>
+          </div>
+        </div>
+        <div class="scorers-list" id="scorersList" aria-label="Top goal scorers">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- LATEST NEWS -->
+    <section class="section news-section" id="news" aria-labelledby="newsHeading">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-tag">LATEST</span>
+            <h2 class="section-title" id="newsHeading">News &amp; Stories</h2>
+          </div>
+          <a href="#" class="btn-text-link" aria-label="View all news articles">View All →</a>
+        </div>
+        <div class="news-featured" id="newsFeatured" aria-label="Featured news articles">
+          <!-- Populated by app.js -->
+        </div>
+        <div class="news-grid" id="newsGrid" aria-label="Latest news articles">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- HOST CITIES BAND -->
+    <section class="section cities-section" aria-labelledby="citiesHeading">
+      <div class="section-container">
+        <div class="section-header">
+          <div class="section-title-group">
+            <span class="section-tag">2026</span>
+            <h2 class="section-title" id="citiesHeading">Host Cities</h2>
+          </div>
+        </div>
+        <div class="cities-scroll" id="citiesScroll" aria-label="Host city list" role="list">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <svg class="footer-logo" viewBox="0 0 160 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="FIFA World Cup 2026 logo" role="img">
+          <g transform="translate(4,2)">
+            <path d="M18 5 L20 13 Q21 18 18 21 Q15 24 13 26 L23 26 L22 28 L14 28 L14 30 L22 30 L22 32 L12 32 L12 34 L24 34 L24 32 L24 30 L24 28 L22 26 Q24.5 23 24.5 20 Q26.5 15 25.5 13 L27.5 5 Z" fill="#C9A84C"/>
+            <path d="M21 5 Q26 6 27 11 Q28 16 26 20 Q25 23 22 25 L26 25 Q29 21 29 14 Q29 8 26 5 Z" fill="#E8C96A"/>
+            <path d="M15 5 Q10 6 9 11 Q8 16 10 20 Q11 23 14 25 L10 25 Q7 21 7 14 Q7 8 10 5 Z" fill="#E8C96A"/>
+            <path d="M12.5 3 L13.2 5.2 L15.5 5.2 L13.7 6.5 L14.4 8.7 L12.5 7.4 L10.6 8.7 L11.3 6.5 L9.5 5.2 L11.8 5.2 Z" fill="#FFD700"/>
+            <path d="M21 3 L21.7 5.2 L24 5.2 L22.2 6.5 L22.9 8.7 L21 7.4 L19.1 8.7 L19.8 6.5 L18 5.2 L20.3 5.2 Z" fill="#C9A84C"/>
+          </g>
+          <text x="42" y="22" font-family="'Bebas Neue',sans-serif" font-size="18" fill="#fff" letter-spacing="2">FIFA</text>
+          <text x="42" y="34" font-family="'Bebas Neue',sans-serif" font-size="11" fill="#C9A84C" letter-spacing="1.5">WORLD CUP 2026™</text>
+          <text x="42" y="44" font-family="'Inter',sans-serif" font-size="6" fill="#556688" letter-spacing="1">USA · CANADA · MEXICO</text>
+        </svg>
+        <p class="footer-tagline">The World's Greatest Football Tournament</p>
       </div>
 
-    </main>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <div class="footer-nav-col">
+          <h3 class="footer-nav-heading">Tournament</h3>
+          <ul role="list">
+            <li><a href="#">Fixtures &amp; Results</a></li>
+            <li><a href="#">Groups</a></li>
+            <li><a href="#">Teams</a></li>
+            <li><a href="#">Players</a></li>
+            <li><a href="#">Statistics</a></li>
+          </ul>
+        </div>
+        <div class="footer-nav-col">
+          <h3 class="footer-nav-heading">Event</h3>
+          <ul role="list">
+            <li><a href="#">Host Cities</a></li>
+            <li><a href="#">Stadiums</a></li>
+            <li><a href="#">Tickets</a></li>
+            <li><a href="#">Fan Zones</a></li>
+            <li><a href="#">Hospitality</a></li>
+          </ul>
+        </div>
+        <div class="footer-nav-col">
+          <h3 class="footer-nav-heading">Media</h3>
+          <ul role="list">
+            <li><a href="#">News</a></li>
+            <li><a href="#">Videos</a></li>
+            <li><a href="#">Photos</a></li>
+            <li><a href="#">Press</a></li>
+            <li><a href="#">Broadcast</a></li>
+          </ul>
+        </div>
+        <div class="footer-nav-col">
+          <h3 class="footer-nav-heading">Follow</h3>
+          <ul class="footer-socials" role="list">
+            <li><a href="#" aria-label="FIFA on Twitter/X">𝕏 Twitter</a></li>
+            <li><a href="#" aria-label="FIFA on Instagram">📸 Instagram</a></li>
+            <li><a href="#" aria-label="FIFA on YouTube">▶ YouTube</a></li>
+            <li><a href="#" aria-label="FIFA on Facebook">👤 Facebook</a></li>
+            <li><a href="#" aria-label="FIFA on TikTok">♪ TikTok</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="site-footer" role="contentinfo">
-      <p class="footer-text">
-        Built with <span aria-label="love">❤️</span> · FootballApp &copy; 2025
-      </p>
-    </footer>
+    <div class="footer-bottom">
+      <p class="footer-legal">© 2026 FIFA. All rights reserved. FIFA World Cup 2026™ and the FIFA World Cup Trophy are trademarks of FIFA.</p>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Cookie Settings</a>
+        <a href="#">Accessibility</a>
+      </div>
+    </div>
+  </footer>
 
-    <script type="module" src="app.js"></script>
-  </body>
+  <script type="module" src="app.js"></script>
+</body>
 </html>

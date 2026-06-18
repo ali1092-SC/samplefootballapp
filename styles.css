@@ -1,212 +1,1050 @@
+/* ═══════════════════════════════════════════════════════════════
+   FIFA WORLD CUP 2026 — Design System
+   Base palette: deep navy #0a0e1a · gold #c9a84c · white #ffffff
+═══════════════════════════════════════════════════════════════ */
+
+/* ─── Custom Properties ──────────────────────────────────────── */
 :root {
-  --ball-size:            64px;
-  --kick-duration:        2s;
-  --idle-bounce-duration: 0.6s;
-  --idle-sway-duration:   1.0s;
-  --impact-duration:      0.15s;
-  --shadow-color:         rgba(0, 0, 0, 0.35);
+  /* Brand colours */
+  --fifa-navy:       #0a0e1a;
+  --fifa-navy-mid:   #111828;
+  --fifa-navy-light: #1a2540;
+  --fifa-navy-card:  #141c2e;
+  --fifa-gold:       #c9a84c;
+  --fifa-gold-light: #e8c96a;
+  --fifa-gold-dark:  #8b6914;
+  --fifa-red:        #e63946;
+  --fifa-green:      #2dc653;
+  --fifa-white:      #ffffff;
+  --fifa-off-white:  #e8edf5;
+  --fifa-muted:      #556688;
+  --fifa-border:     rgba(201,168,76,.18);
+  --fifa-glass:      rgba(20,28,46,.7);
+  /* Typography */
+  --font-display: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif;
+  --font-body:    'Inter', 'Helvetica Neue', Arial, sans-serif;
+  /* Spacing */
+  --space-xs: .25rem;
+  --space-sm: .5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl:3rem;
+  --space-3xl:4rem;
+  /* Layout */
+  --max-width: 1280px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  /* Shadows */
+  --shadow-card:  0 4px 24px rgba(0,0,0,.4);
+  --shadow-glow:  0 0 40px rgba(201,168,76,.2);
+  --shadow-hover: 0 8px 40px rgba(201,168,76,.3);
+  /* Transitions */
+  --transition: .2s ease;
+  --transition-slow: .4s ease;
 }
 
-/* ─── Layout ──────────────────────────────────────────────────── */
+/* ─── Reset & Base ────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; -webkit-text-size-adjust: 100%; }
 body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  font-family: var(--font-body);
+  background: var(--fifa-navy);
+  color: var(--fifa-off-white);
   min-height: 100vh;
-  background: #1a5c2a;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--fifa-gold); }
+img, svg { display: block; max-width: 100%; }
+ul { list-style: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+/* Focus visible ring for accessibility */
+:focus-visible {
+  outline: 2px solid var(--fifa-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--fifa-navy); }
+::-webkit-scrollbar-thumb { background: var(--fifa-gold-dark); border-radius: 3px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════════ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,14,26,.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--fifa-border);
+}
+.nav-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: .6rem var(--space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+.nav-logo a { display: flex; align-items: center; }
+.fifa-logo { height: 56px; width: auto; }
+
+.nav-menu {
+  display: flex;
+  gap: var(--space-xs);
+  flex: 1;
+  justify-content: center;
+}
+.nav-link {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: .875rem;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: var(--fifa-muted);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+  white-space: nowrap;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--fifa-white);
+  background: rgba(201,168,76,.1);
+}
+.nav-link.active { color: var(--fifa-gold); }
+
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px;
+  margin-left: auto;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--fifa-off-white);
+  border-radius: 2px;
+  transition: transform .3s, opacity .3s;
+}
+
+.btn-nav-cta {
+  background: var(--fifa-gold);
+  color: var(--fifa-navy);
+  font-weight: 700;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .5rem 1.1rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+.btn-nav-cta:hover { background: var(--fifa-gold-light); box-shadow: var(--shadow-glow); }
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════════════════ */
+.hero {
+  position: relative;
+  min-height: 92vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-3xl);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl) var(--space-2xl);
   overflow: hidden;
 }
+.hero::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(201,168,76,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 60%, rgba(17,24,40,.8) 0%, transparent 70%),
+    var(--fifa-navy);
+  pointer-events: none;
+}
+.hero-bg-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.hero-content { position: relative; z-index: 1; }
+.hero-badge {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--fifa-gold);
+  background: rgba(201,168,76,.12);
+  border: 1px solid rgba(201,168,76,.3);
+  padding: .35rem .9rem;
+  border-radius: 100px;
+  margin-bottom: var(--space-lg);
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1.0;
+  letter-spacing: .02em;
+  color: var(--fifa-white);
+  margin-bottom: var(--space-md);
+}
+.hero-title-accent {
+  background: linear-gradient(90deg, var(--fifa-gold-light), var(--fifa-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--fifa-muted);
+  margin-bottom: var(--space-2xl);
+  letter-spacing: .02em;
+}
+.hero-cta-group { display: flex; gap: var(--space-md); margin-bottom: var(--space-2xl); flex-wrap: wrap; }
 
-#football-container {
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: linear-gradient(135deg, var(--fifa-gold), var(--fifa-gold-dark));
+  color: var(--fifa-navy);
+  font-weight: 700;
+  font-size: .9rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .8rem 1.8rem;
+  border-radius: var(--radius-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); color: var(--fifa-navy); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: transparent;
+  color: var(--fifa-off-white);
+  font-weight: 600;
+  font-size: .9rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .8rem 1.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,.2);
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+.btn-secondary:hover { border-color: var(--fifa-gold); color: var(--fifa-gold); background: rgba(201,168,76,.06); }
+
+.hero-stats { display: flex; gap: var(--space-2xl); }
+.hero-stat { display: flex; flex-direction: column; }
+.hero-stat-number {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--fifa-gold);
+  letter-spacing: .02em;
+}
+.hero-stat-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--fifa-muted); margin-top: .2rem; }
+
+/* Trophy visual */
+.hero-trophy-visual {
   position: relative;
-  width: 100vw;
-  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.trophy-glow {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,.18) 0%, transparent 70%);
+  animation: trophyPulse 3s ease-in-out infinite;
+}
+@keyframes trophyPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: .7; }
+}
+.hero-trophy-svg {
+  width: min(340px, 90%);
+  height: auto;
+  filter: drop-shadow(0 0 30px rgba(201,168,76,.35));
+  animation: trophyFloat 4s ease-in-out infinite;
+}
+@keyframes trophyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TICKER BAR
+═══════════════════════════════════════════════════════════════ */
+.ticker-bar {
+  background: linear-gradient(90deg, #0d1220 0%, #111828 100%);
+  border-top: 1px solid var(--fifa-border);
+  border-bottom: 2px solid var(--fifa-gold);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  overflow: hidden;
+  height: 44px;
+}
+.ticker-label {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: 0 1.2rem;
+  font-family: var(--font-body);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: var(--fifa-gold);
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: rgba(201,168,76,.1);
+  border-right: 1px solid var(--fifa-border);
+  height: 100%;
+}
+.ticker-pulse {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fifa-red);
+  animation: tickerBlink 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes tickerBlink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--fifa-red); }
+  50% { opacity: .3; box-shadow: none; }
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  animation: tickerScroll 35s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+}
+.ticker-track:hover { animation-play-state: paused; }
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-item { font-size: .82rem; font-weight: 500; color: var(--fifa-off-white); }
+.ticker-separator { color: var(--fifa-gold); opacity: .5; font-size: .6rem; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION SHARED
+═══════════════════════════════════════════════════════════════ */
+.section { padding: var(--space-3xl) 0; }
+.section-container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-xl); }
+.section-header {
   display: flex;
   align-items: flex-end;
-  justify-content: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  gap: var(--space-md);
+  flex-wrap: wrap;
 }
-
-/* ─── Ball shadow ─────────────────────────────────────────────── */
-#ball-shadow {
-  position: absolute;
-  bottom: 0;
-  left: 32px;
-  width: var(--ball-size);
-  height: 12px;
-  background: var(--shadow-color);
+.section-title-group { display: flex; flex-direction: column; gap: .4rem; }
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fifa-gold);
+  width: fit-content;
+}
+.live-tag { color: var(--fifa-red); }
+.upcoming-tag { color: #60a5fa; }
+.gold-tag { color: var(--fifa-gold); }
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: .02em;
+  color: var(--fifa-white);
+  line-height: 1.1;
+}
+.pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  transform: translateX(-50%) scaleX(1);
-  transform-origin: center center;
-  filter: blur(4px);
-  transition: opacity 0.2s ease;
-  pointer-events: none;
+  background: var(--fifa-red);
+  animation: tickerBlink 1s ease-in-out infinite;
+}
+.btn-text-link {
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--fifa-gold);
+  letter-spacing: .04em;
+  transition: opacity var(--transition);
+}
+.btn-text-link:hover { opacity: .75; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MATCH CARDS
+═══════════════════════════════════════════════════════════════ */
+.matches-filter {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: var(--space-xl);
+}
+.filter-tab {
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: .45rem 1.1rem;
+  border-radius: 100px;
+  color: var(--fifa-muted);
+  border: 1px solid transparent;
+  transition: all var(--transition);
+}
+.filter-tab:hover { color: var(--fifa-off-white); border-color: var(--fifa-border); }
+.filter-tab.active {
+  background: rgba(201,168,76,.14);
+  color: var(--fifa-gold);
+  border-color: rgba(201,168,76,.35);
 }
 
-/* ─── Ball base ───────────────────────────────────────────────── */
-.football {
+.matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-lg);
+}
+
+.match-card {
+  background: var(--fifa-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--fifa-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-xl);
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.match-card::before {
+  content: '';
   position: absolute;
-  bottom: 8px;
-  left: 32px;
-  width: var(--ball-size);
-  height: var(--ball-size);
-  font-size: var(--ball-size);
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--fifa-gold), transparent);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.match-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201,168,76,.35);
+  box-shadow: var(--shadow-hover);
+}
+.match-card:hover::before { opacity: 1; }
+.match-card.live-match { border-color: rgba(230,57,70,.35); }
+.match-card.live-match::before { background: linear-gradient(90deg, transparent, var(--fifa-red), transparent); opacity: 1; }
+.match-card.upcoming-match { border-color: rgba(96,165,250,.2); }
+
+.match-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+.match-group-label {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fifa-muted);
+}
+.match-status-badge {
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: .25rem .7rem;
+  border-radius: 100px;
+}
+.badge-live {
+  background: rgba(230,57,70,.18);
+  color: var(--fifa-red);
+  border: 1px solid rgba(230,57,70,.4);
+  animation: badgePulse 1.5s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(230,57,70,.4); }
+  50% { box-shadow: 0 0 0 4px rgba(230,57,70,.0); }
+}
+.badge-ft {
+  background: rgba(45,198,83,.1);
+  color: var(--fifa-green);
+  border: 1px solid rgba(45,198,83,.3);
+}
+.badge-upcoming {
+  background: rgba(96,165,250,.1);
+  color: #60a5fa;
+  border: 1px solid rgba(96,165,250,.3);
+}
+.badge-ht {
+  background: rgba(251,191,36,.1);
+  color: #fbbf24;
+  border: 1px solid rgba(251,191,36,.3);
+}
+
+.match-teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.match-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+}
+.match-team.away { align-items: center; }
+.team-flag {
+  font-size: 2.4rem;
   line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
+}
+.team-name {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--fifa-off-white);
+  text-align: center;
+}
+
+.match-score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .25rem;
+}
+.match-score {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  letter-spacing: .05em;
+  color: var(--fifa-white);
+  line-height: 1;
+}
+.match-time {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--fifa-red);
+}
+.match-time.ft { color: var(--fifa-green); }
+.match-time.ht { color: #fbbf24; }
+.match-time.upcoming { color: #60a5fa; font-size: .7rem; }
+.match-vs {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--fifa-muted);
+  letter-spacing: .05em;
+}
+
+.match-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-md);
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.match-venue {
+  font-size: .68rem;
+  color: var(--fifa-muted);
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+.match-venue-icon { font-size: .7rem; }
+.match-attendance {
+  font-size: .68rem;
+  color: var(--fifa-muted);
+}
+.countdown-display {
+  font-size: .7rem;
+  font-weight: 700;
+  color: #60a5fa;
+  letter-spacing: .04em;
+}
+
+/* Match events scorers */
+.match-events {
+  margin-top: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+.match-event {
+  font-size: .68rem;
+  color: var(--fifa-muted);
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+
+/* Last updated / refresh */
+.section-meta { display: flex; align-items: center; gap: var(--space-md); }
+.last-updated { font-size: .7rem; color: var(--fifa-muted); font-style: italic; }
+.btn-refresh {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--fifa-gold);
+  padding: .35rem .8rem;
+  border: 1px solid rgba(201,168,76,.3);
+  border-radius: 100px;
+  transition: all var(--transition);
+}
+.btn-refresh:hover { background: rgba(201,168,76,.1); }
+.btn-refresh.spinning svg { animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════════════════════════
+   STANDINGS TABLE
+═══════════════════════════════════════════════════════════════ */
+.standings-section { background: linear-gradient(180deg, var(--fifa-navy-mid) 0%, var(--fifa-navy) 100%); }
+.standings-nav { display: flex; gap: .4rem; }
+.group-tab {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: .85rem;
+  color: var(--fifa-muted);
+  border: 1px solid var(--fifa-border);
+  transition: all var(--transition);
+}
+.group-tab:hover { color: var(--fifa-off-white); border-color: rgba(255,255,255,.3); }
+.group-tab.active {
+  background: var(--fifa-gold);
+  color: var(--fifa-navy);
+  border-color: var(--fifa-gold);
+}
+
+.standings-table-wrapper {
+  background: var(--fifa-glass);
+  border: 1px solid var(--fifa-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+.standings-table thead tr {
+  background: rgba(201,168,76,.08);
+  border-bottom: 1px solid var(--fifa-border);
+}
+.standings-table th {
+  padding: .75rem 1rem;
+  text-align: left;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fifa-muted);
+}
+.standings-table th.center { text-align: center; }
+.standings-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  transition: background var(--transition);
+}
+.standings-table tbody tr:hover { background: rgba(255,255,255,.03); }
+.standings-table tbody tr.qualify-direct { border-left: 3px solid var(--fifa-green); }
+.standings-table tbody tr.qualify-playoff { border-left: 3px solid #fbbf24; }
+.standings-table td {
+  padding: .8rem 1rem;
+  color: var(--fifa-off-white);
+}
+.standings-table td.center { text-align: center; color: var(--fifa-muted); }
+.standings-table td.pts {
+  text-align: center;
+  font-weight: 700;
+  color: var(--fifa-white);
+}
+.standing-team {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+.standing-pos { font-size: .75rem; color: var(--fifa-muted); width: 1.2rem; flex-shrink: 0; }
+.standing-flag { font-size: 1.1rem; line-height: 1; }
+.standing-name { font-weight: 600; font-size: .85rem; }
+.form-pills { display: flex; gap: .2rem; }
+.form-pill {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: .5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-w { background: rgba(45,198,83,.25); color: var(--fifa-green); }
+.form-d { background: rgba(251,191,36,.2); color: #fbbf24; }
+.form-l { background: rgba(230,57,70,.2); color: var(--fifa-red); }
+
+/* ═══════════════════════════════════════════════════════════════
+   TOP SCORERS
+═══════════════════════════════════════════════════════════════ */
+.scorers-section { background: var(--fifa-navy); }
+.scorers-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-md);
+}
+.scorer-card {
+  background: var(--fifa-glass);
+  border: 1px solid var(--fifa-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  transition: transform var(--transition), border-color var(--transition);
+}
+.scorer-card:hover { transform: translateX(4px); border-color: rgba(201,168,76,.3); }
+.scorer-rank {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--fifa-gold);
+  line-height: 1;
+  min-width: 2rem;
+  text-align: center;
+}
+.scorer-rank.top { color: #ffd700; }
+.scorer-info { flex: 1; }
+.scorer-name { font-weight: 700; font-size: .9rem; color: var(--fifa-white); }
+.scorer-country { font-size: .72rem; color: var(--fifa-muted); margin-top: .1rem; }
+.scorer-goals {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: var(--fifa-white);
+  line-height: 1;
+}
+.scorer-goals-label { font-size: .55rem; text-transform: uppercase; letter-spacing: .1em; color: var(--fifa-muted); text-align: center; }
+
+/* ═══════════════════════════════════════════════════════════════
+   NEWS SECTION
+═══════════════════════════════════════════════════════════════ */
+.news-section { background: linear-gradient(180deg, var(--fifa-navy-mid) 0%, var(--fifa-navy) 100%); }
+
+/* Featured news (large card) */
+.news-featured {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+.news-card-featured {
+  background: var(--fifa-navy-card);
+  border: 1px solid var(--fifa-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: transform var(--transition-slow), box-shadow var(--transition-slow);
   cursor: pointer;
-  user-select: none;
-  transform-origin: center center;
-  will-change: transform, opacity;
+}
+.news-card-featured:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+.news-card-featured .news-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  background: var(--fifa-navy-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.news-thumb-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.news-thumb-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(10,14,26,.8) 100%);
+}
+.news-card-body { padding: var(--space-lg) var(--space-xl) var(--space-xl); }
+.news-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  flex-wrap: wrap;
+}
+.news-tag {
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: .2rem .6rem;
+  border-radius: 100px;
+  background: rgba(201,168,76,.12);
+  color: var(--fifa-gold);
+  border: 1px solid rgba(201,168,76,.25);
+}
+.news-tag.red { background: rgba(230,57,70,.1); color: var(--fifa-red); border-color: rgba(230,57,70,.25); }
+.news-tag.blue { background: rgba(96,165,250,.1); color: #60a5fa; border-color: rgba(96,165,250,.25); }
+.news-tag.green { background: rgba(45,198,83,.1); color: var(--fifa-green); border-color: rgba(45,198,83,.25); }
+.news-date { font-size: .68rem; color: var(--fifa-muted); }
+.news-headline {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+  letter-spacing: .02em;
+  color: var(--fifa-white);
+  line-height: 1.2;
+  margin-bottom: var(--space-sm);
+}
+.news-excerpt {
+  font-size: .82rem;
+  color: var(--fifa-muted);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.news-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--fifa-gold);
+  margin-top: var(--space-md);
+  transition: gap var(--transition);
+}
+.news-read-more:hover { gap: .5rem; }
+
+/* Secondary featured card (sidebar) */
+.news-card-secondary {
+  background: var(--fifa-navy-card);
+  border: 1px solid var(--fifa-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition), border-color var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+.news-card-secondary:hover { transform: translateY(-4px); border-color: rgba(201,168,76,.3); }
+.news-card-secondary .news-thumb-placeholder { aspect-ratio: 4/3; font-size: 3rem; }
+.news-card-secondary .news-card-body { padding: var(--space-md) var(--space-lg) var(--space-lg); flex: 1; }
+.news-card-secondary .news-headline { font-size: 1.15rem; }
+
+/* News grid */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+.news-card {
+  background: var(--fifa-navy-card);
+  border: 1px solid var(--fifa-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+.news-card:hover { transform: translateY(-4px); border-color: rgba(201,168,76,.3); box-shadow: var(--shadow-card); }
+.news-card .news-thumb-placeholder { aspect-ratio: 16/9; font-size: 2.5rem; }
+.news-card .news-card-body { padding: var(--space-md) var(--space-lg); }
+.news-card .news-headline { font-size: 1rem; }
+.news-card .news-excerpt { -webkit-line-clamp: 2; }
+
+/* Gradient overlays per category */
+.thumb-match-preview  { background: linear-gradient(135deg, #0d1f3c 0%, #1a3a6b 100%); }
+.thumb-squad-update   { background: linear-gradient(135deg, #1a0d2e 0%, #3b1f6b 100%); }
+.thumb-venue          { background: linear-gradient(135deg, #0d2e1a 0%, #1f6b3a 100%); }
+.thumb-interview      { background: linear-gradient(135deg, #2e1a0d 0%, #6b3a1f 100%); }
+.thumb-analysis       { background: linear-gradient(135deg, #2e2a0d 0%, #6b5c1f 100%); }
+.thumb-history        { background: linear-gradient(135deg, #1a1a2e 0%, #3a3a6b 100%); }
+.thumb-breaking       { background: linear-gradient(135deg, #2e0d0d 0%, #6b1f1f 100%); }
+
+/* ═══════════════════════════════════════════════════════════════
+   HOST CITIES
+═══════════════════════════════════════════════════════════════ */
+.cities-section { background: var(--fifa-navy); padding-bottom: var(--space-3xl); }
+.cities-scroll {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  padding-bottom: var(--space-sm);
+  scrollbar-width: thin;
+}
+.city-card {
+  flex-shrink: 0;
+  background: var(--fifa-glass);
+  border: 1px solid var(--fifa-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg) var(--space-xl);
+  min-width: 180px;
+  text-align: center;
+  transition: border-color var(--transition), transform var(--transition);
+  cursor: pointer;
+}
+.city-card:hover { border-color: rgba(201,168,76,.4); transform: translateY(-3px); }
+.city-flag { font-size: 2rem; margin-bottom: .5rem; }
+.city-name { font-weight: 700; font-size: .9rem; color: var(--fifa-white); }
+.city-country { font-size: .68rem; color: var(--fifa-muted); text-transform: uppercase; letter-spacing: .08em; margin-top: .2rem; }
+.city-stadium { font-size: .65rem; color: var(--fifa-muted); margin-top: .3rem; font-style: italic; }
+
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════════════ */
+.site-footer {
+  background: var(--fifa-navy-mid);
+  border-top: 1px solid var(--fifa-border);
+  padding-top: var(--space-3xl);
+}
+.footer-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-xl) var(--space-2xl);
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--space-3xl);
+}
+.footer-logo { height: 48px; width: auto; margin-bottom: var(--space-md); }
+.footer-tagline { font-size: .8rem; color: var(--fifa-muted); line-height: 1.5; }
+.footer-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-xl); }
+.footer-nav-heading {
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--fifa-gold);
+  margin-bottom: var(--space-md);
+}
+.footer-nav ul { display: flex; flex-direction: column; gap: .6rem; }
+.footer-nav a { font-size: .82rem; color: var(--fifa-muted); transition: color var(--transition); }
+.footer-nav a:hover { color: var(--fifa-off-white); }
+.footer-socials { gap: .5rem; }
+.footer-bottom {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-xl);
+  border-top: 1px solid var(--fifa-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+.footer-legal { font-size: .72rem; color: var(--fifa-muted); }
+.footer-links { display: flex; gap: var(--space-lg); }
+.footer-links a { font-size: .72rem; color: var(--fifa-muted); transition: color var(--transition); }
+.footer-links a:hover { color: var(--fifa-gold); }
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════════════════════════ */
+.hidden { display: none !important; }
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.05) 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-/* ─── IDLE state ──────────────────────────────────────────────── */
-.football.idle {
-  opacity: 1;
-  pointer-events: auto;
-  animation:
-    idleBounce var(--idle-bounce-duration) ease-in-out infinite alternate,
-    idleSway   var(--idle-sway-duration)   ease-in-out infinite alternate;
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero-trophy-visual { display: none; }
+  .news-featured { grid-template-columns: 1fr; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .footer-nav { grid-template-columns: repeat(2, 1fr); }
 }
 
-.football.idle ~ #ball-shadow {
-  animation: idleShadow var(--idle-bounce-duration) ease-in-out infinite alternate;
-}
-
-@keyframes idleBounce {
-  0%   { transform: translateY(0)    rotate(-4deg) scaleY(1.00); }
-  30%  { transform: translateY(-18px) rotate(0deg)  scaleY(1.05); }
-  70%  { transform: translateY(-22px) rotate(2deg)  scaleY(1.05); }
-  100% { transform: translateY(0)    rotate(4deg)  scaleY(0.92); }
-}
-
-@keyframes idleSway {
-  0%   { left: 28px; }
-  100% { left: 40px; }
-}
-
-@keyframes idleShadow {
-  0%   { transform: translateX(-50%) scaleX(1.0);  opacity: 0.8; }
-  30%  { transform: translateX(-50%) scaleX(0.6);  opacity: 0.45; }
-  70%  { transform: translateX(-50%) scaleX(0.5);  opacity: 0.35; }
-  100% { transform: translateX(-50%) scaleX(1.05); opacity: 0.85; }
-}
-
-/* ─── KICK IMPACT flash (foot strikes ball) ───────────────────── */
-.football.kicked {
-  opacity: 1;
-  pointer-events: none;
-  animation:
-    kickImpact      var(--impact-duration)  ease-out forwards,
-    footballKickAcross var(--kick-duration) ease-in  forwards var(--impact-duration),
-    footballSpin       var(--kick-duration) linear   forwards var(--impact-duration);
-}
-
-.football.kicked ~ #ball-shadow {
-  animation: kickShadow var(--kick-duration) ease-in forwards var(--impact-duration);
-}
-
-@keyframes kickImpact {
-  0%   { transform: scale(0.80) rotate(0deg); }
-  50%  { transform: scale(1.35) rotate(-8deg); }
-  100% { transform: scale(1.00) rotate(0deg); }
-}
-
-/* Arc trajectory: rises to peak at 40%, falls back to ground */
-@keyframes footballKickAcross {
-  0%   {
-    left: 32px;
-    bottom: 8px;
-    transform: scaleX(0.9) scaleY(1.1);   /* squash on takeoff */
+@media (max-width: 768px) {
+  .nav-menu {
+    position: fixed;
+    top: 72px; left: 0; right: 0;
+    background: rgba(10,14,26,.97);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    padding: var(--space-xl);
+    gap: .25rem;
+    transform: translateY(-110%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    border-bottom: 1px solid var(--fifa-border);
+    z-index: 99;
   }
-  8%   {
-    transform: scaleX(1.15) scaleY(0.85); /* stretch as it launches */
-  }
-  15%  {
-    bottom: 55px;
-    transform: scaleX(1) scaleY(1);
-  }
-  40%  {
-    bottom: 105px;                         /* peak of arc */
-    transform: scaleX(1) scaleY(1);
-  }
-  65%  {
-    bottom: 55px;
-    transform: scaleX(1) scaleY(1);
-  }
-  85%  {
-    bottom: 14px;
-    transform: scaleX(1.1) scaleY(0.9);   /* start squash on descent */
-  }
-  92%  {
-    bottom: 2px;
-    left: calc(100vw - 80px);
-    transform: scaleX(1.25) scaleY(0.72); /* heavy squash on landing */
-  }
-  96%  {
-    bottom: 18px;                          /* small bounce */
-    left: calc(100vw - 74px);
-    transform: scaleX(0.95) scaleY(1.08);
-  }
-  100% {
-    bottom: 8px;
-    left: calc(100vw - 80px);
-    transform: scaleX(1) scaleY(1);
-  }
+  .nav-menu.open { transform: translateY(0); }
+  .nav-hamburger { display: flex; }
+  .nav-actions { display: none; }
+  .matches-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap: var(--space-xl); }
+  .footer-nav { grid-template-columns: repeat(2, 1fr); }
+  .standings-nav { flex-wrap: wrap; }
 }
 
-/* Continuous 720° spin layered on top of translation */
-@keyframes footballSpin {
-  0%   { rotate: 0deg;   }
-  100% { rotate: 720deg; }
+@media (max-width: 480px) {
+  :root { --space-xl: 1.25rem; }
+  .hero-title { font-size: 2.8rem; }
+  .hero-stats { gap: var(--space-lg); }
+  .hero-stat-number { font-size: 1.8rem; }
+  .footer-nav { grid-template-columns: 1fr 1fr; }
+  .news-grid { grid-template-columns: 1fr; }
+  .scorers-list { grid-template-columns: 1fr; }
 }
 
-/* Shadow grows as ball is near ground, shrinks at arc peak */
-@keyframes kickShadow {
-  0%   { left: 32px;              transform: translateX(-50%) scaleX(1.0);  opacity: 0.75; }
-  15%  { transform: translateX(-50%) scaleX(0.55); opacity: 0.40; }
-  40%  { left: 50vw;              transform: translateX(-50%) scaleX(0.25); opacity: 0.15; }
-  65%  { transform: translateX(-50%) scaleX(0.55); opacity: 0.40; }
-  85%  { transform: translateX(-50%) scaleX(0.9);  opacity: 0.70; }
-  92%  { left: calc(100vw - 80px); transform: translateX(-50%) scaleX(1.3);  opacity: 0.90; }
-  96%  { transform: translateX(-50%) scaleX(0.85); opacity: 0.65; }
-  100% { left: calc(100vw - 80px); transform: translateX(-50%) scaleX(1.0);  opacity: 0.75; }
-}
-
-/* ─── RESETTING state ─────────────────────────────────────────── */
-.football.resetting {
-  opacity: 0;
-  pointer-events: none;
-  left: 32px;
-  bottom: 8px;
-  animation: none;
-  transition: none;
-}
-
-.football.resetting ~ #ball-shadow {
-  opacity: 0;
-}
-
-/* ─── FADE-IN DROP when returning to idle ─────────────────────── */
-.football.dropping {
-  opacity: 0;
-  pointer-events: none;
-  left: 32px;
-  animation: fadeInDrop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.football.dropping ~ #ball-shadow {
-  animation: shadowFadeIn 0.45s ease forwards;
-}
-
-@keyframes fadeInDrop {
-  0%   { opacity: 0; transform: translateY(-28px) scale(0.80); }
-  55%  { opacity: 1; transform: translateY(6px)   scale(1.08) scaleX(1.12) scaleY(0.88); }
-  75%  { transform: translateY(-6px) scale(0.97); }
-  90%  { transform: translateY(2px)  scale(1.02) scaleX(1.03) scaleY(0.98); }
-  100% { opacity: 1; transform: translateY(0)     scale(1.00); }
-}
-
-@keyframes shadowFadeIn {
-  0%   { opacity: 0;    transform: translateX(-50%) scaleX(0.4); }
-  55%  { opacity: 0.85; transform: translateX(-50%) scaleX(1.2); }
-  100% { opacity: 0.8;  transform: translateX(-50%) scaleX(1.0); }
+/* ═══════════════════════════════════════════════════════════════
+   REDUCED MOTION
+═══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  .ticker-track { animation: none; }
+  .hero-trophy-svg { animation: none; }
+  .trophy-glow { animation: none; }
 }

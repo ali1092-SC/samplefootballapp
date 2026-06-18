@@ -1,7 +1,7 @@
 {
   "name": "samplefootballapp",
-  "version": "1.0.0",
-  "description": "A sample football app",
+  "version": "2.0.0",
+  "description": "FIFA World Cup 2026 Live App",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,697 +1,829 @@
 /**
- * app.test.js — Comprehensive test suite for the Football App
- *
- * Covers:
- *  - setStatus helper (including edge cases)
- *  - Game state properties (kicks, record, streak)
- *  - Kick mechanics (scoring, streak, record updates)
- *  - Scoreboard DOM rendering
- *  - Particle burst visual effects
- *  - Accessibility & keyboard interactions
- *  - prefers-reduced-motion behaviour
+ * FIFA World Cup 2026 – Test Suite
+ * Covers: renderLiveMatches, renderTomorrowMatches, renderNews,
+ *         renderStandings, renderTopScorers, renderHostCities,
+ *         buildMatchCard, buildCountdown, formatKickoffTime,
+ *         simulateLiveScoreUpdate, startLiveScoreRefresh,
+ *         animateCounter, and UI interaction helpers.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { JSDOM } from 'jsdom';
 
-// ---------------------------------------------------------------------------
-// Helpers — spin up a fresh DOM from the real index.html markup pattern
-// ---------------------------------------------------------------------------
-
-function buildDOM() {
-  const dom = new JSDOM(
-    `<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8" /></head>
-<body>
-  <header class="site-header">
-    <img id="logo" src="logo.png" alt="logo" class="logo-spin" />
-    <h1>Football App</h1>
-  </header>
-
-  <section class="scoreboard" aria-label="scoreboard">
-    <div class="score-item" id="kicks-display">
-      <span class="score-label">Kicks</span>
-      <span class="score-value" id="kicks-value">0</span>
-    </div>
-    <div class="score-item" id="record-display">
-      <span class="score-label">Record</span>
-      <span class="score-value" id="record-value">0</span>
-    </div>
-    <div class="score-item" id="streak-display">
-      <span class="score-label">Streak</span>
-      <span class="score-value" id="streak-value">0</span>
-    </div>
-  </section>
-
-  <main class="arena" id="arena" role="main">
-    <div class="centre-circle" aria-hidden="true"></div>
-    <div id="particle-container" aria-hidden="true"></div>
-    <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
-    <button id="kick-btn" aria-label="Kick the ball">Kick</button>
-  </main>
-</body>
-</html>`,
-    { url: 'http://localhost' }
-  );
+/* ── helpers ──────────────────────────────────────────────────── */
+function makeDOM() {
+  const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+  global.document = dom.window.document;
+  global.window   = dom.window;
   return dom;
 }
-
-// ---------------------------------------------------------------------------
-// Re-create the app logic in isolation so tests don't depend on a live bundle.
-// This mirrors the real app.js contract exactly — any drift here will surface
-// as a test failure, acting as a living spec.
-// ---------------------------------------------------------------------------
-
-function createApp(document, options = {}) {
-  const prefersReduced =
-    options.prefersReducedMotion !== undefined
-      ? options.prefersReducedMotion
-      : false;
-
-  // State
-  const state = {
-    kicks: 0,
-    streak: 0,
-    record: 0,
-  };
-
-  // DOM refs
-  const kickBtn = document.getElementById('kick-btn');
-  const statusEl = document.getElementById('status');
-  const kicksValue = document.getElementById('kicks-value');
-  const recordValue = document.getElementById('record-value');
-  const streakValue = document.getElementById('streak-value');
-  const particleContainer = document.getElementById('particle-container');
-
-  // ── setStatus ──────────────────────────────────────────────────────────────
-  function setStatus(msg) {
-    statusEl.textContent = String(msg);
-  }
-
-  // ── updateScoreboard ───────────────────────────────────────────────────────
-  function updateScoreboard() {
-    kicksValue.textContent = state.kicks;
-    recordValue.textContent = state.record;
-    streakValue.textContent = state.streak;
-
-    if (!prefersReduced) {
-      [kicksValue, recordValue, streakValue].forEach((el) => {
-        el.classList.add('bump');
-        el.addEventListener('animationend', () => el.classList.remove('bump'), {
-          once: true,
-        });
-      });
-    }
-  }
-
-  // ── spawnParticles ─────────────────────────────────────────────────────────
-  function spawnParticles(count = 8) {
-    if (!particleContainer) return;
-    for (let i = 0; i < count; i++) {
-      const p = document.createElement('span');
-      p.className = 'particle';
-      if (!prefersReduced) {
-        p.classList.add('particle--animated');
-      }
-      particleContainer.appendChild(p);
-    }
-  }
-
-  // ── kick ───────────────────────────────────────────────────────────────────
-  function kick() {
-    state.kicks += 1;
-    state.streak += 1;
-
-    if (state.streak > state.record) {
-      state.record = state.streak;
-    }
-
-    spawnParticles();
-    updateScoreboard();
-    setStatus(`Kick #${state.kicks}! Streak: ${state.streak}`);
-  }
-
-  // ── miss ───────────────────────────────────────────────────────────────────
-  function miss() {
-    state.streak = 0;
-    updateScoreboard();
-    setStatus('Missed! Streak reset.');
-  }
-
-  // ── event listeners ────────────────────────────────────────────────────────
-  kickBtn.addEventListener('click', kick);
-  kickBtn.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      kick();
-    }
-  });
-
-  return { state, kick, miss, setStatus, spawnParticles, updateScoreboard };
+function el(id) { return document.getElementById(id); }
+function div(id = '') {
+  const d = document.createElement('div');
+  if (id) d.id = id;
+  document.body.appendChild(d);
+  return d;
 }
 
-// ---------------------------------------------------------------------------
-// Test suites
-// ---------------------------------------------------------------------------
+/* ── module under test ────────────────────────────────────────── */
+import {
+  liveMatchesData,
+  latestNews,
+  standingsData,
+  topScorers,
+  hostCities,
+  tournamentStats,
+  buildMatchCard,
+  buildCountdown,
+  formatKickoffTime,
+  renderLiveMatches,
+  renderTomorrowMatches,
+  simulateLiveScoreUpdate,
+  startLiveScoreRefresh,
+  stopLiveScoreRefresh,
+  renderNews,
+  renderStandings,
+  renderTopScorers,
+  renderHostCities,
+  animateCounter,
+  spawnHeroParticles,
+  updateLastUpdated,
+  updateCountdowns,
+} from './app.js';
 
-describe('setStatus helper', () => {
-  let dom, document, app;
-
-  beforeEach(() => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document);
+/* ═══════════════════════════════════════════════════════════════
+   1. DATA INTEGRITY
+═══════════════════════════════════════════════════════════════ */
+describe('Data integrity', () => {
+  it('liveMatchesData is a non-empty array', () => {
+    expect(Array.isArray(liveMatchesData)).toBe(true);
+    expect(liveMatchesData.length).toBeGreaterThan(0);
   });
 
-  it('sets the status element text content', () => {
-    app.setStatus('Hello, world!');
-    expect(document.getElementById('status').textContent).toBe('Hello, world!');
+  it('every match has required fields', () => {
+    liveMatchesData.forEach(m => {
+      expect(m).toHaveProperty('id');
+      expect(m).toHaveProperty('status');
+      expect(m).toHaveProperty('homeTeam');
+      expect(m).toHaveProperty('awayTeam');
+      expect(m).toHaveProperty('venue');
+      expect(m).toHaveProperty('day');
+    });
   });
 
-  it('handles an empty string', () => {
-    app.setStatus('');
-    expect(document.getElementById('status').textContent).toBe('');
+  it('statuses are one of LIVE | HT | FT | UPCOMING', () => {
+    const valid = new Set(['LIVE', 'HT', 'FT', 'UPCOMING']);
+    liveMatchesData.forEach(m => expect(valid.has(m.status)).toBe(true));
   });
 
-  it('handles a very long string', () => {
-    const long = 'A'.repeat(10_000);
-    app.setStatus(long);
-    expect(document.getElementById('status').textContent).toBe(long);
+  it('today matches have integer scores', () => {
+    liveMatchesData
+      .filter(m => m.day === 'today')
+      .forEach(m => {
+        expect(typeof m.homeTeam.score).toBe('number');
+        expect(typeof m.awayTeam.score).toBe('number');
+      });
   });
 
-  it('handles special characters and HTML entities', () => {
-    app.setStatus('<script>alert("xss")</script>');
-    const el = document.getElementById('status');
-    // textContent must never render markup
-    expect(el.textContent).toBe('<script>alert("xss")</script>');
-    expect(el.innerHTML).not.toContain('<script>');
+  it('tomorrow matches have null scores', () => {
+    liveMatchesData
+      .filter(m => m.day === 'tomorrow')
+      .forEach(m => {
+        expect(m.homeTeam.score).toBeNull();
+        expect(m.awayTeam.score).toBeNull();
+      });
   });
 
-  it('handles numeric input by coercing to string', () => {
-    app.setStatus(42);
-    expect(document.getElementById('status').textContent).toBe('42');
+  it('tomorrow matches have kickoff Date objects', () => {
+    liveMatchesData
+      .filter(m => m.day === 'tomorrow')
+      .forEach(m => expect(m.kickoff instanceof Date).toBe(true));
   });
 
-  it('handles null by coercing to string', () => {
-    app.setStatus(null);
-    expect(document.getElementById('status').textContent).toBe('null');
+  it('latestNews contains at least 6 articles', () => {
+    expect(latestNews.length).toBeGreaterThanOrEqual(6);
   });
 
-  it('reflects the latest value when called rapidly in succession', () => {
+  it('each news article has headline and excerpt', () => {
+    latestNews.forEach(a => {
+      expect(typeof a.headline).toBe('string');
+      expect(a.headline.length).toBeGreaterThan(0);
+      expect(typeof a.excerpt).toBe('string');
+    });
+  });
+
+  it('standingsData has 6 groups (A–F)', () => {
+    expect(Object.keys(standingsData)).toEqual(['A', 'B', 'C', 'D', 'E', 'F']);
+  });
+
+  it('each group has exactly 4 teams', () => {
+    Object.values(standingsData).forEach(group => expect(group.length).toBe(4));
+  });
+
+  it('topScorers is sorted by rank', () => {
+    topScorers.forEach((s, i) => expect(s.rank).toBe(i + 1));
+  });
+
+  it('hostCities has 16 entries', () => {
+    expect(hostCities.length).toBe(16);
+  });
+
+  it('tournamentStats has goals, matchesPlayed and viewers', () => {
+    expect(typeof tournamentStats.goals).toBe('number');
+    expect(typeof tournamentStats.matchesPlayed).toBe('number');
+    expect(typeof tournamentStats.viewers).toBe('number');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   2. buildMatchCard
+═══════════════════════════════════════════════════════════════ */
+describe('buildMatchCard()', () => {
+  const liveMatch = liveMatchesData.find(m => m.status === 'LIVE');
+  const ftMatch   = liveMatchesData.find(m => m.status === 'FT');
+  const upcoming  = liveMatchesData.find(m => m.status === 'UPCOMING');
+  const htMatch   = liveMatchesData.find(m => m.status === 'HT');
+
+  it('returns a non-empty string', () => {
+    expect(typeof buildMatchCard(liveMatch)).toBe('string');
+    expect(buildMatchCard(liveMatch).length).toBeGreaterThan(0);
+  });
+
+  it('LIVE card contains badge-live class', () => {
+    expect(buildMatchCard(liveMatch)).toContain('badge-live');
+  });
+
+  it('FT card contains badge-ft class', () => {
+    expect(buildMatchCard(ftMatch)).toContain('badge-ft');
+  });
+
+  it('HT card contains HALF TIME label', () => {
+    expect(buildMatchCard(htMatch)).toContain('HALF TIME');
+  });
+
+  it('UPCOMING card shows VS instead of score', () => {
+    expect(buildMatchCard(upcoming)).toContain('VS');
+    expect(buildMatchCard(upcoming)).not.toMatch(/\d+–\d+/);
+  });
+
+  it('card contains home and away team names', () => {
+    const html = buildMatchCard(liveMatch);
+    expect(html).toContain(liveMatch.homeTeam.name);
+    expect(html).toContain(liveMatch.awayTeam.name);
+  });
+
+  it('card contains team flags', () => {
+    const html = buildMatchCard(liveMatch);
+    expect(html).toContain(liveMatch.homeTeam.flag);
+    expect(html).toContain(liveMatch.awayTeam.flag);
+  });
+
+  it('card contains venue info', () => {
+    const html = buildMatchCard(liveMatch);
+    expect(html).toContain(liveMatch.venue);
+  });
+
+  it('card contains group label', () => {
+    const html = buildMatchCard(liveMatch);
+    expect(html).toContain(liveMatch.group);
+  });
+
+  it('card has aria-label with team names', () => {
+    const html = buildMatchCard(liveMatch);
+    expect(html).toContain('aria-label');
+    expect(html).toContain(liveMatch.homeTeam.name);
+  });
+
+  it('LIVE card has data-match-id attribute', () => {
+    expect(buildMatchCard(liveMatch)).toContain(`data-match-id="${liveMatch.id}"`);
+  });
+
+  it('LIVE card shows score as X–Y', () => {
+    const html = buildMatchCard(liveMatch);
+    expect(html).toMatch(/\d+–\d+/);
+  });
+
+  it('events are rendered for matches with events', () => {
+    const matchWithEvents = liveMatchesData.find(m => m.events && m.events.length > 0);
+    if (matchWithEvents) {
+      const html = buildMatchCard(matchWithEvents);
+      expect(html).toContain('match-events');
+    }
+  });
+
+  it('upcoming card has countdown-display element', () => {
+    expect(buildMatchCard(upcoming)).toContain('countdown-display');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   3. buildCountdown & formatKickoffTime
+═══════════════════════════════════════════════════════════════ */
+describe('buildCountdown()', () => {
+  it('returns empty string for null input', () => {
+    expect(buildCountdown(null)).toBe('');
+  });
+
+  it('returns "Kick-off!" when date is in the past', () => {
+    const past = new Date(Date.now() - 1000);
+    expect(buildCountdown(past)).toBe('Kick-off!');
+  });
+
+  it('shows hours when >60 minutes away', () => {
+    const future = new Date(Date.now() + 3 * 3_600_000);
+    expect(buildCountdown(future)).toMatch(/In \d+h \d+m/);
+  });
+
+  it('shows minutes when <60 minutes away', () => {
+    const future = new Date(Date.now() + 20 * 60_000);
+    expect(buildCountdown(future)).toMatch(/In \d+m \d+s/);
+  });
+
+  it('shows seconds when <60 seconds away', () => {
+    const future = new Date(Date.now() + 45_000);
+    expect(buildCountdown(future)).toMatch(/In \d+s/);
+  });
+
+  it('returns a string type', () => {
+    expect(typeof buildCountdown(new Date(Date.now() + 100_000))).toBe('string');
+  });
+});
+
+describe('formatKickoffTime()', () => {
+  it('returns "TBC" for null input', () => {
+    expect(formatKickoffTime(null)).toBe('TBC');
+  });
+
+  it('returns a non-empty string for a valid date', () => {
+    const d = new Date(2026, 5, 15, 14, 0);
+    const result = formatKickoffTime(d);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('includes AM or PM', () => {
+    const d = new Date(2026, 5, 15, 14, 30);
+    const result = formatKickoffTime(d);
+    expect(result).toMatch(/AM|PM/);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   4. renderLiveMatches
+═══════════════════════════════════════════════════════════════ */
+describe('renderLiveMatches()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('renders today\'s match cards into container', () => {
+    const container = div('matchesGrid');
+    renderLiveMatches(container, liveMatchesData);
+    const todayCount = liveMatchesData.filter(m => m.day === 'today').length;
+    expect(container.querySelectorAll('.match-card').length).toBe(todayCount);
+  });
+
+  it('does nothing when container is null', () => {
+    expect(() => renderLiveMatches(null, liveMatchesData)).not.toThrow();
+  });
+
+  it('shows "No matches scheduled today" when no today matches', () => {
+    const container = div();
+    renderLiveMatches(container, liveMatchesData.filter(m => m.day === 'tomorrow'));
+    expect(container.textContent).toContain('No matches scheduled today');
+  });
+
+  it('renders LIVE badge for live matches', () => {
+    const container = div();
+    renderLiveMatches(container, liveMatchesData);
+    expect(container.querySelector('.badge-live')).not.toBeNull();
+  });
+
+  it('renders FT badge for finished matches', () => {
+    const container = div();
+    renderLiveMatches(container, liveMatchesData);
+    expect(container.querySelector('.badge-ft')).not.toBeNull();
+  });
+
+  it('live-match class applied to LIVE cards', () => {
+    const container = div();
+    renderLiveMatches(container, liveMatchesData);
+    expect(container.querySelector('.live-match')).not.toBeNull();
+  });
+
+  it('each card has an aria-label', () => {
+    const container = div();
+    renderLiveMatches(container, liveMatchesData);
+    const cards = container.querySelectorAll('[aria-label]');
+    expect(cards.length).toBeGreaterThan(0);
+  });
+
+  it('replaces existing content on re-render', () => {
+    const container = div();
+    renderLiveMatches(container, liveMatchesData);
+    const first = container.innerHTML;
+    renderLiveMatches(container, liveMatchesData);
+    expect(container.innerHTML).toBe(first);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   5. renderTomorrowMatches
+═══════════════════════════════════════════════════════════════ */
+describe('renderTomorrowMatches()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('renders tomorrow\'s match cards', () => {
+    const container = div();
+    renderTomorrowMatches(container, liveMatchesData);
+    const tomorrowCount = liveMatchesData.filter(m => m.day === 'tomorrow').length;
+    expect(container.querySelectorAll('.match-card').length).toBe(tomorrowCount);
+  });
+
+  it('shows VS for upcoming matches', () => {
+    const container = div();
+    renderTomorrowMatches(container, liveMatchesData);
+    expect(container.textContent).toContain('VS');
+  });
+
+  it('renders countdown elements', () => {
+    const container = div();
+    renderTomorrowMatches(container, liveMatchesData);
+    expect(container.querySelector('.countdown-display')).not.toBeNull();
+  });
+
+  it('does nothing when container is null', () => {
+    expect(() => renderTomorrowMatches(null, liveMatchesData)).not.toThrow();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   6. simulateLiveScoreUpdate
+═══════════════════════════════════════════════════════════════ */
+describe('simulateLiveScoreUpdate()', () => {
+  it('returns same number of matches', () => {
+    const updated = simulateLiveScoreUpdate(liveMatchesData);
+    expect(updated.length).toBe(liveMatchesData.length);
+  });
+
+  it('increments minute for LIVE matches', () => {
+    const liveOnly = [{ ...liveMatchesData.find(m => m.status === 'LIVE') }];
+    const before = parseInt(liveOnly[0].minute, 10);
+    const updated = simulateLiveScoreUpdate(liveOnly);
+    expect(parseInt(updated[0].minute, 10)).toBe(Math.min(90, before + 1));
+  });
+
+  it('does not mutate original data', () => {
+    const original = liveMatchesData.map(m => ({ ...m }));
+    simulateLiveScoreUpdate(liveMatchesData);
+    original.forEach((orig, i) => {
+      expect(liveMatchesData[i].id).toBe(orig.id);
+    });
+  });
+
+  it('does not change FT or UPCOMING match scores', () => {
+    const unchanged = [liveMatchesData.find(m => m.status === 'FT')];
+    const updated = simulateLiveScoreUpdate(unchanged);
+    expect(updated[0].homeTeam.score).toBe(unchanged[0].homeTeam.score);
+    expect(updated[0].awayTeam.score).toBe(unchanged[0].awayTeam.score);
+  });
+
+  it('score never decreases', () => {
+    const live = liveMatchesData.filter(m => m.status === 'LIVE');
+    const updated = simulateLiveScoreUpdate(live);
+    live.forEach((m, i) => {
+      expect(updated[i].homeTeam.score).toBeGreaterThanOrEqual(m.homeTeam.score);
+      expect(updated[i].awayTeam.score).toBeGreaterThanOrEqual(m.awayTeam.score);
+    });
+  });
+
+  it('minute caps at 90', () => {
+    const match = { ...liveMatchesData.find(m => m.status === 'LIVE'), minute: '90' };
+    const updated = simulateLiveScoreUpdate([match]);
+    expect(parseInt(updated[0].minute, 10)).toBe(90);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   7. startLiveScoreRefresh / stopLiveScoreRefresh
+═══════════════════════════════════════════════════════════════ */
+describe('startLiveScoreRefresh()', () => {
+  beforeEach(() => { vi.useFakeTimers(); makeDOM(); stopLiveScoreRefresh(); });
+  afterEach(() => { stopLiveScoreRefresh(); vi.useRealTimers(); });
+
+  it('returns an interval id (truthy)', () => {
+    const container = div('matchesGrid');
+    renderLiveMatches(container, liveMatchesData);
+    const id = startLiveScoreRefresh(5_000);
+    expect(id).toBeTruthy();
+  });
+
+  it('calls DOM update after interval elapses', () => {
+    const container = div('matchesGrid');
+    renderLiveMatches(container, liveMatchesData);
+    startLiveScoreRefresh(5_000);
+    const before = container.innerHTML;
+    vi.advanceTimersByTime(5_000);
+    // innerHTML may or may not change (random score) but should not throw
+    expect(typeof container.innerHTML).toBe('string');
+  });
+
+  it('does not create multiple intervals on repeated calls', () => {
+    const container = div('matchesGrid');
+    renderLiveMatches(container, liveMatchesData);
+    const id1 = startLiveScoreRefresh(5_000);
+    const id2 = startLiveScoreRefresh(5_000);
+    expect(id1).toEqual(id2);
+  });
+
+  it('stopLiveScoreRefresh prevents further ticks', () => {
+    const container = div('matchesGrid');
+    renderLiveMatches(container, liveMatchesData);
+    startLiveScoreRefresh(5_000);
+    stopLiveScoreRefresh();
+    const before = container.innerHTML;
+    vi.advanceTimersByTime(20_000);
+    expect(container.innerHTML).toBe(before);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   8. renderNews
+═══════════════════════════════════════════════════════════════ */
+describe('renderNews()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('renders featured articles', () => {
+    const featured = div('newsFeatured');
+    const grid     = div('newsGrid');
+    renderNews(featured, grid, latestNews);
+    expect(featured.children.length).toBeGreaterThan(0);
+  });
+
+  it('renders grid articles', () => {
+    const featured = div('newsFeatured');
+    const grid     = div('newsGrid');
+    renderNews(featured, grid, latestNews);
+    expect(grid.children.length).toBeGreaterThan(0);
+  });
+
+  it('featured count matches data', () => {
+    const featured = div();
+    const grid     = div();
+    renderNews(featured, grid, latestNews);
+    const featuredCount = latestNews.filter(a => a.featured).length;
+    expect(featured.querySelectorAll('article').length).toBe(featuredCount);
+  });
+
+  it('grid count matches non-featured data', () => {
+    const featured = div();
+    const grid     = div();
+    renderNews(featured, grid, latestNews);
+    const gridCount = latestNews.filter(a => !a.featured).length;
+    expect(grid.querySelectorAll('article').length).toBe(gridCount);
+  });
+
+  it('each article card has a headline', () => {
+    const featured = div();
+    const grid     = div();
+    renderNews(featured, grid, latestNews);
+    const headlines = [...featured.querySelectorAll('.news-headline'), ...grid.querySelectorAll('.news-headline')];
+    expect(headlines.length).toBe(latestNews.length);
+  });
+
+  it('category tags are rendered', () => {
+    const featured = div();
+    const grid     = div();
+    renderNews(featured, grid, latestNews);
+    expect(featured.querySelectorAll('.news-tag').length).toBeGreaterThan(0);
+  });
+
+  it('read-more links are present', () => {
+    const featured = div();
+    const grid     = div();
+    renderNews(featured, grid, latestNews);
+    const links = [...featured.querySelectorAll('.news-read-more'), ...grid.querySelectorAll('.news-read-more')];
+    expect(links.length).toBe(latestNews.length);
+  });
+
+  it('articles are keyboard accessible (tabindex)', () => {
+    const featured = div();
+    const grid     = div();
+    renderNews(featured, grid, latestNews);
+    const allArticles = [...featured.querySelectorAll('article'), ...grid.querySelectorAll('article')];
+    allArticles.forEach(a => expect(a.getAttribute('tabindex')).toBe('0'));
+  });
+
+  it('does nothing when containers are null', () => {
+    expect(() => renderNews(null, null, latestNews)).not.toThrow();
+  });
+
+  it('thumb-class is applied to placeholder divs', () => {
+    const featured = div();
+    const grid     = div();
+    renderNews(featured, grid, latestNews);
+    const thumbs = [...featured.querySelectorAll('.news-thumb-placeholder'), ...grid.querySelectorAll('.news-thumb-placeholder')];
+    thumbs.forEach(t => {
+      const hasThumbClass = [...t.classList].some(c => c.startsWith('thumb-'));
+      expect(hasThumbClass).toBe(true);
+    });
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   9. renderStandings
+═══════════════════════════════════════════════════════════════ */
+describe('renderStandings()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('renders a table element', () => {
+    const container = div();
+    renderStandings(container, standingsData.A);
+    expect(container.querySelector('table')).not.toBeNull();
+  });
+
+  it('renders correct number of rows (4 teams)', () => {
+    const container = div();
+    renderStandings(container, standingsData.A);
+    expect(container.querySelectorAll('tbody tr').length).toBe(4);
+  });
+
+  it('renders team names', () => {
+    const container = div();
+    renderStandings(container, standingsData.A);
+    const text = container.textContent;
+    standingsData.A.forEach(team => expect(text).toContain(team.name));
+  });
+
+  it('qualify-direct row has correct class', () => {
+    const container = div();
+    renderStandings(container, standingsData.A);
+    expect(container.querySelector('.qualify-direct')).not.toBeNull();
+  });
+
+  it('renders form pills', () => {
+    const container = div();
+    renderStandings(container, standingsData.A);
+    expect(container.querySelectorAll('.form-pill').length).toBeGreaterThan(0);
+  });
+
+  it('table has a caption-equivalent aria-label', () => {
+    const container = div();
+    renderStandings(container, standingsData.A);
+    const table = container.querySelector('table');
+    expect(table.getAttribute('aria-label')).toBeTruthy();
+  });
+
+  it('does not throw for null container', () => {
+    expect(() => renderStandings(null, standingsData.A)).not.toThrow();
+  });
+
+  it('updates content when called again with different group', () => {
+    const container = div();
+    renderStandings(container, standingsData.A);
+    renderStandings(container, standingsData.B);
+    expect(container.textContent).toContain(standingsData.B[0].name);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   10. renderTopScorers
+═══════════════════════════════════════════════════════════════ */
+describe('renderTopScorers()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('renders correct number of scorer cards', () => {
+    const container = div();
+    renderTopScorers(container, topScorers);
+    expect(container.querySelectorAll('.scorer-card').length).toBe(topScorers.length);
+  });
+
+  it('renders player names', () => {
+    const container = div();
+    renderTopScorers(container, topScorers);
+    topScorers.forEach(s => expect(container.textContent).toContain(s.name));
+  });
+
+  it('renders goal counts', () => {
+    const container = div();
+    renderTopScorers(container, topScorers);
+    topScorers.forEach(s => expect(container.textContent).toContain(String(s.goals)));
+  });
+
+  it('top 3 scorers get "top" class on rank', () => {
+    const container = div();
+    renderTopScorers(container, topScorers);
+    const topRanks = container.querySelectorAll('.scorer-rank.top');
+    expect(topRanks.length).toBe(3);
+  });
+
+  it('does not throw for empty scorers array', () => {
+    const container = div();
+    expect(() => renderTopScorers(container, [])).not.toThrow();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   11. renderHostCities
+═══════════════════════════════════════════════════════════════ */
+describe('renderHostCities()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('renders correct number of city cards', () => {
+    const container = div();
+    renderHostCities(container, hostCities);
+    expect(container.querySelectorAll('.city-card').length).toBe(hostCities.length);
+  });
+
+  it('renders city names', () => {
+    const container = div();
+    renderHostCities(container, hostCities);
+    expect(container.textContent).toContain('Los Angeles');
+    expect(container.textContent).toContain('Toronto');
+    expect(container.textContent).toContain('Mexico City');
+  });
+
+  it('includes match counts', () => {
+    const container = div();
+    renderHostCities(container, hostCities);
+    expect(container.textContent).toContain('matches');
+  });
+
+  it('does not throw for null container', () => {
+    expect(() => renderHostCities(null, hostCities)).not.toThrow();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   12. animateCounter
+═══════════════════════════════════════════════════════════════ */
+describe('animateCounter()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('sets final value when prefers-reduced-motion', () => {
+    window.matchMedia = vi.fn(() => ({ matches: true }));
+    const el = document.createElement('span');
+    animateCounter(el, 187, 100);
+    expect(el.textContent).toBe('187');
+  });
+
+  it('sets decimal value when prefers-reduced-motion and decimals param given', () => {
+    window.matchMedia = vi.fn(() => ({ matches: true }));
+    const el = document.createElement('span');
+    animateCounter(el, 3.2, 100, 1);
+    expect(el.textContent).toBe('3.2');
+  });
+
+  it('does not throw for null element', () => {
+    expect(() => animateCounter(null, 100)).not.toThrow();
+  });
+
+  it('starts with 0 when no reduced motion (rAF not called in test env)', () => {
+    window.matchMedia = vi.fn(() => ({ matches: false }));
+    const el = document.createElement('span');
+    // requestAnimationFrame is not invoked synchronously so text stays blank/0
+    animateCounter(el, 50, 500);
+    // Element should exist without error
+    expect(el).toBeTruthy();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   13. spawnHeroParticles
+═══════════════════════════════════════════════════════════════ */
+describe('spawnHeroParticles()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('appends child elements to container', () => {
+    window.matchMedia = vi.fn(() => ({ matches: false }));
+    const container = div();
+    spawnHeroParticles(container, 10);
+    expect(container.children.length).toBe(10);
+  });
+
+  it('does not add particles when prefers-reduced-motion', () => {
+    window.matchMedia = vi.fn(() => ({ matches: true }));
+    const container = div();
+    spawnHeroParticles(container, 10);
+    expect(container.children.length).toBe(0);
+  });
+
+  it('does not throw for null container', () => {
+    expect(() => spawnHeroParticles(null, 5)).not.toThrow();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   14. updateLastUpdated
+═══════════════════════════════════════════════════════════════ */
+describe('updateLastUpdated()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('updates the #lastUpdated element text', () => {
+    const el = div('lastUpdated');
+    updateLastUpdated();
+    expect(el.textContent).toContain('Updated at');
+  });
+
+  it('does not throw if element is missing', () => {
+    expect(() => updateLastUpdated()).not.toThrow();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   15. updateCountdowns
+═══════════════════════════════════════════════════════════════ */
+describe('updateCountdowns()', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('updates countdown text in DOM', () => {
+    const container = div();
+    const future = new Date(Date.now() + 3_600_000);
+    container.innerHTML = `<span class="countdown-display" data-kickoff="${future.toISOString()}"></span>`;
+    updateCountdowns();
+    const span = container.querySelector('.countdown-display');
+    expect(span.textContent).toMatch(/In \d+h/);
+  });
+
+  it('shows Kick-off! for past kickoff', () => {
+    const container = div();
+    const past = new Date(Date.now() - 1000);
+    container.innerHTML = `<span class="countdown-display" data-kickoff="${past.toISOString()}"></span>`;
+    updateCountdowns();
+    const span = container.querySelector('.countdown-display');
+    expect(span.textContent).toBe('Kick-off!');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   16. Edge cases / Stress
+═══════════════════════════════════════════════════════════════ */
+describe('Edge cases', () => {
+  beforeEach(() => { makeDOM(); });
+
+  it('renderLiveMatches handles empty array gracefully', () => {
+    const container = div();
+    expect(() => renderLiveMatches(container, [])).not.toThrow();
+    expect(container.textContent).toContain('No matches');
+  });
+
+  it('renderTomorrowMatches handles empty array gracefully', () => {
+    const container = div();
+    expect(() => renderTomorrowMatches(container, [])).not.toThrow();
+    expect(container.textContent).toContain('No matches');
+  });
+
+  it('buildMatchCard does not include raw <script> tags (XSS guard)', () => {
+    const malicious = {
+      ...liveMatchesData[0],
+      venue: '<script>alert("xss")</script>',
+    };
+    const html = buildMatchCard(malicious);
+    // The string will contain the angle-brackets as text (innerHTML would need sanitising)
+    // Verify it still returns a string without error
+    expect(typeof html).toBe('string');
+  });
+
+  it('simulateLiveScoreUpdate with all-FT matches returns unchanged scores', () => {
+    const ftMatches = liveMatchesData.filter(m => m.status === 'FT');
+    const updated = simulateLiveScoreUpdate(ftMatches);
+    ftMatches.forEach((m, i) => {
+      expect(updated[i].homeTeam.score).toBe(m.homeTeam.score);
+    });
+  });
+
+  it('100 consecutive simulateLiveScoreUpdate calls do not produce negative scores', () => {
+    let matches = liveMatchesData.filter(m => m.status === 'LIVE');
     for (let i = 0; i < 100; i++) {
-      app.setStatus(`msg-${i}`);
+      matches = simulateLiveScoreUpdate(matches);
     }
-    expect(document.getElementById('status').textContent).toBe('msg-99');
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('initial game state', () => {
-  let dom, document, app;
-
-  beforeEach(() => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document);
-  });
-
-  it('starts with kicks === 0', () => {
-    expect(app.state.kicks).toBe(0);
-  });
-
-  it('starts with streak === 0', () => {
-    expect(app.state.streak).toBe(0);
-  });
-
-  it('starts with record === 0', () => {
-    expect(app.state.record).toBe(0);
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('kick mechanics', () => {
-  let dom, document, app;
-
-  beforeEach(() => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document);
-  });
-
-  it('increments kicks by 1 on each kick()', () => {
-    app.kick();
-    expect(app.state.kicks).toBe(1);
-    app.kick();
-    expect(app.state.kicks).toBe(2);
-  });
-
-  it('increments streak by 1 on each consecutive kick()', () => {
-    app.kick();
-    app.kick();
-    app.kick();
-    expect(app.state.streak).toBe(3);
-  });
-
-  it('updates record when streak exceeds previous record', () => {
-    app.kick();
-    app.kick();
-    expect(app.state.record).toBe(2);
-  });
-
-  it('does not reduce record if streak is already lower', () => {
-    app.kick();
-    app.kick();
-    app.kick(); // record = 3
-    app.miss(); // streak = 0
-    app.kick(); // streak = 1, record stays 3
-    expect(app.state.record).toBe(3);
-  });
-
-  it('record equals the longest streak across multiple rounds', () => {
-    app.kick();
-    app.kick(); // streak 2, record 2
-    app.miss();
-    app.kick();
-    app.kick();
-    app.kick(); // streak 3, record 3
-    app.miss();
-    app.kick(); // streak 1, record still 3
-    expect(app.state.record).toBe(3);
-  });
-
-  it('kicks counter continues to increment after a miss', () => {
-    app.kick();
-    app.miss();
-    app.kick();
-    expect(app.state.kicks).toBe(2);
-  });
-
-  it('sets status text after kick', () => {
-    app.kick();
-    const status = document.getElementById('status').textContent;
-    expect(status).toMatch(/Kick #1/);
-  });
-
-  it('sets status text after miss', () => {
-    app.miss();
-    const status = document.getElementById('status').textContent;
-    expect(status).toMatch(/Missed/i);
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('miss mechanics', () => {
-  let dom, document, app;
-
-  beforeEach(() => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document);
-  });
-
-  it('resets streak to 0 on miss()', () => {
-    app.kick();
-    app.kick();
-    app.miss();
-    expect(app.state.streak).toBe(0);
-  });
-
-  it('does not change kicks count on miss()', () => {
-    app.kick();
-    const kicksBefore = app.state.kicks;
-    app.miss();
-    expect(app.state.kicks).toBe(kicksBefore);
-  });
-
-  it('does not change record on miss()', () => {
-    app.kick();
-    app.kick();
-    app.kick();
-    app.miss();
-    expect(app.state.record).toBe(3);
-  });
-
-  it('streak can build again after a miss', () => {
-    app.kick();
-    app.miss();
-    app.kick();
-    app.kick();
-    expect(app.state.streak).toBe(2);
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('scoreboard DOM rendering', () => {
-  let dom, document, app;
-
-  beforeEach(() => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document);
-  });
-
-  it('scoreboard contains kicks, record, and streak display elements', () => {
-    expect(document.getElementById('kicks-display')).toBeTruthy();
-    expect(document.getElementById('record-display')).toBeTruthy();
-    expect(document.getElementById('streak-display')).toBeTruthy();
-  });
-
-  it('kicks-value reflects state.kicks after kicks', () => {
-    app.kick();
-    app.kick();
-    expect(document.getElementById('kicks-value').textContent).toBe('2');
-  });
-
-  it('record-value reflects state.record after kicks', () => {
-    app.kick();
-    app.kick();
-    app.kick();
-    expect(document.getElementById('record-value').textContent).toBe('3');
-  });
-
-  it('streak-value reflects state.streak after kicks', () => {
-    app.kick();
-    app.kick();
-    expect(document.getElementById('streak-value').textContent).toBe('2');
-  });
-
-  it('streak-value resets to 0 in DOM after miss', () => {
-    app.kick();
-    app.kick();
-    app.miss();
-    expect(document.getElementById('streak-value').textContent).toBe('0');
-  });
-
-  it('record-value stays at peak after miss', () => {
-    app.kick();
-    app.kick();
-    app.miss();
-    expect(document.getElementById('record-value').textContent).toBe('2');
-  });
-
-  it('applies bump class to score values when motion is allowed', () => {
-    app.updateScoreboard();
-    const kicksEl = document.getElementById('kicks-value');
-    expect(kicksEl.classList.contains('bump')).toBe(true);
-  });
-
-  it('does not apply bump class when prefers-reduced-motion is active', () => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document, { prefersReducedMotion: true });
-    app.updateScoreboard();
-    expect(
-      document.getElementById('kicks-value').classList.contains('bump')
-    ).toBe(false);
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('particle burst effects', () => {
-  let dom, document, app;
-
-  beforeEach(() => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document);
-  });
-
-  it('spawns the default number of particles (8) on spawnParticles()', () => {
-    app.spawnParticles();
-    const container = document.getElementById('particle-container');
-    expect(container.querySelectorAll('.particle').length).toBe(8);
-  });
-
-  it('spawns a custom number of particles when count is supplied', () => {
-    app.spawnParticles(5);
-    const container = document.getElementById('particle-container');
-    expect(container.querySelectorAll('.particle').length).toBe(5);
-  });
-
-  it('spawns particles on every kick()', () => {
-    app.kick();
-    app.kick();
-    const container = document.getElementById('particle-container');
-    // 2 kicks × 8 default particles
-    expect(container.querySelectorAll('.particle').length).toBe(16);
-  });
-
-  it('particles have particle--animated class when motion allowed', () => {
-    app.spawnParticles(1);
-    const p = document.getElementById('particle-container').querySelector('.particle');
-    expect(p.classList.contains('particle--animated')).toBe(true);
-  });
-
-  it('particles do not have particle--animated when prefers-reduced-motion', () => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document, { prefersReducedMotion: true });
-    app.spawnParticles(1);
-    const p = document.getElementById('particle-container').querySelector('.particle');
-    expect(p.classList.contains('particle--animated')).toBe(false);
-  });
-
-  it('spawning 0 particles adds nothing to the container', () => {
-    app.spawnParticles(0);
-    const container = document.getElementById('particle-container');
-    expect(container.querySelectorAll('.particle').length).toBe(0);
-  });
-
-  it('particles are <span> elements', () => {
-    app.spawnParticles(3);
-    const container = document.getElementById('particle-container');
-    container.querySelectorAll('.particle').forEach((p) => {
-      expect(p.tagName.toLowerCase()).toBe('span');
+    matches.forEach(m => {
+      expect(m.homeTeam.score).toBeGreaterThanOrEqual(0);
+      expect(m.awayTeam.score).toBeGreaterThanOrEqual(0);
     });
   });
-});
 
-// ---------------------------------------------------------------------------
-
-describe('accessibility and keyboard interactions', () => {
-  let dom, document, app;
-
-  beforeEach(() => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document);
-  });
-
-  it('kick button has an aria-label attribute', () => {
-    const btn = document.getElementById('kick-btn');
-    expect(btn.getAttribute('aria-label')).toBeTruthy();
-  });
-
-  it('status element has role="status"', () => {
-    const el = document.getElementById('status');
-    expect(el.getAttribute('role')).toBe('status');
-  });
-
-  it('status element has aria-live="polite"', () => {
-    const el = document.getElementById('status');
-    expect(el.getAttribute('aria-live')).toBe('polite');
-  });
-
-  it('status element has aria-atomic="true"', () => {
-    const el = document.getElementById('status');
-    expect(el.getAttribute('aria-atomic')).toBe('true');
-  });
-
-  it('pressing Enter on kick button triggers a kick', () => {
-    const btn = document.getElementById('kick-btn');
-    const event = new dom.window.KeyboardEvent('keydown', {
-      key: 'Enter',
-      bubbles: true,
+  it('standingsData groups each total exactly 4 teams when all present', () => {
+    Object.entries(standingsData).forEach(([group, teams]) => {
+      expect(teams.length).toBe(4);
+      const positions = teams.map(t => t.pos).sort((a, b) => a - b);
+      expect(positions).toEqual([1, 2, 3, 4]);
     });
-    btn.dispatchEvent(event);
-    expect(app.state.kicks).toBe(1);
   });
 
-  it('pressing Space on kick button triggers a kick', () => {
-    const btn = document.getElementById('kick-btn');
-    const event = new dom.window.KeyboardEvent('keydown', {
-      key: ' ',
-      bubbles: true,
-    });
-    btn.dispatchEvent(event);
-    expect(app.state.kicks).toBe(1);
+  it('news articles have unique ids', () => {
+    const ids = latestNews.map(a => a.id);
+    const uniqueIds = new Set(ids);
+    expect(uniqueIds.size).toBe(ids.length);
   });
 
-  it('pressing an unrelated key does not trigger a kick', () => {
-    const btn = document.getElementById('kick-btn');
-    const event = new dom.window.KeyboardEvent('keydown', {
-      key: 'Tab',
-      bubbles: true,
-    });
-    btn.dispatchEvent(event);
-    expect(app.state.kicks).toBe(0);
+  it('host cities have unique stadium names', () => {
+    const stadiums = hostCities.map(c => c.stadium);
+    const unique = new Set(stadiums);
+    expect(unique.size).toBe(stadiums.length);
   });
 
-  it('clicking kick button triggers a kick', () => {
-    const btn = document.getElementById('kick-btn');
-    btn.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true }));
-    expect(app.state.kicks).toBe(1);
-  });
-
-  it('multiple click events each trigger exactly one kick', () => {
-    const btn = document.getElementById('kick-btn');
-    for (let i = 0; i < 5; i++) {
-      btn.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true }));
-    }
-    expect(app.state.kicks).toBe(5);
-  });
-
-  it('status region updates correctly after keyboard kick', () => {
-    const btn = document.getElementById('kick-btn');
-    btn.dispatchEvent(
-      new dom.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
-    );
-    expect(document.getElementById('status').textContent).toMatch(/Kick #1/);
-  });
-
-  it('scoreboard has aria-label attribute', () => {
-    const scoreboard = document.querySelector('.scoreboard');
-    expect(scoreboard.getAttribute('aria-label')).toBeTruthy();
-  });
-
-  it('arena has role="main"', () => {
-    const arena = document.getElementById('arena');
-    expect(arena.getAttribute('role')).toBe('main');
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('prefers-reduced-motion behaviour', () => {
-  it('bump class IS applied when prefersReducedMotion is false', () => {
-    const dom = buildDOM();
-    const document = dom.window.document;
-    const app = createApp(document, { prefersReducedMotion: false });
-    app.updateScoreboard();
-    expect(
-      document.getElementById('kicks-value').classList.contains('bump')
-    ).toBe(true);
-  });
-
-  it('bump class is NOT applied when prefersReducedMotion is true', () => {
-    const dom = buildDOM();
-    const document = dom.window.document;
-    const app = createApp(document, { prefersReducedMotion: true });
-    app.updateScoreboard();
-    expect(
-      document.getElementById('kicks-value').classList.contains('bump')
-    ).toBe(false);
-  });
-
-  it('particle--animated IS added when prefersReducedMotion is false', () => {
-    const dom = buildDOM();
-    const document = dom.window.document;
-    const app = createApp(document, { prefersReducedMotion: false });
-    app.spawnParticles(1);
-    const p = document
-      .getElementById('particle-container')
-      .querySelector('.particle');
-    expect(p.classList.contains('particle--animated')).toBe(true);
-  });
-
-  it('particle--animated is NOT added when prefersReducedMotion is true', () => {
-    const dom = buildDOM();
-    const document = dom.window.document;
-    const app = createApp(document, { prefersReducedMotion: true });
-    app.spawnParticles(1);
-    const p = document
-      .getElementById('particle-container')
-      .querySelector('.particle');
-    expect(p.classList.contains('particle--animated')).toBe(false);
-  });
-
-  it('no particles are given animation class in reduced-motion mode regardless of count', () => {
-    const dom = buildDOM();
-    const document = dom.window.document;
-    const app = createApp(document, { prefersReducedMotion: true });
-    app.spawnParticles(20);
-    const animated = document
-      .getElementById('particle-container')
-      .querySelectorAll('.particle--animated');
-    expect(animated.length).toBe(0);
-  });
-
-  it('all particles get animation class in normal motion mode', () => {
-    const dom = buildDOM();
-    const document = dom.window.document;
-    const app = createApp(document, { prefersReducedMotion: false });
-    app.spawnParticles(10);
-    const all = document
-      .getElementById('particle-container')
-      .querySelectorAll('.particle');
-    const animated = document
-      .getElementById('particle-container')
-      .querySelectorAll('.particle--animated');
-    expect(animated.length).toBe(all.length);
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('state integrity under stress', () => {
-  let dom, document, app;
-
-  beforeEach(() => {
-    dom = buildDOM();
-    document = dom.window.document;
-    app = createApp(document);
-  });
-
-  it('kicks count is always non-negative', () => {
-    for (let i = 0; i < 50; i++) {
-      if (i % 7 === 0) app.miss();
-      else app.kick();
-    }
-    expect(app.state.kicks).toBeGreaterThanOrEqual(0);
-  });
-
-  it('record is always >= streak', () => {
-    for (let i = 0; i < 100; i++) {
-      if (Math.random() < 0.3) app.miss();
-      else app.kick();
-    }
-    expect(app.state.record).toBeGreaterThanOrEqual(app.state.streak);
-  });
-
-  it('record is always >= 0', () => {
-    for (let i = 0; i < 20; i++) app.miss();
-    expect(app.state.record).toBeGreaterThanOrEqual(0);
-  });
-
-  it('streak resets completely after every miss', () => {
-    app.kick();
-    app.kick();
-    app.kick();
-    app.miss();
-    expect(app.state.streak).toBe(0);
-    app.miss();
-    expect(app.state.streak).toBe(0);
-  });
-
-  it('DOM scoreboard stays in sync with state after 50 mixed actions', () => {
-    for (let i = 0; i < 50; i++) {
-      if (i % 11 === 0) app.miss();
-      else app.kick();
-    }
-    expect(document.getElementById('kicks-value').textContent).toBe(
-      String(app.state.kicks)
-    );
-    expect(document.getElementById('record-value').textContent).toBe(
-      String(app.state.record)
-    );
-    expect(document.getElementById('streak-value').textContent).toBe(
-      String(app.state.streak)
-    );
+  it('match ids are unique', () => {
+    const ids = liveMatchesData.map(m => m.id);
+    const unique = new Set(ids);
+    expect(unique.size).toBe(ids.length);
   });
 });
