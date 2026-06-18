@@ -1,288 +1,279 @@
-/**
- * FIFA World Cup 2026 — app.js
- * Core application logic: logo integration helpers, canvas overlay,
- * and utility exports consumed by app.test.js / vitest.
- */
+import { matches } from './data/matches.js';
+import { news } from './data/news.js';
 
-'use strict';
-
-/* ─────────────────────────────────────────────────────────────────
-   LOGO CONSTANTS
-   The official FIFA World Cup 2026 logo colour palette and
-   geometry constants. These are used by canvas rendering helpers
-   and referenced in tests.
-───────────────────────────────────────────────────────────────── */
-export const LOGO = {
-  SYMBOL_ID: 'wc2026-logo',
-
-  COLORS: {
-    gold_light: '#f5d675',
-    gold_mid:   '#c9a227',
-    gold_dark:  '#a07a10',
-    black:      '#000000',
-    white:      '#ffffff',
+// ─── Player Card Data ────────────────────────────────────────────────────────
+export const playerCardData = [
+  {
+    name: 'Lionel Messi',
+    country: 'Argentina',
+    jerseyImageUrl:
+      'https://img.a.transfermarkt.technology/portrait/big/28003-1682683695.jpg',
+    sectionTarget: '#players',
   },
-
-  GRADIENT: {
-    id:     'goldGrad',
-    stops:  [
-      { offset: '0%',   color: '#f5d675' },
-      { offset: '50%',  color: '#c9a227' },
-      { offset: '100%', color: '#a07a10' },
-    ],
+  {
+    name: 'Cristiano Ronaldo',
+    country: 'Portugal',
+    jerseyImageUrl:
+      'https://img.a.transfermarkt.technology/portrait/big/8198-1701955611.jpg',
+    sectionTarget: '#players',
   },
-
-  RADIAL_GRADIENT: {
-    id:  'trophyGrad',
-    cx:  '50%', cy: '35%', r: '60%',
-    stops: [
-      { offset: '0%',   color: '#f5e88a' },
-      { offset: '60%',  color: '#c9a227' },
-      { offset: '100%', color: '#a07a10' },
-    ],
+  {
+    name: 'Kylian Mbappé',
+    country: 'France',
+    jerseyImageUrl:
+      'https://img.a.transfermarkt.technology/portrait/big/342229-1682683755.jpg',
+    sectionTarget: '#players',
   },
+  {
+    name: 'Erling Haaland',
+    country: 'Norway',
+    jerseyImageUrl:
+      'https://img.a.transfermarkt.technology/portrait/big/418560-1682683867.jpg',
+    sectionTarget: '#players',
+  },
+  {
+    name: 'Vinicius Jr',
+    country: 'Brazil',
+    jerseyImageUrl:
+      'https://img.a.transfermarkt.technology/portrait/big/371998-1682683926.jpg',
+    sectionTarget: '#players',
+  },
+  {
+    name: 'Pedri',
+    country: 'Spain',
+    jerseyImageUrl:
+      'https://img.a.transfermarkt.technology/portrait/big/608892-1682683978.jpg',
+    sectionTarget: '#players',
+  },
+];
 
-  VIEWBOX:   '0 0 300 420',
-  TAGLINE:   'WE ARE 26',
-  YEAR:      2026,
-  NATIONS:   48,
-};
-
-/* ─────────────────────────────────────────────────────────────────
-   SIZE CONFIGURATIONS
-   Canonical dimensions for each logo placement context.
-───────────────────────────────────────────────────────────────── */
-export const LOGO_SIZES = {
-  hero:    { width: 260, height: 260, cssClass: 'logo-hero'    },
-  nav:     { width:  48, height:  48, cssClass: 'logo-nav'     },
-  section: { width:  80, height:  80, cssClass: 'logo-section' },
-  footer:  { width: 120, height: 120, cssClass: 'logo-footer'  },
-  canvas:  { width: 180, height: 180, cssClass: 'logo-canvas'  },
-};
-
-/* ─────────────────────────────────────────────────────────────────
-   DOM HELPERS
-───────────────────────────────────────────────────────────────── */
-
+// ─── Smooth-Scroll Helper ────────────────────────────────────────────────────
 /**
- * Creates an SVG <use> element referencing the logo symbol.
- * @param {string} sizeKey – one of 'hero' | 'nav' | 'section' | 'footer' | 'canvas'
- * @param {string} [ariaLabel] – accessible label; omit to mark aria-hidden
- * @returns {SVGSVGElement}
- */
-export function createLogoElement (sizeKey = 'nav', ariaLabel = null) {
-  const cfg = LOGO_SIZES[sizeKey];
-  if (!cfg) throw new RangeError(`Unknown logo size key: "${sizeKey}"`);
-
-  const svg  = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width',   String(cfg.width));
-  svg.setAttribute('height',  String(cfg.height));
-  svg.setAttribute('viewBox', LOGO.VIEWBOX);
-  svg.classList.add(cfg.cssClass);
-
-  if (ariaLabel) {
-    svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', ariaLabel);
-  } else {
-    svg.setAttribute('aria-hidden', 'true');
-    svg.setAttribute('focusable',   'false');
-  }
-
-  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-  use.setAttribute('href', `#${LOGO.SYMBOL_ID}`);
-  svg.appendChild(use);
-
-  return svg;
-}
-
-/**
- * Injects a logo SVG into every element matching `selector`.
- * @param {string}  selector  – CSS selector for target containers
- * @param {string}  sizeKey   – logo size context
- * @param {boolean} [prepend] – if true, insert before first child
- */
-export function injectLogos (selector, sizeKey = 'section', prepend = false) {
-  const containers = document.querySelectorAll(selector);
-  containers.forEach(container => {
-    const svg = createLogoElement(sizeKey);
-    if (prepend && container.firstChild) {
-      container.insertBefore(svg, container.firstChild);
-    } else {
-      container.appendChild(svg);
-    }
-  });
-  return containers.length;
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   CANVAS OVERLAY
-   Draws a lightweight gold "2026" text mark on the hero canvas
-   to reinforce branding alongside the football animation.
-   Called after the football animation initialises.
-───────────────────────────────────────────────────────────────── */
-
-/**
- * Renders the brand overlay onto a canvas context.
- * The overlay is intentionally subtle — it does NOT replace the
- * inline SVG logo in the hero section but adds a canvas-native mark.
+ * Smoothly scrolls the page to the element identified by `targetSelector`.
+ * Accounts for any fixed/sticky nav bar height so the section isn't hidden.
  *
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} width   – canvas width
- * @param {number} height  – canvas height
+ * @param {string} targetSelector – CSS selector, e.g. "#players"
+ * @returns {boolean} true when target was found and scrolled to, false otherwise
  */
-export function drawCanvasBrandOverlay (ctx, width, height) {
-  if (!ctx) return;
+export function smoothScrollTo(targetSelector) {
+  const target = document.querySelector(targetSelector);
+  if (!target) return false;
 
-  ctx.save();
+  const nav = document.querySelector('nav') || document.querySelector('header');
+  const navHeight = nav ? nav.getBoundingClientRect().height : 0;
+  const elementTop = target.getBoundingClientRect().top + window.pageYOffset;
 
-  // Subtle gold radial glow at centre
-  const glow = ctx.createRadialGradient(
-    width / 2, height / 2, 20,
-    width / 2, height / 2, Math.min(width, height) * .45
-  );
-  glow.addColorStop(0,   'rgba(245, 214, 117, 0.06)');
-  glow.addColorStop(.6,  'rgba(201, 162, 39,  0.03)');
-  glow.addColorStop(1,   'rgba(0, 0, 0, 0)');
+  window.scrollTo({
+    top: elementTop - navHeight,
+    behavior: 'smooth',
+  });
 
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, width, height);
-
-  ctx.restore();
+  return true;
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   COUNTDOWN UTILITY
-───────────────────────────────────────────────────────────────── */
-
+// ─── Nav Player Link Wiring ──────────────────────────────────────────────────
 /**
- * Calculates time remaining until the FIFA World Cup 2026 opening match.
- * @param {Date} [now] – injectable current time (for testing)
- * @returns {{ days: number, hours: number, minutes: number, seconds: number, expired: boolean }}
+ * Attaches smooth-scroll click handlers to every nav link that points to
+ * "#players" (or carries a data-scroll="#players" attribute).
  */
-export function getCountdownValues (now = new Date()) {
-  const TARGET = new Date('2026-06-11T19:00:00-04:00');
-  const diff   = TARGET - now;
+function wireNavPlayerLinks() {
+  const navLinks = document.querySelectorAll(
+    'nav a[href="#players"], nav [data-scroll="#players"]'
+  );
+
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target =
+        link.getAttribute('href') || link.getAttribute('data-scroll');
+      smoothScrollTo(target);
+    });
+  });
+}
+
+// ─── Active-State via IntersectionObserver ───────────────────────────────────
+/**
+ * Observes the players section and toggles an `active` class on matching nav
+ * links whenever the section enters / leaves the viewport.
+ */
+function observePlayersSection() {
+  const playersSection = document.querySelector('#players');
+  if (!playersSection) return;
+
+  const navLinks = document.querySelectorAll(
+    'nav a[href="#players"], nav [data-scroll="#players"]'
+  );
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', entry.isIntersecting);
+        });
+      });
+    },
+    {
+      // Fire when at least 20 % of the section is visible
+      threshold: 0.2,
+    }
+  );
+
+  observer.observe(playersSection);
+}
+
+// ─── Countdown Timer ─────────────────────────────────────────────────────────
+/**
+ * Returns the formatted time remaining until `kickoffDate`.
+ * Returns an object with { days, hours, minutes, seconds } as zero-padded
+ * strings, plus `expired: true` when the date is in the past.
+ *
+ * @param {Date} kickoffDate
+ * @param {Date} [now] – injectable "current time" for testing
+ * @returns {{ days: string, hours: string, minutes: string, seconds: string, expired: boolean }}
+ */
+export function getCountdownValues(kickoffDate, now = new Date()) {
+  const diff = kickoffDate - now;
 
   if (diff <= 0) {
-    return { days: 0, hours: 0, minutes: 0, seconds: 0, expired: true };
+    return { days: '00', hours: '00', minutes: '00', seconds: '00', expired: true };
   }
 
+  const totalSeconds = Math.floor(diff / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const pad = (n) => String(n).padStart(2, '0');
+
   return {
-    days:    Math.floor(diff / 864e5),
-    hours:   Math.floor((diff % 864e5) / 36e5),
-    minutes: Math.floor((diff % 36e5)  / 6e4),
-    seconds: Math.floor((diff % 6e4)   / 1e3),
+    days: pad(days),
+    hours: pad(hours),
+    minutes: pad(minutes),
+    seconds: pad(seconds),
     expired: false,
   };
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   SCORE PREDICTOR UTILITY
-───────────────────────────────────────────────────────────────── */
-
-/** FIFA-ranking-based strength table (higher = stronger) */
-export const TEAM_STRENGTH = {
-  Argentina:   10,
-  France:       9,
-  Brazil:       9,
-  Spain:        8,
-  England:      7,
-  Germany:      7,
-  Portugal:     7,
-  Netherlands:  7,
-  Belgium:      8,
-  Croatia:      7,
-  USA:          5,
-  Mexico:       5,
-  Canada:       4,
-  Morocco:      6,
-  Senegal:      5,
-  Japan:        5,
-};
-
 /**
- * Simulates a Poisson-distributed goal count for one team.
- * Uses a deterministic seed for test reproducibility when provided.
- * @param {number} lambda – expected goals
- * @param {() => number} [rng] – random number generator (default: Math.random)
- * @returns {number} simulated goals
+ * Starts a live countdown inside `containerEl`, updating every second.
+ * Reads the target date from `containerEl.dataset.kickoff` (ISO string).
+ *
+ * @param {HTMLElement} containerEl
+ * @returns {number|null} The interval ID (or null if no valid kickoff found)
  */
-export function poissonGoals (lambda, rng = Math.random) {
-  const L = Math.exp(-lambda);
-  let k = 0, p = 1;
-  do { k++; p *= rng(); } while (p > L);
-  return k - 1;
+export function startCountdown(containerEl) {
+  if (!containerEl) return null;
+
+  const kickoffIso = containerEl.dataset.kickoff;
+  if (!kickoffIso) return null;
+
+  const kickoffDate = new Date(kickoffIso);
+  if (isNaN(kickoffDate.getTime())) return null;
+
+  function render() {
+    const values = getCountdownValues(kickoffDate);
+
+    containerEl.innerHTML = values.expired
+      ? '<span class="countdown__expired">Kick-off!</span>'
+      : `<span class="countdown__segment"><span class="countdown__value">${values.days}</span><span class="countdown__label">Days</span></span>` +
+        `<span class="countdown__segment"><span class="countdown__value">${values.hours}</span><span class="countdown__label">Hrs</span></span>` +
+        `<span class="countdown__segment"><span class="countdown__value">${values.minutes}</span><span class="countdown__label">Min</span></span>` +
+        `<span class="countdown__segment"><span class="countdown__value">${values.seconds}</span><span class="countdown__label">Sec</span></span>`;
+  }
+
+  render();
+  return setInterval(render, 1000);
 }
 
-/**
- * Predicts a scoreline for a match between two teams.
- * @param {string}   teamA
- * @param {string}   teamB
- * @param {()=>number} [rng]
- * @returns {{ teamA: string, teamB: string, goalsA: number, goalsB: number }}
- */
-export function predictMatch (teamA, teamB, rng = Math.random) {
-  if (teamA === teamB) throw new Error('Teams must be different');
+// ─── Render Helpers ──────────────────────────────────────────────────────────
+export function renderMatches() {
+  const container = document.getElementById('matches-list');
+  if (!container) return;
 
-  const sA = TEAM_STRENGTH[teamA] ?? 5;
-  const sB = TEAM_STRENGTH[teamB] ?? 5;
-  const total = sA + sB;
-
-  const lambdaA = (sA / total) * 2.8;
-  const lambdaB = (sB / total) * 2.8;
-
-  return {
-    teamA,
-    teamB,
-    goalsA: poissonGoals(lambdaA, rng),
-    goalsB: poissonGoals(lambdaB, rng),
-  };
+  container.innerHTML = matches
+    .map(
+      (m) => `
+      <article class="match-card">
+        <div class="match-teams">
+          <span class="team home">${m.homeTeam}</span>
+          <span class="match-score">${m.score ?? 'vs'}</span>
+          <span class="team away">${m.awayTeam}</span>
+        </div>
+        <div class="match-meta">
+          <span class="match-date">${new Date(m.date).toLocaleDateString(undefined, {
+            weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+          })}</span>
+          <span class="match-venue">${m.venue ?? ''}</span>
+        </div>
+      </article>`
+    )
+    .join('');
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   TICKER UTILITY
-───────────────────────────────────────────────────────────────── */
+export function renderNews() {
+  const container = document.getElementById('news-list');
+  if (!container) return;
 
-/** Default ticker items displayed in the news ticker */
-export const TICKER_ITEMS = [
-  '🏆 FIFA World Cup 2026 — USA · Canada · Mexico',
-  '48 Nations Competing For The First Time In History',
-  'Opening Match: June 11, 2026 · MetLife Stadium, New York',
-  'Final: July 19, 2026 · MetLife Stadium',
-  '16 World-Class Venues Across 3 Countries',
-  '104 Matches · 48 Teams · 1 Trophy',
-  'WE ARE 26 — The Greatest Show On Earth Returns',
-];
+  container.innerHTML = news
+    .map(
+      (n) => `
+      <article class="news-card">
+        ${n.imageUrl ? `<img src="${n.imageUrl}" alt="${n.title}" class="news-card__image" loading="lazy" />` : ''}
+        <div class="news-card__body">
+          <h3 class="news-card__title">${n.title}</h3>
+          <p class="news-card__summary">${n.summary ?? ''}</p>
+          <time class="news-card__date" datetime="${n.date}">${new Date(n.date).toLocaleDateString()}</time>
+        </div>
+      </article>`
+    )
+    .join('');
+}
 
-/* ─────────────────────────────────────────────────────────────────
-   VENUE DATA
-───────────────────────────────────────────────────────────────── */
-export const VENUES = [
-  { city: 'New York / New Jersey', stadium: 'MetLife Stadium',            capacity: 82500, country: 'USA', isFinal: true  },
-  { city: 'Los Angeles',           stadium: 'SoFi Stadium',               capacity: 70240, country: 'USA', isFinal: false },
-  { city: 'Dallas / Fort Worth',   stadium: 'AT&T Stadium',               capacity: 80000, country: 'USA', isFinal: false },
-  { city: 'Houston',               stadium: 'NRG Stadium',                capacity: 72220, country: 'USA', isFinal: false },
-  { city: 'Miami',                 stadium: 'Hard Rock Stadium',          capacity: 65326, country: 'USA', isFinal: false },
-  { city: 'Denver',                stadium: 'Empower Field at Mile High', capacity: 76125, country: 'USA', isFinal: false },
-  { city: 'San Francisco Bay Area',stadium: 'Levi\'s Stadium',            capacity: 68500, country: 'USA', isFinal: false },
-  { city: 'Mexico City',           stadium: 'Estadio Azteca',             capacity: 87523, country: 'MEX', isFinal: false },
-  { city: 'Toronto',               stadium: 'BMO Field / Rogers Centre',  capacity: 45000, country: 'CAN', isFinal: false },
-  { city: 'Vancouver',             stadium: 'BC Place',                   capacity: 54500, country: 'CAN', isFinal: false },
-];
+export function renderPlayerCards() {
+  const container = document.querySelector('#players .players-grid');
+  if (!container) return;
 
-/* ─────────────────────────────────────────────────────────────────
-   DEFAULT EXPORT
-───────────────────────────────────────────────────────────────── */
-export default {
-  LOGO,
-  LOGO_SIZES,
-  TEAM_STRENGTH,
-  TICKER_ITEMS,
-  VENUES,
-  createLogoElement,
-  injectLogos,
-  drawCanvasBrandOverlay,
-  getCountdownValues,
-  poissonGoals,
-  predictMatch,
-};
+  container.innerHTML = playerCardData
+    .map(
+      (p) => `
+      <article class="player-card">
+        <div class="player-card__image-wrap">
+          <img
+            src="${p.jerseyImageUrl}"
+            alt="${p.name} – ${p.country} jersey"
+            class="player-card__image"
+            loading="lazy"
+            onerror="this.src='https://via.placeholder.com/200x200?text=${encodeURIComponent(p.name)}'"
+          />
+        </div>
+        <div class="player-card__info">
+          <h3 class="player-card__name">${p.name}</h3>
+          <span class="player-card__country">${p.country}</span>
+        </div>
+      </article>`
+    )
+    .join('');
+}
+
+// ─── Boot ────────────────────────────────────────────────────────────────────
+function init() {
+  renderMatches();
+  renderNews();
+  renderPlayerCards();
+  wireNavPlayerLinks();
+  observePlayersSection();
+
+  // Start countdown for every element carrying a data-kickoff attribute
+  document.querySelectorAll('[data-kickoff]').forEach((el) => {
+    startCountdown(el);
+  });
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+}
