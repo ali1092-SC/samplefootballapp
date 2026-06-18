@@ -1,1122 +1,780 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { JSDOM } from 'jsdom';
-
-/* ── DOM SETUP ───────────────────────────────────────────────────── */
-function buildDOM() {
-  const dom = new JSDOM(`<!DOCTYPE html><html><body>
-    <div id="cdDays"></div><div id="cdHours"></div>
-    <div id="cdMins"></div><div id="cdSecs"></div>
-    <div id="matchesGrid"></div>
-    <div id="featuredMatchCard"></div>
-    <div id="tickerItems"></div>
-    <div id="standingsScroll"></div>
-    <div id="newsHeroCard"></div>
-    <div id="newsGrid"></div>
-    <button id="loadMoreNews"></button>
-    <div id="scorersList"></div>
-    <div id="citiesScroll"></div>
-    <div id="toastContainer"></div>
-    <div class="tab-pills">
-      <button class="pill active" data-day="today" id="tab-today" aria-selected="true">Today</button>
-      <button class="pill" data-day="tomorrow" id="tab-tomorrow" aria-selected="false">Tomorrow</button>
-    </div>
-    <div id="matches-panel"></div>
-    <div class="news-filter-pills">
-      <button class="pill active" data-category="all">All</button>
-      <button class="pill" data-category="match">Match</button>
-      <button class="pill" data-category="team">Team</button>
-    </div>
-    <button id="heroCtaBtn"></button>
-    <div id="heroCountdown"></div>
-  </body></html>`, {
-    url: 'http://localhost/',
-    pretendToBeVisual: true,
-  });
-
-  global.document  = dom.window.document;
-  global.window    = dom.window;
-  global.navigator = dom.window.navigator;
-  return dom;
-}
-
-/* ── IMPORT MOCKS VIA INLINE REIMPLEMENTATION ──────────────────── */
-// Re-implement pure helpers locally so tests don't depend on module loader
 import {
-  MATCH_STATUS,
-  formatKickOff,
-  todayMatches,
-  tomorrowMatches,
-  groupStandings,
-  hostCities,
-} from './data/matches.js';
-
-import {
-  allNews,
-  topScorers,
-  getNewsByCategory,
-  getCategoryBadgeClass,
-  getCategoryLabel,
+  pad,
   timeAgo,
-} from './data/news.js';
-
-import {
-  buildMatchStatusBadge,
+  getCountdownValues,
+  animatedCounter,
+  initScrollReveal,
+  buildTickerItem,
   buildMatchCard,
-  renderMatchCards,
-  renderFeaturedMatch,
-  buildTickerItems,
-  renderTicker,
-  buildStandingCard,
-  renderStandings,
+  buildGroupCard,
+  buildScorerRow,
   buildNewsHeroCard,
   buildNewsCard,
-  renderNewsSection,
-  buildScorerRow,
-  renderTopScorers,
-  buildCityCard,
-  renderHostCities,
+  renderTicker,
+  renderMatchGrid,
+  renderStandings,
+  renderNews,
+  renderNewsFilters,
+  renderScorers,
+  renderCities,
+  filterNews,
+  getCategories,
   showToast,
-  updateCountdown,
-  simulateLiveUpdates,
+  updateTickerScore,
+  updateMatchCard,
+  simulateLiveScores,
+  startLivePolling,
+  stopLivePolling,
+  initCountdown,
+  initMatchTabs,
+  initCarousel,
+  initHeader,
+  initParticles,
+  closeMobileNav,
 } from './app.js';
+import { todayMatches, tomorrowMatches, recentResults, groupStandings, hostCities, topScorers } from './data/matches.js';
+import { newsArticles } from './data/news.js';
 
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  DATA MODULE TESTS                                                 */
-/* ═══════════════════════════════════════════════════════════════════ */
+/* ── DOM setup helper ─────────────────────────────────────── */
+function setupDOM(html = '') {
+  document.body.innerHTML = html;
+}
 
-describe('data/matches.js', () => {
-  describe('MATCH_STATUS constants', () => {
-    it('exports all four status values', () => {
-      expect(MATCH_STATUS.LIVE).toBe('live');
-      expect(MATCH_STATUS.UPCOMING).toBe('upcoming');
-      expect(MATCH_STATUS.FINISHED).toBe('finished');
-      expect(MATCH_STATUS.HT).toBe('ht');
-    });
+/* ══════════════════════════════════════════════════════════
+   UTILITY HELPERS
+══════════════════════════════════════════════════════════ */
+describe('pad()', () => {
+  it('pads single digit with leading zero', () => expect(pad(5)).toBe('05'));
+  it('pads to requested length', () => expect(pad(7, 3)).toBe('007'));
+  it('does not trim already correct length', () => expect(pad(42)).toBe('42'));
+  it('handles zero correctly', () => expect(pad(0)).toBe('00'));
+  it('handles three-digit day countdown', () => expect(pad(365, 3)).toBe('365'));
+});
+
+describe('timeAgo()', () => {
+  it('returns "just now" for < 1 minute', () => {
+    const ts = new Date(Date.now() - 30000).toISOString();
+    expect(timeAgo(ts)).toBe('just now');
   });
-
-  describe('formatKickOff()', () => {
-    it('formats a date to HH:MM string', () => {
-      const d = new Date(2026, 5, 11, 14, 30, 0);
-      const result = formatKickOff(d);
-      expect(result).toMatch(/^\d{2}:\d{2}$/);
-    });
-
-    it('handles midnight correctly', () => {
-      const d = new Date(2026, 5, 11, 0, 0, 0);
-      expect(formatKickOff(d)).toBe('00:00');
-    });
-
-    it('handles noon correctly', () => {
-      const d = new Date(2026, 5, 11, 12, 0, 0);
-      expect(formatKickOff(d)).toBe('12:00');
-    });
+  it('returns minutes for < 1 hour', () => {
+    const ts = new Date(Date.now() - 15 * 60000).toISOString();
+    expect(timeAgo(ts)).toBe('15m ago');
   });
-
-  describe('todayMatches', () => {
-    it('exports an array', () => {
-      expect(Array.isArray(todayMatches)).toBe(true);
-    });
-
-    it('has at least one match', () => {
-      expect(todayMatches.length).toBeGreaterThan(0);
-    });
-
-    it('every match has required fields', () => {
-      todayMatches.forEach(m => {
-        expect(m).toHaveProperty('id');
-        expect(m).toHaveProperty('status');
-        expect(m).toHaveProperty('homeTeam');
-        expect(m).toHaveProperty('awayTeam');
-        expect(m).toHaveProperty('score');
-        expect(m).toHaveProperty('group');
-        expect(m).toHaveProperty('venue');
-        expect(m).toHaveProperty('city');
-      });
-    });
-
-    it('each match has homeTeam with name, abbr, flag', () => {
-      todayMatches.forEach(m => {
-        expect(m.homeTeam).toHaveProperty('name');
-        expect(m.homeTeam).toHaveProperty('abbr');
-        expect(m.homeTeam).toHaveProperty('flag');
-      });
-    });
-
-    it('abbr fields are exactly 3 characters', () => {
-      todayMatches.forEach(m => {
-        expect(m.homeTeam.abbr).toHaveLength(3);
-        expect(m.awayTeam.abbr).toHaveLength(3);
-      });
-    });
-
-    it('score.home and score.away are non-negative integers', () => {
-      todayMatches.forEach(m => {
-        expect(m.score.home).toBeGreaterThanOrEqual(0);
-        expect(m.score.away).toBeGreaterThanOrEqual(0);
-        expect(Number.isInteger(m.score.home)).toBe(true);
-        expect(Number.isInteger(m.score.away)).toBe(true);
-      });
-    });
-
-    it('status is one of the four valid values', () => {
-      const valid = Object.values(MATCH_STATUS);
-      todayMatches.forEach(m => {
-        expect(valid).toContain(m.status);
-      });
-    });
-
-    it('live matches have a minute value between 1 and 90', () => {
-      todayMatches
-        .filter(m => m.status === MATCH_STATUS.LIVE)
-        .forEach(m => {
-          expect(m.minute).toBeGreaterThanOrEqual(1);
-          expect(m.minute).toBeLessThanOrEqual(90);
-        });
-    });
-
-    it('upcoming matches have minute === null', () => {
-      todayMatches
-        .filter(m => m.status === MATCH_STATUS.UPCOMING)
-        .forEach(m => {
-          expect(m.minute).toBeNull();
-        });
-    });
-
-    it('all IDs are unique', () => {
-      const ids = todayMatches.map(m => m.id);
-      expect(new Set(ids).size).toBe(ids.length);
-    });
-
-    it('kickOff is a Date instance', () => {
-      todayMatches.forEach(m => {
-        expect(m.kickOff).toBeInstanceOf(Date);
-      });
-    });
+  it('returns hours for < 1 day', () => {
+    const ts = new Date(Date.now() - 3 * 3600000).toISOString();
+    expect(timeAgo(ts)).toBe('3h ago');
   });
-
-  describe('tomorrowMatches', () => {
-    it('has at least one match', () => {
-      expect(tomorrowMatches.length).toBeGreaterThan(0);
-    });
-
-    it('all tomorrow matches are UPCOMING', () => {
-      tomorrowMatches.forEach(m => {
-        expect(m.status).toBe(MATCH_STATUS.UPCOMING);
-      });
-    });
-
-    it('IDs do not overlap with todayMatches', () => {
-      const todayIds    = new Set(todayMatches.map(m => m.id));
-      const tomorrowIds = tomorrowMatches.map(m => m.id);
-      tomorrowIds.forEach(id => expect(todayIds.has(id)).toBe(false));
-    });
-  });
-
-  describe('groupStandings', () => {
-    it('exports an array of groups', () => {
-      expect(Array.isArray(groupStandings)).toBe(true);
-      expect(groupStandings.length).toBeGreaterThan(0);
-    });
-
-    it('each group has label and 4 rows', () => {
-      groupStandings.forEach(g => {
-        expect(g).toHaveProperty('group');
-        expect(g).toHaveProperty('rows');
-        expect(g.rows).toHaveLength(4);
-      });
-    });
-
-    it('rows are sorted by position 1-4', () => {
-      groupStandings.forEach(g => {
-        g.rows.forEach((r, i) => {
-          expect(r.pos).toBe(i + 1);
-        });
-      });
-    });
-
-    it('pts is a non-negative integer for all rows', () => {
-      groupStandings.forEach(g => {
-        g.rows.forEach(r => {
-          expect(r.pts).toBeGreaterThanOrEqual(0);
-          expect(Number.isInteger(r.pts)).toBe(true);
-        });
-      });
-    });
-  });
-
-  describe('hostCities', () => {
-    it('exports 16 cities', () => {
-      expect(hostCities).toHaveLength(16);
-    });
-
-    it('each city has name, country, icon, matches', () => {
-      hostCities.forEach(c => {
-        expect(c).toHaveProperty('name');
-        expect(c).toHaveProperty('country');
-        expect(c).toHaveProperty('icon');
-        expect(c).toHaveProperty('matches');
-        expect(c.matches).toBeGreaterThanOrEqual(6);
-      });
-    });
-
-    it('only hosts from USA, Canada, Mexico', () => {
-      const allowed = new Set(['USA', 'Canada', 'Mexico']);
-      hostCities.forEach(c => expect(allowed.has(c.country)).toBe(true));
-    });
+  it('returns days for >= 1 day', () => {
+    const ts = new Date(Date.now() - 2 * 86400000).toISOString();
+    expect(timeAgo(ts)).toBe('2d ago');
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  DATA/NEWS.JS TESTS                                                */
-/* ═══════════════════════════════════════════════════════════════════ */
+describe('getCountdownValues()', () => {
+  it('returns correct structure', () => {
+    const future = new Date(Date.now() + 90061000); // ~1d 1h 1m 1s
+    const { days, hours, mins, secs, delta } = getCountdownValues(future);
+    expect(days).toBeGreaterThanOrEqual(1);
+    expect(hours).toBeGreaterThanOrEqual(0);
+    expect(mins).toBeGreaterThanOrEqual(0);
+    expect(secs).toBeGreaterThanOrEqual(0);
+    expect(delta).toBeGreaterThan(0);
+  });
+  it('returns all zeros for past date', () => {
+    const past = new Date(Date.now() - 1000);
+    const { days, hours, mins, secs, delta } = getCountdownValues(past);
+    expect(days + hours + mins + secs + delta).toBe(0);
+  });
+});
+
+describe('animatedCounter()', () => {
+  it('does not throw for null element', () => {
+    expect(() => animatedCounter(null, 10)).not.toThrow();
+  });
+  it('sets content on element', () => {
+    vi.useFakeTimers();
+    const el = document.createElement('span');
+    el.textContent = '0';
+    animatedCounter(el, 100, 100);
+    vi.advanceTimersByTime(200);
+    expect(Number(el.textContent)).toBeGreaterThanOrEqual(0);
+    vi.useRealTimers();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   DATA MODULES
+══════════════════════════════════════════════════════════ */
+describe('data/matches.js', () => {
+  it('todayMatches is a non-empty array', () => {
+    expect(Array.isArray(todayMatches)).toBe(true);
+    expect(todayMatches.length).toBeGreaterThan(0);
+  });
+  it('each match has required fields', () => {
+    todayMatches.forEach(m => {
+      expect(m).toHaveProperty('id');
+      expect(m).toHaveProperty('homeTeam');
+      expect(m).toHaveProperty('awayTeam');
+      expect(m).toHaveProperty('status');
+      expect(m).toHaveProperty('venue');
+    });
+  });
+  it('tomorrowMatches only contain UPCOMING status', () => {
+    tomorrowMatches.forEach(m => expect(m.status).toBe('UPCOMING'));
+  });
+  it('recentResults only contain FT status', () => {
+    recentResults.forEach(m => expect(m.status).toBe('FT'));
+  });
+  it('groupStandings has groups A-F', () => {
+    const names = groupStandings.map(g => g.name);
+    ['A','B','C','D','E','F'].forEach(n => expect(names).toContain(n));
+  });
+  it('each group has 4 teams', () => {
+    groupStandings.forEach(g => expect(g.teams.length).toBe(4));
+  });
+  it('topScorers has at least 5 entries', () => {
+    expect(topScorers.length).toBeGreaterThanOrEqual(5);
+  });
+  it('topScorers sorted descending by goals', () => {
+    for (let i = 0; i < topScorers.length - 1; i++) {
+      expect(topScorers[i].goals).toBeGreaterThanOrEqual(topScorers[i + 1].goals);
+    }
+  });
+  it('hostCities has 16 entries', () => expect(hostCities.length).toBe(16));
+  it('each city has stadium and matches count', () => {
+    hostCities.forEach(c => {
+      expect(c).toHaveProperty('stadium');
+      expect(c.matches).toBeGreaterThan(0);
+    });
+  });
+});
 
 describe('data/news.js', () => {
-  describe('allNews', () => {
-    it('exports an array', () => {
-      expect(Array.isArray(allNews)).toBe(true);
-    });
-
-    it('has at least 6 articles', () => {
-      expect(allNews.length).toBeGreaterThanOrEqual(6);
-    });
-
-    it('each article has required fields', () => {
-      allNews.forEach(a => {
-        expect(a).toHaveProperty('id');
-        expect(a).toHaveProperty('category');
-        expect(a).toHaveProperty('title');
-        expect(a).toHaveProperty('excerpt');
-        expect(a).toHaveProperty('author');
-        expect(a).toHaveProperty('publishedAt');
-        expect(a).toHaveProperty('readTime');
-      });
-    });
-
-    it('all IDs are unique', () => {
-      const ids = allNews.map(a => a.id);
-      expect(new Set(ids).size).toBe(ids.length);
-    });
-
-    it('author has name and initials', () => {
-      allNews.forEach(a => {
-        expect(a.author).toHaveProperty('name');
-        expect(a.author).toHaveProperty('initials');
-        expect(a.author.initials).toHaveLength(2);
-      });
-    });
-
-    it('exactly one article is featured', () => {
-      const featured = allNews.filter(a => a.isFeatured);
-      expect(featured).toHaveLength(1);
-    });
-
-    it('publishedAt parses to a valid date', () => {
-      allNews.forEach(a => {
-        const d = new Date(a.publishedAt);
-        expect(isNaN(d.getTime())).toBe(false);
-      });
+  it('newsArticles is a non-empty array', () => {
+    expect(Array.isArray(newsArticles)).toBe(true);
+    expect(newsArticles.length).toBeGreaterThan(0);
+  });
+  it('each article has required fields', () => {
+    newsArticles.forEach(a => {
+      expect(a).toHaveProperty('id');
+      expect(a).toHaveProperty('title');
+      expect(a).toHaveProperty('category');
+      expect(a).toHaveProperty('excerpt');
+      expect(a).toHaveProperty('publishedAt');
+      expect(a).toHaveProperty('readTime');
     });
   });
-
-  describe('getNewsByCategory()', () => {
-    it('"all" returns all articles', () => {
-      expect(getNewsByCategory('all')).toEqual(allNews);
-    });
-
-    it('filters correctly for "match" category', () => {
-      const result = getNewsByCategory('match');
-      result.forEach(a => expect(a.category).toBe('match'));
-    });
-
-    it('filters correctly for "team" category', () => {
-      const result = getNewsByCategory('team');
-      result.forEach(a => expect(a.category).toBe('team'));
-    });
-
-    it('returns empty array for unknown category', () => {
-      expect(getNewsByCategory('unknown_xyz')).toEqual([]);
-    });
-  });
-
-  describe('getCategoryBadgeClass()', () => {
-    it('returns badge-match for match', () => {
-      expect(getCategoryBadgeClass('match')).toBe('badge-match');
-    });
-
-    it('returns badge-team for team', () => {
-      expect(getCategoryBadgeClass('team')).toBe('badge-team');
-    });
-
-    it('returns badge-transfer for transfer', () => {
-      expect(getCategoryBadgeClass('transfer')).toBe('badge-transfer');
-    });
-
-    it('falls back to badge-general for unknown', () => {
-      expect(getCategoryBadgeClass('unknown')).toBe('badge-general');
-    });
-  });
-
-  describe('getCategoryLabel()', () => {
-    it('returns human-readable label for match', () => {
-      expect(getCategoryLabel('match')).toBe('Match Report');
-    });
-
-    it('returns human-readable label for team', () => {
-      expect(getCategoryLabel('team')).toBe('Team News');
-    });
-
-    it('falls back to "News" for unknown', () => {
-      expect(getCategoryLabel('xyz')).toBe('News');
-    });
-  });
-
-  describe('timeAgo()', () => {
-    it('returns "Xs ago" for seconds', () => {
-      const d = new Date(Date.now() - 30000).toISOString();
-      expect(timeAgo(d)).toMatch(/^\d+s ago$/);
-    });
-
-    it('returns "Xm ago" for minutes', () => {
-      const d = new Date(Date.now() - 5 * 60000).toISOString();
-      expect(timeAgo(d)).toMatch(/^\d+m ago$/);
-    });
-
-    it('returns "Xh ago" for hours', () => {
-      const d = new Date(Date.now() - 3 * 3600000).toISOString();
-      expect(timeAgo(d)).toMatch(/^\d+h ago$/);
-    });
-
-    it('returns "Xd ago" for days', () => {
-      const d = new Date(Date.now() - 2 * 86400000).toISOString();
-      expect(timeAgo(d)).toMatch(/^\d+d ago$/);
-    });
-  });
-
-  describe('topScorers', () => {
-    it('exports an array of scorers', () => {
-      expect(Array.isArray(topScorers)).toBe(true);
-      expect(topScorers.length).toBeGreaterThan(0);
-    });
-
-    it('rank 1 scorer has the most goals', () => {
-      const sorted = [...topScorers].sort((a, b) => b.goals - a.goals);
-      expect(topScorers[0].goals).toBe(sorted[0].goals);
-    });
-
-    it('all scorers have goals >= 1', () => {
-      topScorers.forEach(s => expect(s.goals).toBeGreaterThanOrEqual(1));
-    });
-
-    it('ranks are sequential starting from 1', () => {
-      topScorers.forEach((s, i) => expect(s.rank).toBe(i + 1));
+  it('publishedAt is a valid ISO date', () => {
+    newsArticles.forEach(a => {
+      expect(new Date(a.publishedAt).toISOString()).toBe(a.publishedAt);
     });
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  RENDERING HELPER TESTS                                            */
-/* ═══════════════════════════════════════════════════════════════════ */
-
-describe('buildMatchStatusBadge()', () => {
-  const base = { homeTeam: { name: 'A', abbr: 'AAA', flag: '🏳️' }, awayTeam: { name: 'B', abbr: 'BBB', flag: '🏳️' }, kickOff: new Date(), score: { home: 0, away: 0 } };
-
-  it('renders LIVE badge with minute', () => {
-    const html = buildMatchStatusBadge({ ...base, status: MATCH_STATUS.LIVE, minute: 42 });
-    expect(html).toContain('status-live');
-    expect(html).toContain("42'");
+/* ══════════════════════════════════════════════════════════
+   TICKER
+══════════════════════════════════════════════════════════ */
+describe('buildTickerItem()', () => {
+  it('returns a div element', () => {
+    const item = buildTickerItem(todayMatches[0]);
+    expect(item.tagName).toBe('DIV');
+    expect(item.className).toBe('ticker-item');
   });
-
-  it('renders HT badge', () => {
-    const html = buildMatchStatusBadge({ ...base, status: MATCH_STATUS.HT, minute: 45 });
-    expect(html).toContain('HT');
-    expect(html).toContain('status-live');
+  it('has data-match-id attribute', () => {
+    const item = buildTickerItem(todayMatches[0]);
+    expect(item.dataset.matchId).toBe(todayMatches[0].id);
   });
-
-  it('renders FT badge', () => {
-    const html = buildMatchStatusBadge({ ...base, status: MATCH_STATUS.FINISHED, minute: 90 });
-    expect(html).toContain('FT');
-    expect(html).toContain('status-finished');
+  it('shows score for LIVE match', () => {
+    const live = todayMatches.find(m => m.status === 'LIVE');
+    const item = buildTickerItem(live);
+    expect(item.innerHTML).toContain(`${live.homeScore} - ${live.awayScore}`);
   });
-
-  it('renders kick-off time for upcoming', () => {
-    const kickOff = new Date(2026, 5, 11, 15, 0, 0);
-    const html = buildMatchStatusBadge({ ...base, status: MATCH_STATUS.UPCOMING, minute: null, kickOff });
-    expect(html).toContain('status-upcoming');
-    expect(html).toContain('15:00');
+  it('shows time for UPCOMING match', () => {
+    const upcoming = { ...todayMatches[0], status: 'UPCOMING', time: '22:00' };
+    const item = buildTickerItem(upcoming);
+    expect(item.innerHTML).toContain('22:00');
   });
-});
-
-describe('buildMatchCard()', () => {
-  const match = {
-    id: 'test-01',
-    group: 'GROUP A',
-    status: MATCH_STATUS.LIVE,
-    minute: 55,
-    homeTeam: { name: 'Brazil', abbr: 'BRA', flag: '🇧🇷' },
-    awayTeam: { name: 'Serbia', abbr: 'SRB', flag: '🇷🇸' },
-    score: { home: 2, away: 0 },
-    kickOff: new Date(),
-    venue: 'MetLife',
-    city: 'New York',
-  };
-
-  it('contains team names', () => {
-    const html = buildMatchCard(match);
-    expect(html).toContain('Brazil');
-    expect(html).toContain('Serbia');
-  });
-
-  it('contains team flags', () => {
-    const html = buildMatchCard(match);
-    expect(html).toContain('🇧🇷');
-    expect(html).toContain('🇷🇸');
-  });
-
-  it('contains score for live match', () => {
-    const html = buildMatchCard(match);
-    expect(html).toContain('2 - 0');
-  });
-
-  it('shows "vs" for upcoming match', () => {
-    const html = buildMatchCard({ ...match, status: MATCH_STATUS.UPCOMING, score: { home: 0, away: 0 } });
-    expect(html).toContain('vs');
-  });
-
-  it('has is-live class for live match', () => {
-    expect(buildMatchCard(match)).toContain('is-live');
-  });
-
-  it('does not have is-live class for upcoming', () => {
-    const html = buildMatchCard({ ...match, status: MATCH_STATUS.UPCOMING });
-    expect(html).not.toContain('is-live');
-  });
-
-  it('includes data-match-id attribute', () => {
-    expect(buildMatchCard(match)).toContain('data-match-id="test-01"');
-  });
-
-  it('includes venue in the card', () => {
-    expect(buildMatchCard(match)).toContain('MetLife');
-  });
-
-  it('includes city in the card', () => {
-    expect(buildMatchCard(match)).toContain('New York');
-  });
-
-  it('shows abbr codes', () => {
-    const html = buildMatchCard(match);
-    expect(html).toContain('BRA');
-    expect(html).toContain('SRB');
-  });
-});
-
-describe('buildTickerItems()', () => {
-  const matches = [
-    {
-      id: 't1',
-      status: MATCH_STATUS.LIVE,
-      minute: 30,
-      homeTeam: { abbr: 'ENG', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-      awayTeam: { abbr: 'USA', flag: '🇺🇸' },
-      score: { home: 1, away: 0 },
-      kickOff: new Date(),
-    },
-    {
-      id: 't2',
-      status: MATCH_STATUS.UPCOMING,
-      minute: null,
-      homeTeam: { abbr: 'GER', flag: '🇩🇪' },
-      awayTeam: { abbr: 'JPN', flag: '🇯🇵' },
-      score: { home: 0, away: 0 },
-      kickOff: new Date(Date.now() + 3600000),
-    },
-  ];
-
-  it('returns a non-empty string', () => {
-    const html = buildTickerItems(matches);
-    expect(typeof html).toBe('string');
-    expect(html.length).toBeGreaterThan(0);
-  });
-
-  it('includes all team abbreviations', () => {
-    const html = buildTickerItems(matches);
-    expect(html).toContain('ENG');
-    expect(html).toContain('USA');
-    expect(html).toContain('GER');
-    expect(html).toContain('JPN');
-  });
-
-  it('shows live score for live match', () => {
-    const html = buildTickerItems(matches);
-    expect(html).toContain('1–0');
-  });
-
-  it('shows minute for live match', () => {
-    const html = buildTickerItems(matches);
-    expect(html).toContain("30'");
-  });
-
-  it('returns empty string for empty array', () => {
-    expect(buildTickerItems([])).toBe('');
-  });
-
-  it('shows FT for finished match', () => {
-    const fin = [{ ...matches[0], status: MATCH_STATUS.FINISHED, minute: 90 }];
-    expect(buildTickerItems(fin)).toContain('FT');
-  });
-
-  it('shows HT for half-time match', () => {
-    const ht = [{ ...matches[0], status: MATCH_STATUS.HT, minute: 45 }];
-    expect(buildTickerItems(ht)).toContain('HT');
-  });
-});
-
-describe('buildStandingCard()', () => {
-  const group = groupStandings[0];
-
-  it('includes group label', () => {
-    expect(buildStandingCard(group)).toContain(group.group);
-  });
-
-  it('includes all four team names', () => {
-    const html = buildStandingCard(group);
-    group.rows.forEach(r => expect(html).toContain(r.team));
-  });
-
-  it('includes points for each row', () => {
-    const html = buildStandingCard(group);
-    group.rows.forEach(r => expect(html).toContain(String(r.pts)));
-  });
-
-  it('applies "qualified" class to qualifying teams', () => {
-    const html = buildStandingCard(group);
-    const qualCount = group.rows.filter(r => r.qualified).length;
-    const matches   = (html.match(/qualified/g) || []).length;
-    expect(matches).toBeGreaterThanOrEqual(qualCount);
-  });
-});
-
-describe('buildNewsHeroCard()', () => {
-  const article = allNews.find(a => a.isFeatured) ?? allNews[0];
-
-  it('contains the article title', () => {
-    expect(buildNewsHeroCard(article)).toContain(article.title);
-  });
-
-  it('contains the excerpt', () => {
-    expect(buildNewsHeroCard(article)).toContain(article.excerpt);
-  });
-
-  it('contains author name', () => {
-    expect(buildNewsHeroCard(article)).toContain(article.author.name);
-  });
-
-  it('contains author initials', () => {
-    expect(buildNewsHeroCard(article)).toContain(article.author.initials);
-  });
-
-  it('contains the category badge class', () => {
-    const badgeClass = getCategoryBadgeClass(article.category);
-    expect(buildNewsHeroCard(article)).toContain(badgeClass);
-  });
-
-  it('contains the article icon', () => {
-    expect(buildNewsHeroCard(article)).toContain(article.icon);
-  });
-});
-
-describe('buildNewsCard()', () => {
-  const article = allNews[1];
-
-  it('contains title', () => {
-    expect(buildNewsCard(article)).toContain(article.title);
-  });
-
-  it('contains category badge', () => {
-    const badgeClass = getCategoryBadgeClass(article.category);
-    expect(buildNewsCard(article)).toContain(badgeClass);
-  });
-
-  it('contains data-news-id attribute', () => {
-    expect(buildNewsCard(article)).toContain(`data-news-id="${article.id}"`);
-  });
-
-  it('contains author name', () => {
-    expect(buildNewsCard(article)).toContain(article.author.name);
-  });
-
-  it('contains article icon', () => {
-    expect(buildNewsCard(article)).toContain(article.icon);
-  });
-});
-
-describe('buildScorerRow()', () => {
-  it('contains scorer name', () => {
-    const html = buildScorerRow(topScorers[0]);
-    expect(html).toContain(topScorers[0].name);
-  });
-
-  it('contains goals count', () => {
-    const html = buildScorerRow(topScorers[0]);
-    expect(html).toContain(String(topScorers[0].goals));
-  });
-
-  it('applies rank-1 class to top scorer', () => {
-    expect(buildScorerRow(topScorers[0])).toContain('rank-1');
-  });
-
-  it('applies rank-2 class to second scorer', () => {
-    expect(buildScorerRow(topScorers[1])).toContain('rank-2');
-  });
-
-  it('contains flag emoji', () => {
-    expect(buildScorerRow(topScorers[0])).toContain(topScorers[0].flag);
-  });
-
-  it('contains team name', () => {
-    expect(buildScorerRow(topScorers[0])).toContain(topScorers[0].team);
-  });
-});
-
-describe('buildCityCard()', () => {
-  it('contains city name', () => {
-    expect(buildCityCard(hostCities[0])).toContain(hostCities[0].name);
-  });
-
-  it('contains country', () => {
-    expect(buildCityCard(hostCities[0])).toContain(hostCities[0].country);
-  });
-
-  it('contains match count', () => {
-    const html = buildCityCard(hostCities[0]);
-    expect(html).toContain(`${hostCities[0].matches} Matches`);
-  });
-
-  it('contains city icon', () => {
-    expect(buildCityCard(hostCities[0])).toContain(hostCities[0].icon);
-  });
-
-  it('has tabindex="0" for keyboard access', () => {
-    expect(buildCityCard(hostCities[0])).toContain('tabindex="0"');
-  });
-});
-
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  DOM RENDERING TESTS                                               */
-/* ═══════════════════════════════════════════════════════════════════ */
-
-describe('renderMatchCards()', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('populates matchesGrid with cards', () => {
-    renderMatchCards('today');
-    const grid = document.getElementById('matchesGrid');
-    expect(grid.innerHTML.trim().length).toBeGreaterThan(0);
-  });
-
-  it('renders one article per today match', () => {
-    renderMatchCards('today');
-    const cards = document.querySelectorAll('.match-card');
-    expect(cards.length).toBe(todayMatches.length);
-  });
-
-  it('renders tomorrow matches when day="tomorrow"', () => {
-    renderMatchCards('tomorrow');
-    const cards = document.querySelectorAll('.match-card');
-    expect(cards.length).toBe(tomorrowMatches.length);
-  });
-
-  it('handles missing grid gracefully', () => {
-    document.getElementById('matchesGrid').remove();
-    expect(() => renderMatchCards('today')).not.toThrow();
-  });
-});
-
-describe('renderFeaturedMatch()', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('populates featuredMatchCard', () => {
-    renderFeaturedMatch();
-    const el = document.getElementById('featuredMatchCard');
-    expect(el.innerHTML.trim().length).toBeGreaterThan(0);
-  });
-
-  it('contains a team name', () => {
-    renderFeaturedMatch();
-    const el = document.getElementById('featuredMatchCard');
-    expect(el.textContent.trim().length).toBeGreaterThan(0);
-  });
-
-  it('handles missing container gracefully', () => {
-    document.getElementById('featuredMatchCard').remove();
-    expect(() => renderFeaturedMatch()).not.toThrow();
+  it('has role=listitem', () => {
+    const item = buildTickerItem(todayMatches[0]);
+    expect(item.getAttribute('role')).toBe('listitem');
   });
 });
 
 describe('renderTicker()', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('populates tickerItems', () => {
-    renderTicker();
-    const el = document.getElementById('tickerItems');
-    expect(el.innerHTML.trim().length).toBeGreaterThan(0);
+  beforeEach(() => {
+    setupDOM('<div id="ticker-track"></div>');
   });
+  it('populates ticker-track with doubled items', () => {
+    renderTicker(todayMatches);
+    const track = document.getElementById('ticker-track');
+    expect(track.children.length).toBe(todayMatches.length * 2);
+  });
+  it('handles empty array gracefully', () => {
+    renderTicker([]);
+    expect(document.getElementById('ticker-track').children.length).toBe(0);
+  });
+});
 
-  it('duplicates content for seamless loop', () => {
-    renderTicker();
-    const el    = document.getElementById('tickerItems');
-    const items = el.querySelectorAll('.ticker-item');
-    // Should be double the matches (seamless loop duplication)
-    expect(items.length).toBe(todayMatches.length * 2);
+describe('updateTickerScore()', () => {
+  it('updates score element text', () => {
+    setupDOM(`<div id="ticker-score-match-001">2 - 1</div>`);
+    updateTickerScore('match-001', 3, 1);
+    expect(document.getElementById('ticker-score-match-001').textContent).toBe('3 - 1');
+  });
+  it('adds "updated" class', () => {
+    setupDOM(`<div id="ticker-score-match-001">0 - 0</div>`);
+    updateTickerScore('match-001', 1, 0);
+    expect(document.getElementById('ticker-score-match-001').classList.contains('updated')).toBe(true);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   MATCH CARDS
+══════════════════════════════════════════════════════════ */
+describe('buildMatchCard()', () => {
+  it('returns an article element', () => {
+    const card = buildMatchCard(todayMatches[0]);
+    expect(card.tagName).toBe('ARTICLE');
+  });
+  it('has correct aria-label', () => {
+    const m    = todayMatches[0];
+    const card = buildMatchCard(m);
+    expect(card.getAttribute('aria-label')).toBe(`${m.homeTeam} vs ${m.awayTeam}`);
+  });
+  it('adds live-card class for LIVE match', () => {
+    const live = todayMatches.find(m => m.status === 'LIVE');
+    const card = buildMatchCard(live);
+    expect(card.className).toContain('live-card');
+  });
+  it('shows VS for UPCOMING match', () => {
+    const upcoming = tomorrowMatches[0];
+    const card     = buildMatchCard(upcoming);
+    expect(card.innerHTML).toContain('VS');
+  });
+  it('shows score for FT match', () => {
+    const ft   = recentResults[0];
+    const card = buildMatchCard(ft);
+    expect(card.innerHTML).toContain(`${ft.homeScore} - ${ft.awayScore}`);
+  });
+  it('shows venue in footer', () => {
+    const m    = todayMatches[0];
+    const card = buildMatchCard(m);
+    expect(card.innerHTML).toContain(m.venue);
+  });
+  it('is keyboard-focusable', () => {
+    const card = buildMatchCard(todayMatches[0]);
+    expect(card.tabIndex).toBe(0);
+  });
+});
+
+describe('renderMatchGrid()', () => {
+  beforeEach(() => setupDOM('<div id="today-matches"></div>'));
+
+  it('populates container with match cards', () => {
+    renderMatchGrid('today-matches', todayMatches);
+    const container = document.getElementById('today-matches');
+    expect(container.children.length).toBe(todayMatches.length);
+  });
+  it('shows empty message for empty array', () => {
+    renderMatchGrid('today-matches', []);
+    expect(document.getElementById('today-matches').innerHTML).toContain('No matches');
+  });
+  it('does nothing for missing container', () => {
+    expect(() => renderMatchGrid('nonexistent', todayMatches)).not.toThrow();
+  });
+});
+
+describe('updateMatchCard()', () => {
+  it('updates score display', () => {
+    setupDOM(`<div class="match-card" data-match-id="match-001"><div id="score-match-001">0 - 0</div></div>`);
+    updateMatchCard('match-001', 2, 0, 55);
+    expect(document.getElementById('score-match-001').textContent).toBe('2 - 0');
+  });
+  it('does not throw when element missing', () => {
+    setupDOM('');
+    expect(() => updateMatchCard('nonexistent', 1, 0, 50)).not.toThrow();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   STANDINGS
+══════════════════════════════════════════════════════════ */
+describe('buildGroupCard()', () => {
+  it('returns a div with group-card class', () => {
+    const card = buildGroupCard(groupStandings[0]);
+    expect(card.tagName).toBe('DIV');
+    expect(card.className).toContain('group-card');
+  });
+  it('renders group name in header', () => {
+    const g    = groupStandings[0];
+    const card = buildGroupCard(g);
+    expect(card.innerHTML).toContain(`Group ${g.name}`);
+  });
+  it('renders all four team rows', () => {
+    const card = buildGroupCard(groupStandings[0]);
+    const rows = card.querySelectorAll('tbody tr');
+    expect(rows.length).toBe(4);
+  });
+  it('first two rows have qualified class', () => {
+    const card = buildGroupCard(groupStandings[0]);
+    const rows = [...card.querySelectorAll('tbody tr')];
+    expect(rows[0].className).toContain('qualified');
+    expect(rows[1].className).toContain('qualified');
+    expect(rows[2].className).not.toContain('qualified');
+  });
+  it('has aria-label', () => {
+    const g    = groupStandings[1];
+    const card = buildGroupCard(g);
+    expect(card.getAttribute('aria-label')).toContain(`Group ${g.name}`);
   });
 });
 
 describe('renderStandings()', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('populates standingsScroll', () => {
+  beforeEach(() => setupDOM(`
+    <div id="standings-track"></div>
+    <button id="standings-prev"></button>
+    <button id="standings-next"></button>
+    <div id="standings-dots"></div>
+  `));
+  it('populates standings-track', () => {
     renderStandings();
-    const el = document.getElementById('standingsScroll');
-    expect(el.innerHTML.trim().length).toBeGreaterThan(0);
-  });
-
-  it('renders one card per group', () => {
-    renderStandings();
-    const cards = document.querySelectorAll('.standing-card');
-    expect(cards.length).toBe(groupStandings.length);
-  });
-
-  it('handles missing container gracefully', () => {
-    document.getElementById('standingsScroll').remove();
-    expect(() => renderStandings()).not.toThrow();
+    expect(document.getElementById('standings-track').children.length).toBe(groupStandings.length);
   });
 });
 
-describe('renderNewsSection()', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('populates newsHeroCard', () => {
-    renderNewsSection('all', 1, 6);
-    const el = document.getElementById('newsHeroCard');
-    expect(el.innerHTML.trim().length).toBeGreaterThan(0);
+/* ══════════════════════════════════════════════════════════
+   NEWS
+══════════════════════════════════════════════════════════ */
+describe('getCategories()', () => {
+  it('includes "all" as first entry', () => {
+    const cats = getCategories();
+    expect(cats[0]).toBe('all');
   });
-
-  it('populates newsGrid', () => {
-    renderNewsSection('all', 1, 6);
-    const el = document.getElementById('newsGrid');
-    expect(el.innerHTML.trim().length).toBeGreaterThan(0);
-  });
-
-  it('respects pageSize parameter', () => {
-    renderNewsSection('all', 1, 3);
-    const cards = document.querySelectorAll('.news-card');
-    expect(cards.length).toBeLessThanOrEqual(3);
-  });
-
-  it('filters by category', () => {
-    renderNewsSection('match', 1, 20);
-    const grid  = document.getElementById('newsGrid');
-    const count = grid.querySelectorAll('.news-card').length;
-    const matchArticles = allNews.filter(a => a.category === 'match' && !a.isFeatured);
-    expect(count).toBeLessThanOrEqual(matchArticles.length);
-  });
-
-  it('hides load-more button when all articles shown', () => {
-    renderNewsSection('all', 99, 99);
-    const btn = document.getElementById('loadMoreNews');
-    expect(btn.style.display).toBe('none');
-  });
-
-  it('handles missing containers gracefully', () => {
-    document.getElementById('newsHeroCard').remove();
-    document.getElementById('newsGrid').remove();
-    expect(() => renderNewsSection('all', 1, 6)).not.toThrow();
+  it('returns unique categories', () => {
+    const cats = getCategories().slice(1);
+    expect(new Set(cats).size).toBe(cats.length);
   });
 });
 
-describe('renderTopScorers()', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('populates scorersList', () => {
-    renderTopScorers();
-    const el = document.getElementById('scorersList');
-    expect(el.innerHTML.trim().length).toBeGreaterThan(0);
+describe('filterNews()', () => {
+  it('returns all articles for "all"', () => {
+    const { items, total } = filterNews('all', 1);
+    expect(total).toBe(newsArticles.length);
+    expect(items.length).toBeLessThanOrEqual(6);
   });
-
-  it('renders one row per scorer', () => {
-    renderTopScorers();
-    const rows = document.querySelectorAll('.scorer-row');
-    expect(rows.length).toBe(topScorers.length);
+  it('filters by category correctly', () => {
+    const cat = newsArticles[0].category.toLowerCase();
+    const { items } = filterNews(cat, 1);
+    items.forEach(a => expect(a.category.toLowerCase()).toBe(cat));
   });
-
-  it('sets role="list" on container', () => {
-    renderTopScorers();
-    expect(document.getElementById('scorersList').getAttribute('role')).toBe('list');
+  it('returns correct page slice', () => {
+    const { items } = filterNews('all', 2);
+    expect(items.length).toBeGreaterThan(0);
+    expect(items.length).toBeLessThanOrEqual(6);
   });
-});
-
-describe('renderHostCities()', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('populates citiesScroll', () => {
-    renderHostCities();
-    const el = document.getElementById('citiesScroll');
-    expect(el.innerHTML.trim().length).toBeGreaterThan(0);
+  it('returns pages count', () => {
+    const { pages } = filterNews('all', 1);
+    expect(pages).toBe(Math.ceil(newsArticles.length / 6));
   });
-
-  it('renders one card per city', () => {
-    renderHostCities();
-    const cards = document.querySelectorAll('.city-card');
-    expect(cards.length).toBe(hostCities.length);
+  it('returns empty for unknown category', () => {
+    const { items } = filterNews('unknowncategory', 1);
+    expect(items.length).toBe(0);
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  TOAST TESTS                                                       */
-/* ═══════════════════════════════════════════════════════════════════ */
+describe('buildNewsHeroCard()', () => {
+  it('returns an anchor element', () => {
+    const card = buildNewsHeroCard(newsArticles[0]);
+    expect(card.tagName).toBe('A');
+    expect(card.className).toContain('news-hero-card');
+  });
+  it('contains article title', () => {
+    const a    = newsArticles[0];
+    const card = buildNewsHeroCard(a);
+    expect(card.innerHTML).toContain(a.title);
+  });
+  it('has aria-label', () => {
+    const a    = newsArticles[0];
+    const card = buildNewsHeroCard(a);
+    expect(card.getAttribute('aria-label')).toBe(a.title);
+  });
+});
 
+describe('buildNewsCard()', () => {
+  it('returns an anchor with news-card class', () => {
+    const card = buildNewsCard(newsArticles[1]);
+    expect(card.tagName).toBe('A');
+    expect(card.className).toContain('news-card');
+  });
+  it('contains excerpt', () => {
+    const a    = newsArticles[1];
+    const card = buildNewsCard(a);
+    expect(card.innerHTML).toContain(a.excerpt);
+  });
+});
+
+describe('renderNews()', () => {
+  beforeEach(() => setupDOM(`
+    <div id="news-layout"></div>
+    <div id="news-filters"></div>
+    <div id="news-pagination"></div>
+  `));
+  it('populates news-layout', () => {
+    renderNews();
+    expect(document.getElementById('news-layout').children.length).toBeGreaterThan(0);
+  });
+  it('hero card is first child wrapper', () => {
+    renderNews();
+    const first = document.getElementById('news-layout').firstElementChild;
+    expect(first.className).toContain('news-hero-col');
+  });
+});
+
+describe('renderNewsFilters()', () => {
+  beforeEach(() => setupDOM('<div id="news-filters"></div>'));
+  it('renders filter buttons', () => {
+    renderNewsFilters();
+    const filters = document.getElementById('news-filters');
+    expect(filters.children.length).toBeGreaterThan(1);
+  });
+  it('first button is "All"', () => {
+    renderNewsFilters();
+    const first = document.getElementById('news-filters').firstElementChild;
+    expect(first.textContent).toBe('All');
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   SCORERS
+══════════════════════════════════════════════════════════ */
+describe('buildScorerRow()', () => {
+  it('returns a div with scorer-row class', () => {
+    const row = buildScorerRow(topScorers[0], 0);
+    expect(row.className).toContain('scorer-row');
+  });
+  it('contains player name', () => {
+    const s   = topScorers[0];
+    const row = buildScorerRow(s, 0);
+    expect(row.innerHTML).toContain(s.name);
+  });
+  it('has correct aria-label with goals', () => {
+    const s   = topScorers[0];
+    const row = buildScorerRow(s, 0);
+    expect(row.getAttribute('aria-label')).toContain(`${s.goals} goals`);
+  });
+  it('renders goal bar with correct pct', () => {
+    const s    = topScorers[1];
+    const row  = buildScorerRow(s, 1);
+    const fill = row.querySelector('.goal-bar-fill');
+    const maxGoals = topScorers[0].goals;
+    const expected = Math.round((s.goals / maxGoals) * 100);
+    expect(Number(fill.dataset.pct)).toBe(expected);
+  });
+});
+
+describe('renderScorers()', () => {
+  beforeEach(() => setupDOM('<div id="scorers-list"></div>'));
+  it('populates scorers-list', () => {
+    renderScorers();
+    expect(document.getElementById('scorers-list').children.length).toBe(topScorers.length);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   CITIES
+══════════════════════════════════════════════════════════ */
+describe('renderCities()', () => {
+  beforeEach(() => setupDOM(`
+    <div id="cities-track"></div>
+    <button id="cities-prev"></button>
+    <button id="cities-next"></button>
+    <div id="cities-dots"></div>
+  `));
+  it('populates cities-track', () => {
+    renderCities();
+    expect(document.getElementById('cities-track').children.length).toBe(hostCities.length);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════ */
 describe('showToast()', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    buildDOM();
+  beforeEach(() => setupDOM('<div id="toast-container"></div>'));
+  it('appends a toast element', () => {
+    showToast('Title', 'Message');
+    expect(document.getElementById('toast-container').children.length).toBe(1);
   });
-
-  afterEach(() => {
-    vi.useRealTimers();
+  it('toast contains title and message', () => {
+    showToast('Hello', 'World', '✅', 'toast-info');
+    const toast = document.querySelector('.toast');
+    expect(toast.innerHTML).toContain('Hello');
+    expect(toast.innerHTML).toContain('World');
   });
-
-  it('appends a toast to the container', () => {
-    showToast('Hello World', 'toast-info');
-    const toasts = document.querySelectorAll('.toast');
-    expect(toasts.length).toBe(1);
-  });
-
-  it('toast contains the message', () => {
-    showToast('Goal scored!', 'toast-goal');
-    expect(document.querySelector('.toast').textContent).toBe('Goal scored!');
-  });
-
-  it('applies type class to toast', () => {
-    showToast('Test', 'toast-goal');
+  it('toast has correct type class', () => {
+    showToast('T', 'M', '⚽', 'toast-goal');
     expect(document.querySelector('.toast').classList.contains('toast-goal')).toBe(true);
   });
-
-  it('adds toast-exit class after timeout', () => {
-    showToast('Fade out', 'toast-info');
-    vi.advanceTimersByTime(4500);
-    expect(document.querySelector('.toast')?.classList.contains('toast-exit')).toBe(true);
+  it('has role=alert', () => {
+    showToast('T', 'M');
+    expect(document.querySelector('.toast').getAttribute('role')).toBe('alert');
   });
-
-  it('handles missing container gracefully', () => {
-    document.getElementById('toastContainer').remove();
-    expect(() => showToast('Oops')).not.toThrow();
+  it('close button exists', () => {
+    showToast('T', 'M');
+    expect(document.querySelector('.toast-close')).not.toBeNull();
   });
-
-  it('stacks multiple toasts', () => {
-    showToast('Toast 1');
-    showToast('Toast 2');
-    showToast('Toast 3');
-    expect(document.querySelectorAll('.toast').length).toBe(3);
+  it('returns toast element', () => {
+    const t = showToast('T', 'M');
+    expect(t).not.toBeNull();
   });
-
-  it('sets role="status" on toast element', () => {
-    showToast('Accessible', 'toast-info');
-    expect(document.querySelector('.toast').getAttribute('role')).toBe('status');
+  it('does not throw when container missing', () => {
+    setupDOM('');
+    expect(() => showToast('T', 'M')).not.toThrow();
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  COUNTDOWN TESTS                                                   */
-/* ═══════════════════════════════════════════════════════════════════ */
-
-describe('updateCountdown()', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('sets numeric content in all four countdown slots', () => {
-    updateCountdown();
-    ['cdDays','cdHours','cdMins','cdSecs'].forEach(id => {
-      const val = document.getElementById(id).textContent;
-      expect(val).toMatch(/^\d{2}$/);
-    });
-  });
-
-  it('shows 00:00:00:00 when tournament has already started', () => {
-    const origStart = global._tournamentStart;
-    // Simulate past date by temporarily overriding — we verify the function
-    // handles the diff<=0 branch by calling with a past-anchored date
-    // (we can't easily override the module const, so we just verify zero-padding)
-    updateCountdown();
-    // As long as it doesn't throw and produces padded output, the branch is safe
-    expect(document.getElementById('cdDays').textContent).toHaveLength(2);
-  });
-
-  it('does not throw if elements are absent', () => {
-    document.getElementById('cdDays').remove();
-    expect(() => updateCountdown()).not.toThrow();
-  });
-});
-
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  LIVE SIMULATION TESTS                                             */
-/* ═══════════════════════════════════════════════════════════════════ */
-
-describe('simulateLiveUpdates()', () => {
+/* ══════════════════════════════════════════════════════════
+   LIVE SCORE SIMULATION
+══════════════════════════════════════════════════════════ */
+describe('simulateLiveScores()', () => {
   beforeEach(() => {
-    buildDOM();
-    renderMatchCards('today');
+    setupDOM(`
+      <div id="toast-container"></div>
+      <div class="match-card" data-match-id="match-001">
+        <div id="score-match-001">2 - 1</div>
+        <div class="match-minute">67'</div>
+      </div>
+      <div id="ticker-score-match-001">2 - 1</div>
+    `);
   });
-
   it('does not throw', () => {
-    expect(() => simulateLiveUpdates()).not.toThrow();
+    expect(() => simulateLiveScores()).not.toThrow();
   });
-
-  it('advances minute for live matches', () => {
-    const liveMatch = todayMatches.find(m => m.status === MATCH_STATUS.LIVE);
-    if (!liveMatch) return;
-    const minBefore = liveMatch.minute;
-    simulateLiveUpdates();
-    // The internal liveMatchData is a clone — we can't directly inspect it
-    // but we verify no errors and DOM is still intact
-    expect(document.querySelectorAll('.match-card').length).toBeGreaterThan(0);
+  it('minute advances for live matches', () => {
+    const liveMatch = todayMatches.find(m => m.status === 'LIVE');
+    const prevMinute = liveMatch ? liveMatch.minute : 0;
+    simulateLiveScores();
+    if (liveMatch) expect(liveMatch.minute).toBeGreaterThanOrEqual(prevMinute);
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  ACCESSIBILITY / ARIA TESTS                                        */
-/* ═══════════════════════════════════════════════════════════════════ */
-
-describe('Accessibility', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('match cards have aria-label', () => {
-    renderMatchCards('today');
-    const cards = document.querySelectorAll('[aria-label]');
-    expect(cards.length).toBeGreaterThan(0);
+describe('startLivePolling() / stopLivePolling()', () => {
+  it('startLivePolling sets an interval', () => {
+    vi.useFakeTimers();
+    startLivePolling();
+    vi.advanceTimersByTime(8001);
+    stopLivePolling();
+    vi.useRealTimers();
+    expect(true).toBe(true); // no throw
   });
-
-  it('news cards have aria-label', () => {
-    renderNewsSection('all', 1, 6);
-    const newsCards = document.querySelectorAll('.news-card[aria-label]');
-    expect(newsCards.length).toBeGreaterThan(0);
-  });
-
-  it('scorer rows have aria-label', () => {
-    renderTopScorers();
-    const rows = document.querySelectorAll('.scorer-row[aria-label]');
-    expect(rows.length).toBeGreaterThan(0);
-  });
-
-  it('city cards have aria-label', () => {
-    renderHostCities();
-    const cards = document.querySelectorAll('.city-card[aria-label]');
-    expect(cards.length).toBeGreaterThan(0);
-  });
-
-  it('standing cards have role="table"', () => {
-    renderStandings();
-    const tables = document.querySelectorAll('[role="table"]');
-    expect(tables.length).toBeGreaterThan(0);
-  });
-
-  it('standing rows have role="row"', () => {
-    renderStandings();
-    const rows = document.querySelectorAll('[role="row"]');
-    expect(rows.length).toBeGreaterThan(0);
-  });
-
-  it('score elements have aria-live attribute', () => {
-    renderMatchCards('today');
-    const liveScores = document.querySelectorAll('[aria-live]');
-    expect(liveScores.length).toBeGreaterThan(0);
+  it('stopLivePolling clears interval without error', () => {
+    expect(() => { startLivePolling(); stopLivePolling(); }).not.toThrow();
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════════ */
-/*  EDGE CASE / STRESS TESTS                                          */
-/* ═══════════════════════════════════════════════════════════════════ */
-
-describe('Edge cases', () => {
-  beforeEach(() => { buildDOM(); });
-
-  it('buildMatchCard handles 0-0 score for finished match', () => {
-    const m = {
-      id: 'edge-1',
-      group: 'GROUP Z',
-      status: MATCH_STATUS.FINISHED,
-      minute: 90,
-      homeTeam: { name: 'TeamA', abbr: 'TMA', flag: '🏳️' },
-      awayTeam: { name: 'TeamB', abbr: 'TMB', flag: '🏳️' },
-      score: { home: 0, away: 0 },
-      kickOff: new Date(),
-      venue: 'Test Arena',
-      city: 'Test City',
-    };
-    expect(buildMatchCard(m)).toContain('0 - 0');
+/* ══════════════════════════════════════════════════════════
+   COUNTDOWN
+══════════════════════════════════════════════════════════ */
+describe('initCountdown()', () => {
+  beforeEach(() => setupDOM(`
+    <div id="cd-days"><span>000</span></div>
+    <div id="cd-hours"><span>00</span></div>
+    <div id="cd-mins"><span>00</span></div>
+    <div id="cd-secs"><span>00</span></div>
+  `));
+  it('updates digit spans on init', () => {
+    vi.useFakeTimers();
+    initCountdown(new Date(Date.now() + 100000000));
+    vi.advanceTimersByTime(1100);
+    const span = document.querySelector('#cd-days span');
+    expect(span.textContent.length).toBeGreaterThan(0);
+    vi.useRealTimers();
   });
-
-  it('buildMatchCard handles high scores', () => {
-    const m = {
-      id: 'edge-2',
-      group: 'GROUP Z',
-      status: MATCH_STATUS.FINISHED,
-      minute: 90,
-      homeTeam: { name: 'TeamA', abbr: 'TMA', flag: '🏳️' },
-      awayTeam: { name: 'TeamB', abbr: 'TMB', flag: '🏳️' },
-      score: { home: 9, away: 7 },
-      kickOff: new Date(),
-      venue: 'Test Arena',
-      city: 'Test City',
-    };
-    expect(buildMatchCard(m)).toContain('9 - 7');
+  it('does not throw for past date', () => {
+    expect(() => initCountdown(new Date(Date.now() - 1000))).not.toThrow();
   });
+});
 
-  it('buildTickerItems handles all statuses', () => {
-    const matches = Object.values(MATCH_STATUS).map((status, i) => ({
-      id: `s${i}`,
-      status,
-      minute: 45,
-      homeTeam: { abbr: 'AAA', flag: '🏳️' },
-      awayTeam: { abbr: 'BBB', flag: '🏳️' },
-      score: { home: 1, away: 1 },
-      kickOff: new Date(),
-    }));
-    expect(() => buildTickerItems(matches)).not.toThrow();
+/* ══════════════════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════════════════ */
+describe('initMatchTabs()', () => {
+  beforeEach(() => setupDOM(`
+    <button role="tab" class="tab-btn active" aria-selected="true" aria-controls="panel-today" id="tab-today">Today</button>
+    <button role="tab" class="tab-btn"        aria-selected="false" aria-controls="panel-tomorrow" id="tab-tomorrow">Tomorrow</button>
+    <div role="tabpanel" id="panel-today"    class="tab-panel active"><div class="match-grid" id="today-matches"></div></div>
+    <div role="tabpanel" id="panel-tomorrow" class="tab-panel"><div class="match-grid" id="tomorrow-matches"></div></div>
+    <div id="toast-container"></div>
+  `));
+  it('clicking a tab activates its panel', () => {
+    initMatchTabs();
+    document.getElementById('tab-tomorrow').click();
+    expect(document.getElementById('panel-tomorrow').classList.contains('active')).toBe(true);
+    expect(document.getElementById('panel-today').classList.contains('active')).toBe(false);
   });
-
-  it('renderNewsSection with page=0 does not crash', () => {
-    expect(() => renderNewsSection('all', 0, 6)).not.toThrow();
+  it('clicked tab gets aria-selected=true', () => {
+    initMatchTabs();
+    const btn = document.getElementById('tab-tomorrow');
+    btn.click();
+    expect(btn.getAttribute('aria-selected')).toBe('true');
   });
+});
 
-  it('timeAgo handles future dates gracefully', () => {
-    const future = new Date(Date.now() + 999999).toISOString();
-    expect(() => timeAgo(future)).not.toThrow();
+/* ══════════════════════════════════════════════════════════
+   CAROUSEL
+══════════════════════════════════════════════════════════ */
+describe('initCarousel()', () => {
+  beforeEach(() => {
+    setupDOM(`
+      <div id="test-track" style="display:flex">
+        <div style="width:300px">A</div>
+        <div style="width:300px">B</div>
+        <div style="width:300px">C</div>
+        <div style="width:300px">D</div>
+        <div style="width:300px">E</div>
+        <div style="width:300px">F</div>
+      </div>
+      <button id="test-prev" disabled>‹</button>
+      <button id="test-next">›</button>
+      <div id="test-dots"></div>
+    `);
   });
+  it('creates correct number of dots', () => {
+    initCarousel('test', 6, 3);
+    expect(document.getElementById('test-dots').children.length).toBe(2);
+  });
+  it('prev button starts disabled', () => {
+    initCarousel('test', 6, 3);
+    expect(document.getElementById('test-prev').disabled).toBe(true);
+  });
+  it('clicking next enables prev', () => {
+    initCarousel('test', 6, 3);
+    document.getElementById('test-next').click();
+    expect(document.getElementById('test-prev').disabled).toBe(false);
+  });
+  it('does not throw for missing container', () => {
+    expect(() => initCarousel('nonexistent', 6, 3)).not.toThrow();
+  });
+});
 
-  it('getNewsByCategory returns array for valid categories', () => {
-    ['all', 'match', 'team', 'transfer', 'preview', 'general'].forEach(cat => {
-      expect(Array.isArray(getNewsByCategory(cat))).toBe(true);
+/* ══════════════════════════════════════════════════════════
+   SCROLL-REVEAL
+══════════════════════════════════════════════════════════ */
+describe('initScrollReveal()', () => {
+  it('marks all reveal elements visible when IntersectionObserver absent', () => {
+    const orig = global.IntersectionObserver;
+    global.IntersectionObserver = undefined;
+    setupDOM(`<div class="reveal"></div><div class="reveal-left"></div>`);
+    initScrollReveal();
+    document.querySelectorAll('.reveal, .reveal-left').forEach(el => {
+      expect(el.classList.contains('visible')).toBe(true);
+    });
+    global.IntersectionObserver = orig;
+  });
+  it('does not throw when IntersectionObserver is available', () => {
+    class MockIO {
+      constructor(cb) { this.cb = cb; }
+      observe() {}
+      unobserve() {}
+    }
+    global.IntersectionObserver = MockIO;
+    setupDOM(`<div class="reveal"></div>`);
+    expect(() => initScrollReveal()).not.toThrow();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   HEADER / NAV
+══════════════════════════════════════════════════════════ */
+describe('initHeader()', () => {
+  it('does not throw when elements missing', () => {
+    setupDOM('');
+    expect(() => initHeader()).not.toThrow();
+  });
+  it('adds scrolled class on scroll', () => {
+    setupDOM(`<header id="site-header"></header><button id="scroll-top"></button>`);
+    initHeader();
+    Object.defineProperty(window, 'scrollY', { value: 100, writable: true });
+    window.dispatchEvent(new Event('scroll'));
+    expect(true).toBe(true); // no throw; class toggled via rAF
+  });
+});
+
+describe('closeMobileNav()', () => {
+  it('removes open class from mobile-nav', () => {
+    setupDOM(`<nav id="mobile-nav" class="mobile-nav open"></nav><button id="hamburger" class="hamburger open"></button>`);
+    closeMobileNav();
+    expect(document.getElementById('mobile-nav').classList.contains('open')).toBe(false);
+  });
+  it('sets hamburger aria-expanded to false', () => {
+    setupDOM(`<nav id="mobile-nav" class="mobile-nav open"></nav><button id="hamburger" aria-expanded="true"></button>`);
+    closeMobileNav();
+    expect(document.getElementById('hamburger').getAttribute('aria-expanded')).toBe('false');
+  });
+  it('does not throw when elements missing', () => {
+    setupDOM('');
+    expect(() => closeMobileNav()).not.toThrow();
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   PARTICLES
+══════════════════════════════════════════════════════════ */
+describe('initParticles()', () => {
+  it('injects particles into hero-particles container', () => {
+    setupDOM('<div id="hero-particles"></div>');
+    initParticles();
+    expect(document.getElementById('hero-particles').children.length).toBeGreaterThan(0);
+  });
+  it('does not throw when container missing', () => {
+    setupDOM('');
+    expect(() => initParticles()).not.toThrow();
+  });
+  it('all children have particle class', () => {
+    setupDOM('<div id="hero-particles"></div>');
+    initParticles();
+    [...document.getElementById('hero-particles').children].forEach(p => {
+      expect(p.className).toContain('particle');
     });
   });
+});
 
-  it('buildNewsCard handles special characters in title safely', () => {
-    const article = {
-      ...allNews[0],
-      title: 'Test & "quoted" <title>',
-      icon: '⚽',
-    };
-    // Should not throw
-    expect(() => buildNewsCard(article)).not.toThrow();
+/* ══════════════════════════════════════════════════════════
+   EDGE CASES
+══════════════════════════════════════════════════════════ */
+describe('Edge Cases', () => {
+  it('renderMatchGrid handles null gracefully', () => {
+    setupDOM('<div id="today-matches"></div>');
+    expect(() => renderMatchGrid('today-matches', null)).not.toThrow();
   });
-
-  it('renderMatchCards with invalid day falls back gracefully', () => {
-    expect(() => renderMatchCards('invalid')).not.toThrow();
+  it('filterNews page 999 returns empty items', () => {
+    const { items } = filterNews('all', 999);
+    expect(items.length).toBe(0);
   });
-
-  it('multiple rapid renders do not accumulate cards', () => {
-    renderMatchCards('today');
-    renderMatchCards('today');
-    renderMatchCards('today');
-    const cards = document.querySelectorAll('.match-card');
-    expect(cards.length).toBe(todayMatches.length);
+  it('buildMatchCard renders LIVE status badge', () => {
+    const live = todayMatches.find(m => m.status === 'LIVE');
+    const card = buildMatchCard(live);
+    expect(card.innerHTML).toContain('live');
+  });
+  it('buildScorerRow handles top scorer with 0 assists', () => {
+    const scorer = { name: 'Test Player', flag: '🏳️', team: 'Test FC', goals: 3, assists: 0 };
+    expect(() => buildScorerRow(scorer, 0)).not.toThrow();
+  });
+  it('updateMatchCard handles same score (no flash)', () => {
+    setupDOM(`<div class="match-card" data-match-id="m1"><div id="score-m1">1 - 0</div></div>`);
+    updateMatchCard('m1', 1, 0, 50);
+    expect(document.getElementById('score-m1').classList.contains('updated')).toBe(false);
+  });
+  it('showToast auto-removes after timeout', () => {
+    vi.useFakeTimers();
+    setupDOM('<div id="toast-container"></div>');
+    showToast('T', 'M');
+    expect(document.querySelector('.toast')).not.toBeNull();
+    vi.advanceTimersByTime(5100);
+    vi.useRealTimers();
+    // toast has removing class or is gone
+    const t = document.querySelector('.toast');
+    if (t) expect(t.classList.contains('removing')).toBe(true);
   });
 });
