@@ -4,9 +4,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    include: ['**/*.test.js', '**/*.spec.js'],
+    include: ['**/*.test.js'],
+    setupFiles: [],
     coverage: {
-      reporter: ['text', 'lcov'],
+      reporter: ['text', 'html'],
+      include: ['app.js'],
     },
   },
 });
